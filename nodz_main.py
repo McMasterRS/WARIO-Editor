@@ -89,12 +89,15 @@ class Nodz(QtWidgets.QGraphicsView):
         inFactor = 1.15
         outFactor = 1 / inFactor
 
-        if event.delta() > 0:
+        if event.angleDelta().y() > 0:
             zoomFactor = inFactor
         else:
             zoomFactor = outFactor
 
         self.scale(zoomFactor, zoomFactor)
+
+
+
         self.currentState = 'DEFAULT'
 
     def mousePressEvent(self, event):
@@ -103,6 +106,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         # Tablet zoom
+        '''
         if (event.button() == QtCore.Qt.RightButton and
             event.modifiers() == QtCore.Qt.AltModifier):
             self.currentState = 'ZOOM_VIEW'
@@ -110,10 +114,13 @@ class Nodz(QtWidgets.QGraphicsView):
             self.zoomInitialPos = event.pos()
             self.initMouse = QtGui.QCursor.pos()
             self.setInteractive(False)
-
+        '''
+        if (event.button() == QtCore.Qt.RightButton and
+            event.modifiers() == QtCore.Qt.AltModifier):
+            self.currentState = 'MENU'
 
         # Drag view
-        elif (event.button() == QtCore.Qt.MiddleButton and
+        if (event.button() == QtCore.Qt.MiddleButton and
               event.modifiers() == QtCore.Qt.AltModifier):
             self.currentState = 'DRAG_VIEW'
             self.prevPos = event.pos()
@@ -174,6 +181,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         # Zoom.
+        '''
         if self.currentState == 'ZOOM_VIEW':
             offset = self.zoomInitialPos.x() - event.pos().x()
 
@@ -208,9 +216,9 @@ class Nodz(QtWidgets.QGraphicsView):
 
             self.setTransformationAnchor(QtWidgets.QGraphicsView.NoAnchor)
             self.translate(diff.x(), diff.y())
-
+        '''
         # Drag canvas.
-        elif self.currentState == 'DRAG_VIEW':
+        if self.currentState == 'DRAG_VIEW':
             offset = self.prevPos - event.pos()
             self.prevPos = event.pos()
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() + offset.y())
