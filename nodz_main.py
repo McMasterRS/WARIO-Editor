@@ -1,6 +1,6 @@
 import os
 import json
-import six
+#import six
 import functools
 try:
     import networkx as nx
@@ -1573,6 +1573,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
         # Attributes.
         offset = 0
+
         for attr in self.attrs:
             nodzInst = self.scene().views()[0]
             config = nodzInst.config
@@ -1621,8 +1622,14 @@ class NodeItem(QtWidgets.QGraphicsItem):
                                      rect.top(),
                                      rect.width() - 2*self.radius,
                                      rect.height())
-            painter.drawText(textRect, QtCore.Qt.AlignVCenter, name)
-
+            if(self.attrsData[attr]['plug'] and self.attrsData[attr]['socket']):
+                painter.drawText(textRect, QtCore.Qt.AlignVCenter | QtCore.Qt.AlignCenter, name)
+            elif(self.attrsData[attr]['plug']):
+                painter.drawText(textRect, QtCore.Qt.AlignVCenter | QtCore.Qt.AlignRight, name)
+            elif(self.attrsData[attr]['socket']):
+                painter.drawText(textRect, QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft, name)
+            else:
+                painter.drawText(textRect, QtCore.Qt.AlignVCenter | QtCore.Qt.AlignCenter, name)
             offset += self.attrHeight
 
     def mousePressEvent(self, event):

@@ -125,6 +125,9 @@ nodz.createAttribute(node=nodeB, name='Integer', index=-1, preset='attr_preset_1
 # Node C
 nodeC = nodz.createNode(name='Adder', preset='node_preset_1')
 
+nodz.createAttribute(node=nodeC, name='TestA', index=-1, preset='attr_preset_1',
+                     plug=False, socket=False, dataType=int)
+
 nodz.createAttribute(node=nodeC, name='Integer A', index=-1, preset='attr_preset_1',
                      plug=False, socket=True, dataType=int)
 
@@ -133,6 +136,9 @@ nodz.createAttribute(node=nodeC, name='Integer B', index=-1, preset='attr_preset
 
 nodz.createAttribute(node=nodeC, name='Sum', index=-1, preset='attr_preset_1',
                      plug=True, socket=False, dataType=int)
+
+nodz.createAttribute(node=nodeC, name='TestB', index=-1, preset='attr_preset_1',
+                     plug=True, socket=True, dataType=int)
 
 nodeD = nodz.createNode(name='Output', preset='node_preset_1')
 
