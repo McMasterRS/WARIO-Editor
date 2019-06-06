@@ -11,6 +11,7 @@ nodz = nodz_main.Nodz(None)
 # nodz.loadConfig(filePath='')
 nodz.initialize()
 nodz.show()
+#nodz.gridVisToggle = False
 
 ######################################################################
 # Test signals
@@ -103,6 +104,65 @@ nodz.signal_GraphEvaluated.connect(on_graphEvaluated)
 
 nodz.signal_KeyPressed.connect(on_keyPressed)
 
+# Node A
+nodeA = nodz.createNode(name='nodeA', preset='node_preset_1', position=None)
+
+nodz.createAttribute(node=nodeA, name='Aattr1', index=-1, preset='attr_preset_1',
+                     plug=True, socket=False, dataType=str)
+
+nodz.createAttribute(node=nodeA, name='Aattr2', index=-1, preset='attr_preset_1',
+                     plug=False, socket=False, dataType=int)
+
+nodz.createAttribute(node=nodeA, name='Aattr3', index=-1, preset='attr_preset_2',
+                     plug=True, socket=True, dataType=int)
+
+nodz.createAttribute(node=nodeA, name='Aattr4', index=-1, preset='attr_preset_2',
+                     plug=True, socket=True, dataType=str)
+
+nodz.createAttribute(node=nodeA, name='Aattr5', index=-1, preset='attr_preset_3',
+                     plug=True, socket=True, dataType=dict)
+
+# Node B
+nodeB = nodz.createNode(name='nodeB', preset='node_preset_1')
+
+nodz.createAttribute(node=nodeB, name='Battr1', index=-1, preset='attr_preset_1',
+                     plug=True, socket=False, dataType=str)
+
+nodz.createAttribute(node=nodeB, name='Battr2', index=-1, preset='attr_preset_1',
+                     plug=True, socket=False, dataType=int)
+
+nodz.createAttribute(node=nodeB, name='Battr3', index=-1, preset='attr_preset_3',
+                     plug=True, socket=False, dataType=dict)
+
+# Node C
+nodeC = nodz.createNode(name='nodeC', preset='node_preset_1')
+
+nodz.createAttribute(node=nodeC, name='Cattr1', index=-1, preset='attr_preset_1',
+                     plug=False, socket=True, dataType=str)
+
+nodz.createAttribute(node=nodeC, name='Cattr2', index=-1, preset='attr_preset_1',
+                     plug=True, socket=False, dataType=int)
+
+nodz.createAttribute(node=nodeC, name='Cattr3', index=-1, preset='attr_preset_1',
+                     plug=True, socket=False, dataType=str)
+
+nodz.createAttribute(node=nodeC, name='Cattr4', index=-1, preset='attr_preset_2',
+                     plug=False, socket=True, dataType=str)
+
+nodz.createAttribute(node=nodeC, name='Cattr5', index=-1, preset='attr_preset_2',
+                     plug=False, socket=True, dataType=int)
+
+nodz.createAttribute(node=nodeC, name='Cattr6', index=-1, preset='attr_preset_3',
+                     plug=True, socket=False, dataType=str)
+
+nodz.createAttribute(node=nodeC, name='Cattr7', index=-1, preset='attr_preset_3',
+                     plug=True, socket=False, dataType=str)
+
+nodz.createAttribute(node=nodeC, name='Cattr8', index=-1, preset='attr_preset_3',
+                     plug=True, socket=False, dataType=int)
+
+nodz.createAttribute(node=nodeC, name='Cattr9', index=-1, preset='attr_preset_2',
+                     plug=False, socket=True, dataType=dict)
 
 if app:
     # command line stand alone test... run our own event loop

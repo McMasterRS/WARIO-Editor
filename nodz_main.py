@@ -1,7 +1,7 @@
 import os
 import json
 import six
-
+import functools
 try:
     import networkx as nx
     from networkx.readwrite import json_graph
@@ -115,9 +115,23 @@ class Nodz(QtWidgets.QGraphicsView):
             self.initMouse = QtGui.QCursor.pos()
             self.setInteractive(False)
         '''
-        if (event.button() == QtCore.Qt.RightButton and
-            event.modifiers() == QtCore.Qt.AltModifier):
+        if (event.button() == QtCore.Qt.RightButton ):
             self.currentState = 'MENU'
+            menu = QtWidgets.QMenu(self)
+
+            subMenu = menu.addMenu("File")
+            loadFromAction = subMenu.addAction("Open File...")
+            loadFromAction = subMenu.addAction("Save File...")
+            quitAction = menu.addAction("Quit")
+            subMenu = menu.addMenu("Nodes")
+            nodeTypes = ['alpha','beta','gamma']
+            for nt in nodeTypes:
+                action = subMenu.addAction('Create ' + nt, functools.partial(self.createNode,name=nt))
+                #action = subMenu.addAction('Create ' + nt)
+
+            xxxx = menu.exec_(event.globalPos())
+            #print(xxxx)
+            #super(Nodz, self).contextMenuEvent()
 
         # Drag view
         if (event.button() == QtCore.Qt.MiddleButton and
@@ -1206,6 +1220,10 @@ class NodeScene(QtWidgets.QGraphicsScene):
         Draw a grid in the background.
 
         """
+
+        background_brush = QtGui.QBrush( QtGui.QColor(0,0,0), QtCore.Qt.SolidPattern)
+        painter.fillRect(rect, background_brush)
+
         if self.views()[0].gridVisToggle:
             leftLine = rect.left() - rect.left() % self.gridSize
             topLine = rect.top() - rect.top() % self.gridSize
