@@ -1,7 +1,8 @@
 import os
 import json
-#import six
+import six
 import functools
+import sys
 try:
     import networkx as nx
     from networkx.readwrite import json_graph
@@ -120,9 +121,11 @@ class Nodz(QtWidgets.QGraphicsView):
             menu = QtWidgets.QMenu(self)
 
             subMenu = menu.addMenu("File")
-            loadFromAction = subMenu.addAction("Open File...")
-            loadFromAction = subMenu.addAction("Save File...")
-            quitAction = menu.addAction("Quit")
+            loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraph,filePath='./test.sav'))
+            saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraph,filePath='./test.sav'))
+            #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./testnx.sav'))
+            #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./testnx.sav'))
+            quitAction = menu.addAction("Quit", functools.partial(sys.exit))
             subMenu = menu.addMenu("Nodes")
             nodeTypes = ['alpha','beta','gamma']
             for nt in nodeTypes:
@@ -871,7 +874,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
     def executeGraph(self, filePath='path'):
         graph = self.getNetworkxGraph()
-        '''
+
         if nx is None:
             raise Exception("Failed to import networkx")
         graph = nx.MultiDiGraph()
@@ -896,7 +899,7 @@ class Nodz(QtWidgets.QGraphicsView):
         for edge in edges:
             (plugNode, plugAttr), (socketNode, socketAttr) = edge
             graph.add_edge(plugNode, socketNode, plug=plugAttr, socket=socketAttr)
-        '''
+
 
         commands = []
         for node in graph.nodes:
@@ -911,7 +914,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
     def saveGraphAsNetworkX(self, filePath='path'):
         graph = self.getNetworkxGraph()
-        '''
+
         if nx is None:
             raise Exception("Failed to import networkx")
         graph = nx.MultiDiGraph()
@@ -936,7 +939,7 @@ class Nodz(QtWidgets.QGraphicsView):
         for edge in edges:
             (plugNode, plugAttr), (socketNode, socketAttr) = edge
             graph.add_edge(plugNode, socketNode, plug=plugAttr, socket=socketAttr)
-        '''
+
 
         serialized = json_graph.node_link_data(graph)
         jsonized = json.dumps(serialized, indent=4)
