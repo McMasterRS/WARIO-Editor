@@ -3,6 +3,8 @@ import json
 import six
 import functools
 import sys
+import uuid
+
 try:
     import networkx as nx
     from networkx.readwrite import json_graph
@@ -547,12 +549,13 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         # Check for name clashes
+        nodeId = uuid.uuid4()
         if name in self.scene().nodes.keys():
             print('A node with the same name already exists : {0}'.format(name))
             print('Node creation aborted !')
             return
         else:
-            nodeItem = NodeItem(name=name, alternate=alternate, preset=preset,
+            nodeItem = NodeItem(nodeId=nodeId, name=name, alternate=alternate, preset=preset,
                                 config=self.config, extended_attributes=extended_attributes)
 
             # Store node in scene.
@@ -1303,7 +1306,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
     """
 
-    def __init__(self, name, alternate, preset, config, extended_attributes=None):
+    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None):
         """
         Initialize the class.
 
@@ -1325,6 +1328,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.setZValue(1)
 
         # Storage
+        self.nodeId = nodeId
         self.name = name
         self.alternate = alternate
         self.nodePreset = preset
