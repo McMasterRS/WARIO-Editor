@@ -117,6 +117,7 @@ class Nodz(QtWidgets.QGraphicsView):
             self.setInteractive(False)
         '''
         if (event.button() == QtCore.Qt.RightButton ):
+
             self.currentState = 'MENU'
             menu = QtWidgets.QMenu(self)
 
@@ -125,19 +126,22 @@ class Nodz(QtWidgets.QGraphicsView):
             saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraphDialog))
             #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./testnx.sav'))
             #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./testnx.sav'))
+            clearActuion = menu.addAction("Clear", functools.partial(self.clearGraph))
             quitAction = menu.addAction("Quit", functools.partial(sys.exit))
             subMenu = menu.addMenu("Nodes")
             nodeTypes = self.config['node_types']
             nodeAttr = dict()
             #print(nodeTypes)
             #nodeTypes = ['alpha','beta','gamma']
+
             for nt in nodeTypes:
                 nodeAttr[nt] = self.config['node_types'][nt]
-                action = subMenu.addAction('Create ' + nt, functools.partial(self.createNode,name=nt))
+                action = subMenu.addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos())))
                 #action = subMenu.addAction('Create ' + nt)
 
-            xxxx = menu.exec_(event.globalPos())
-            #print(xxxx)
+            menu.exec_(event.globalPos())
+
+
             #super(Nodz, self).contextMenuEvent()
 
         # Drag view
@@ -560,7 +564,8 @@ class Nodz(QtWidgets.QGraphicsView):
 
             # Set node position.
             self.scene().addItem(nodeItem)
-            nodeItem.setPos(position - nodeItem.nodeCenter)
+            #nodeItem.setPos(position - nodeItem.nodeCenter)
+            nodeItem.setPos(position)
 
             # Emit signal.
             self.signal_NodeCreated.emit(name)
@@ -917,6 +922,13 @@ class Nodz(QtWidgets.QGraphicsView):
     def buildNodeCommand(self, node):
         return 'aasdfa'
 
+    def newNode(self,name,attrs,position):
+        node = self.createNode(name=name,preset=attrs['preset'],position=position)
+
+        for attr in attrs['attributes']:
+            self.createAttribute(node,name=attr,index=attrs['attributes'][attr]['index'],preset=attrs['attributes'][attr]['preset'],plug=attrs['attributes'][attr]['plug'],socket=attrs['attributes'][attr]['socket'],dataType=attrs['attributes'][attr]['type'])
+
+
     def saveGraphAsNetworkX(self, filePath='path'):
         graph = self.getNetworkxGraph()
 
@@ -1170,11 +1182,19 @@ class Nodz(QtWidgets.QGraphicsView):
         Clear the graph.
 
         """
-        self.scene().clear()
-        self.scene().nodes = dict()
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Warning)
+        msg.setWindowTitle("Clear Diagram")
+        msg.setText("Are you sure?")
+        msg.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
+        msg.setDefaultButton(QtWidgets.QMessageBox.Cancel)
+        retval = msg.exec_()
+        if (retval == QtWidgets.QMessageBox.Ok):
+            self.scene().clear()
+            self.scene().nodes = dict()
 
-        # Emit signal.
-        self.signal_GraphCleared.emit()
+            # Emit signal.
+            self.signal_GraphCleared.emit()
 
     ##################################################################
     # END API
