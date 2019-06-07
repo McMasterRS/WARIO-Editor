@@ -104,42 +104,6 @@ nodz.signal_GraphEvaluated.connect(on_graphEvaluated)
 
 nodz.signal_KeyPressed.connect(on_keyPressed)
 
-# Node A
-nodeA = nodz.createNode(name='Source A', preset='node_preset_1', position=None)
-
-nodz.createAttribute(node=nodeA, name='Integer', index=-1, preset='attr_preset_1',
-                     plug=True, socket=False, dataType=int)
-
-
-
-# Node B
-nodeB = nodz.createNode(name='Source B', preset='node_preset_1')
-
-nodz.createAttribute(node=nodeB, name='Integer', index=-1, preset='attr_preset_1',
-                     plug=True, socket=False, dataType=int)
-
-
-
-
-
-# Node C
-nodeC = nodz.createNode(name='Adder', preset='node_preset_1')
-
-nodz.createAttribute(node=nodeC, name='Integer A', index=-1, preset='attr_preset_1',
-                     plug=False, socket=True, dataType=int)
-
-nodz.createAttribute(node=nodeC, name='Integer B', index=-1, preset='attr_preset_1',
-                     plug=False, socket=True, dataType=int)
-
-nodz.createAttribute(node=nodeC, name='Sum', index=-1, preset='attr_preset_1',
-                     plug=True, socket=False, dataType=int)
-
-
-nodeD = nodz.createNode(name='Output', preset='node_preset_1')
-
-nodz.createAttribute(node=nodeD, name='Integer', index=-1, preset='attr_preset_1',
-                     plug=False, socket=True, dataType=int)
-
 
 if app:
     # command line stand alone test... run our own event loop
