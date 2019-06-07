@@ -121,14 +121,18 @@ class Nodz(QtWidgets.QGraphicsView):
             menu = QtWidgets.QMenu(self)
 
             subMenu = menu.addMenu("File")
-            loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraph,filePath='./test.sav'))
-            saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraph,filePath='./test.sav'))
+            loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraphDialog))
+            saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraphDialog))
             #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./testnx.sav'))
             #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./testnx.sav'))
             quitAction = menu.addAction("Quit", functools.partial(sys.exit))
             subMenu = menu.addMenu("Nodes")
-            nodeTypes = ['alpha','beta','gamma']
+            nodeTypes = self.config['node_types']
+            nodeAttr = dict()
+            #print(nodeTypes)
+            #nodeTypes = ['alpha','beta','gamma']
             for nt in nodeTypes:
+                nodeAttr[nt] = self.config['node_types'][nt]
                 action = subMenu.addAction('Create ' + nt, functools.partial(self.createNode,name=nt))
                 #action = subMenu.addAction('Create ' + nt)
 
@@ -473,6 +477,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         self.config = utils._loadConfig(filePath)
+
 
     def initialize(self):
         """
@@ -1005,6 +1010,17 @@ class Nodz(QtWidgets.QGraphicsView):
         # Emit signal.
         self.signal_GraphLoaded.emit()
 
+    def loadGraphDialog(self):
+        dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.')
+        if (dialog != ''):
+            #print(dialog[0])
+            self.loadGraph(filePath=dialog[0])
+
+    def saveGraphDialog(self):
+        dialog = QtWidgets.QFileDialog.getSaveFileName(directory='.')
+        if (dialog != ''):
+            #print(dialog[0])
+            self.saveGraph(filePath=dialog[0])
 
     def loadGraph(self, filePath='path'):
         """
