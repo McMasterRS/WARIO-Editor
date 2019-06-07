@@ -1026,6 +1026,8 @@ class Nodz(QtWidgets.QGraphicsView):
         self.signal_GraphLoaded.emit()
 
     def loadGraphDialog(self):
+        if (not self.clearGraph()):
+            return
         dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.')
         if (dialog != ''):
             #print(dialog[0])
@@ -1047,6 +1049,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         # Load data.
+
         if os.path.exists(filePath):
             data = utils._loadData(filePath=filePath)
         else:
@@ -1187,19 +1190,30 @@ class Nodz(QtWidgets.QGraphicsView):
         Clear the graph.
 
         """
-        msg = QtWidgets.QMessageBox()
-        msg.setIcon(QtWidgets.QMessageBox.Warning)
-        msg.setWindowTitle("Clear Diagram")
-        msg.setText("Are you sure?")
-        msg.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
-        msg.setDefaultButton(QtWidgets.QMessageBox.Cancel)
-        retval = msg.exec_()
-        if (retval == QtWidgets.QMessageBox.Ok):
+        if (len(self.scene().nodes)>0):
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Warning)
+            msg.setWindowTitle("Clear Diagram")
+            msg.setText("Are you sure?")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
+            msg.setDefaultButton(QtWidgets.QMessageBox.Cancel)
+            retval = msg.exec_()
+            if (retval == QtWidgets.QMessageBox.Ok):
+                self.scene().clear()
+                self.scene().nodes = dict()
+
+                # Emit signal.
+                self.signal_GraphCleared.emit()
+                return True
+            else:
+                return False
+        else:
             self.scene().clear()
             self.scene().nodes = dict()
 
             # Emit signal.
             self.signal_GraphCleared.emit()
+            return True
 
     ##################################################################
     # END API
