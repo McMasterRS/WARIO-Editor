@@ -3,6 +3,8 @@ import json
 import six
 import functools
 import sys
+import uuid
+
 try:
     import networkx as nx
     from networkx.readwrite import json_graph
@@ -118,23 +120,31 @@ class Nodz(QtWidgets.QGraphicsView):
             self.setInteractive(False)
         '''
         if (event.button() == QtCore.Qt.RightButton ):
+
             self.currentState = 'MENU'
             menu = QtWidgets.QMenu(self)
 
             subMenu = menu.addMenu("File")
-            loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraph,filePath='./test.sav'))
-            saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraph,filePath='./test.sav'))
+            loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraphDialog))
+            saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraphDialog))
             #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./testnx.sav'))
             #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./testnx.sav'))
+            clearActuion = menu.addAction("Clear", functools.partial(self.clearGraph))
             quitAction = menu.addAction("Quit", functools.partial(sys.exit))
             subMenu = menu.addMenu("Nodes")
-            nodeTypes = ['alpha','beta','gamma']
+            nodeTypes = self.config['node_types']
+            nodeAttr = dict()
+            #print(nodeTypes)
+            #nodeTypes = ['alpha','beta','gamma']
+
             for nt in nodeTypes:
-                action = subMenu.addAction('Create ' + nt, functools.partial(self.createNode,name=nt))
+                nodeAttr[nt] = self.config['node_types'][nt]
+                action = subMenu.addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos())))
                 #action = subMenu.addAction('Create ' + nt)
 
-            xxxx = menu.exec_(event.globalPos())
-            #print(xxxx)
+            menu.exec_(event.globalPos())
+
+
             #super(Nodz, self).contextMenuEvent()
 
         # Drag view
@@ -440,7 +450,7 @@ class Nodz(QtWidgets.QGraphicsView):
         """
         selected_nodes = list()
         for node in self.scene().selectedItems():
-            selected_nodes.append(node.name)
+            selected_nodes.append(node.nodeId)
             node._remove()
 
         # Emit signal.
@@ -454,7 +464,7 @@ class Nodz(QtWidgets.QGraphicsView):
         selected_nodes = list()
         if self.scene().selectedItems():
             for node in self.scene().selectedItems():
-                selected_nodes.append(node.name)
+                selected_nodes.append(node.nodeId)
 
         # Emit signal.
         self.signal_NodeSelected.emit(selected_nodes)
@@ -474,6 +484,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         self.config = utils._loadConfig(filePath)
+
 
     def initialize(self):
         """
@@ -515,7 +526,7 @@ class Nodz(QtWidgets.QGraphicsView):
         return self.createNode(name, preset, position, alternate, extended_attributes)
 
     # NODES
-    def createNode(self, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None):
+    def createNode(self, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None):
         """
         Create a new node with a given name, position and color.
 
@@ -539,16 +550,19 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         # Check for name clashes
-        if name in self.scene().nodes.keys():
+        if nodeId == None:
+            nodeId = uuid.uuid4().hex
+
+        if nodeId in self.scene().nodes.keys():
             print('A node with the same name already exists : {0}'.format(name))
             print('Node creation aborted !')
             return
         else:
-            nodeItem = NodeItem(name=name, alternate=alternate, preset=preset,
+            nodeItem = NodeItem(nodeId=nodeId, name=name, alternate=alternate, preset=preset,
                                 config=self.config, extended_attributes=extended_attributes)
 
             # Store node in scene.
-            self.scene().nodes[name] = nodeItem
+            self.scene().nodes[nodeId] = nodeItem
 
             if not position:
                 # Get the center of the view.
@@ -556,10 +570,11 @@ class Nodz(QtWidgets.QGraphicsView):
 
             # Set node position.
             self.scene().addItem(nodeItem)
-            nodeItem.setPos(position - nodeItem.nodeCenter)
+            #nodeItem.setPos(position - nodeItem.nodeCenter)
+            nodeItem.setPos(position)
 
             # Emit signal.
-            self.signal_NodeCreated.emit(name)
+            self.signal_NodeCreated.emit(nodeId)
 
             return nodeItem
 
@@ -577,7 +592,7 @@ class Nodz(QtWidgets.QGraphicsView):
             return
 
         if node in self.scene().nodes.values():
-            nodeName = node.name
+            nodeName = node.nodeId
             node._remove()
 
             # Emit signal.
@@ -601,29 +616,23 @@ class Nodz(QtWidgets.QGraphicsView):
 
         oldName = node.name
 
-        if newName != None:
-            # Check for name clashes
-            if newName in self.scene().nodes.keys():
-                print('A node with the same name already exists : {0}'.format(newName))
-                print('Node edition aborted !')
-                return
-            else:
-                node.name = newName
+
+        node.name = newName
 
         # Replace node data.
-        self.scene().nodes[newName] = self.scene().nodes[oldName]
-        self.scene().nodes.pop(oldName)
+        #self.scene().nodes[newName] = self.scene().nodes[oldName]
+        #self.scene().nodes.pop(oldName)
 
         # Store new node name in the connections
-        if node.sockets:
-            for socket in node.sockets.values():
-                for connection in socket.connections:
-                    connection.socketNode = newName
+        #if node.sockets:
+        #    for socket in node.sockets.values():
+        #        for connection in socket.connections:
+        #           connection.socketNode = newName
 
-        if node.plugs:
-            for plug in node.plugs.values():
-                for connection in plug.connections:
-                    connection.plugNode = newName
+        #if node.plugs:
+        #    for plug in node.plugs.values():
+        #        for connection in plug.connections:
+        #            connection.plugNode = newName
 
         node.update()
 
@@ -809,15 +818,18 @@ class Nodz(QtWidgets.QGraphicsView):
         data['NODES'] = dict()
 
         nodes = self.scene().nodes.keys()
+
         for node in nodes:
             nodeInst = self.scene().nodes[node]
+            name = nodeInst.name
             preset = nodeInst.nodePreset
             nodeAlternate = nodeInst.alternate
 
-            data['NODES'][node] = {'preset': preset,
-                                   'position': [nodeInst.pos().x(), nodeInst.pos().y()],
-                                   'alternate': nodeAlternate,
-                                   'attributes': []}
+            data['NODES'][node] = { 'name': name,
+                                    'preset': preset,
+                                    'position': [nodeInst.pos().x(), nodeInst.pos().y()],
+                                    'alternate': nodeAlternate,
+                                    'attributes': []}
 
             attrs = nodeInst.attrs
             for attr in attrs:
@@ -879,6 +891,7 @@ class Nodz(QtWidgets.QGraphicsView):
         if nx is None:
             raise Exception("Failed to import networkx")
         graph = nx.MultiDiGraph()
+
         for name, node in self.scene().nodes.items():
             attributes = []
             for attr in node.attrs:
@@ -912,6 +925,13 @@ class Nodz(QtWidgets.QGraphicsView):
 
     def buildNodeCommand(self, node):
         return 'aasdfa'
+
+    def newNode(self,name,attrs,position):
+        node = self.createNode(name=name,preset=attrs['preset'],position=position)
+
+        for attr in attrs['attributes']:
+            self.createAttribute(node,name=attr,index=attrs['attributes'][attr]['index'],preset=attrs['attributes'][attr]['preset'],plug=attrs['attributes'][attr]['plug'],socket=attrs['attributes'][attr]['socket'],dataType=attrs['attributes'][attr]['type'])
+
 
     def saveGraphAsNetworkX(self, filePath='path'):
         graph = self.getNetworkxGraph()
@@ -1006,6 +1026,19 @@ class Nodz(QtWidgets.QGraphicsView):
         # Emit signal.
         self.signal_GraphLoaded.emit()
 
+    def loadGraphDialog(self):
+        if (not self.clearGraph()):
+            return
+        dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.')
+        if (dialog != ''):
+            #print(dialog[0])
+            self.loadGraph(filePath=dialog[0])
+
+    def saveGraphDialog(self):
+        dialog = QtWidgets.QFileDialog.getSaveFileName(directory='.')
+        if (dialog != ''):
+            #print(dialog[0])
+            self.saveGraph(filePath=dialog[0])
 
     def loadGraph(self, filePath='path'):
         """
@@ -1017,6 +1050,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         # Load data.
+
         if os.path.exists(filePath):
             data = utils._loadData(filePath=filePath)
         else:
@@ -1026,21 +1060,23 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Apply nodes data.
         nodesData = data['NODES']
-        nodesName = nodesData.keys()
+        nodeIds = nodesData.keys()
 
-        for name in nodesName:
-            preset = nodesData[name]['preset']
-            position = nodesData[name]['position']
+        for nodeId in nodeIds:
+            name = nodesData[nodeId]['name']
+            preset = nodesData[nodeId]['preset']
+            position = nodesData[nodeId]['position']
             position = QtCore.QPointF(position[0], position[1])
-            alternate = nodesData[name]['alternate']
+            alternate = nodesData[nodeId]['alternate']
 
-            node = self.createNode(name=name,
-                                   preset=preset,
-                                   position=position,
-                                   alternate=alternate)
+            node = self.createNode( nodeId=nodeId,
+                                    name=name,
+                                    preset=preset,
+                                    position=position,
+                                    alternate=alternate)
 
             # Apply attributes data.
-            attrsData = nodesData[name]['attributes']
+            attrsData = nodesData[nodeId]['attributes']
 
             for attrData in attrsData:
                 index = attrsData.index(attrData)
@@ -1105,9 +1141,9 @@ class Nodz(QtWidgets.QGraphicsView):
 
         connection = ConnectionItem(plug.center(), socket.center(), plug, socket)
 
-        connection.plugNode = plug.parentItem().name
+        connection.plugNode = plug.parentItem().nodeId
         connection.plugAttr = plug.attribute
-        connection.socketNode = socket.parentItem().name
+        connection.socketNode = socket.parentItem().nodeId
         connection.socketAttr = socket.attribute
 
         plug.connect(socket, connection)
@@ -1155,11 +1191,30 @@ class Nodz(QtWidgets.QGraphicsView):
         Clear the graph.
 
         """
-        self.scene().clear()
-        self.scene().nodes = dict()
+        if (len(self.scene().nodes)>0):
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Warning)
+            msg.setWindowTitle("Clear Diagram")
+            msg.setText("Are you sure?")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
+            msg.setDefaultButton(QtWidgets.QMessageBox.Cancel)
+            retval = msg.exec_()
+            if (retval == QtWidgets.QMessageBox.Ok):
+                self.scene().clear()
+                self.scene().nodes = dict()
 
-        # Emit signal.
-        self.signal_GraphCleared.emit()
+                # Emit signal.
+                self.signal_GraphCleared.emit()
+                return True
+            else:
+                return False
+        else:
+            self.scene().clear()
+            self.scene().nodes = dict()
+
+            # Emit signal.
+            self.signal_GraphCleared.emit()
+            return True
 
     ##################################################################
     # END API
@@ -1268,7 +1323,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
     """
 
-    def __init__(self, name, alternate, preset, config, extended_attributes=None):
+    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None):
         """
         Initialize the class.
 
@@ -1290,6 +1345,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.setZValue(1)
 
         # Storage
+        self.nodeId = nodeId
         self.name = name
         self.alternate = alternate
         self.nodePreset = preset
@@ -1511,7 +1567,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         in the process
 
         """
-        self.scene().nodes.pop(self.name)
+        self.scene().nodes.pop(self.nodeId)
 
         # Remove all sockets connections.
         for socket in self.sockets.values():
@@ -1774,6 +1830,7 @@ class SlotItem(QtWidgets.QGraphicsItem):
             nodzInst.drawingConnection = True
             nodzInst.sourceSlot = self
             nodzInst.currentDataType = self.dataType
+
         else:
             super(SlotItem, self).mousePressEvent(event)
 
@@ -1975,7 +2032,7 @@ class PlugItem(SlotItem):
         """
         # Populate connection.
         connection.socketItem = socket_item
-        connection.plugNode = self.parentItem().name
+        connection.plugNode = self.parentItem().nodeId
         connection.plugAttr = self.attribute
 
         # Add socket to connected slots.
@@ -2102,7 +2159,7 @@ class SocketItem(SlotItem):
 
         # Populate connection.
         connection.plugItem = plug_item
-        connection.socketNode = self.parentItem().name
+        connection.socketNode = self.parentItem().nodeId
         connection.socketAttr = self.attribute
 
         # Add plug to connected slots.

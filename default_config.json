@@ -72,5 +72,85 @@
         "text": [0, 0, 0, 255],
         "plug": [255, 155, 0, 255],
         "socket": [255, 155, 0, 255]
+    },
+
+    "node_types":{
+        "Data In": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            }
+        },
+        "Data Out": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "In": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                }
+            }
+        },
+        "Dual In - Single Out": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "In A": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "In B": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            }
+        },
+        "Single In - Single Out": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "In": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            }
+        }
     }
 }
