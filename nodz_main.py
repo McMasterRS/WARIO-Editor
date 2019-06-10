@@ -14,6 +14,7 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
+from PyQt5 import uic
 import nodz_utils as utils
 
 
@@ -1310,6 +1311,10 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
         # Methods.
         self._createStyle(config)
+        
+        item = {"text" : "test", "type" : "textbox", "params" : ""}
+        
+        self.settings = settingsItem([item, item, item] )
 
     @property
     def height(self):
@@ -1556,7 +1561,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
                                 self.radius,
                                 self.radius)
 
-        # Node label.
+        # Node label.   
         painter.setPen(self._textPen)
         painter.setFont(self._nodeTextFont)
 
@@ -1695,6 +1700,9 @@ class NodeItem(QtWidgets.QGraphicsItem):
                 item.setZValue(0)
 
         super(NodeItem, self).hoverLeaveEvent(event)
+        
+    def mouseDoubleClickEvent(self, event):
+        self.settings.show()
 
 
 class SlotItem(QtWidgets.QGraphicsItem):
@@ -2329,3 +2337,37 @@ class ConnectionItem(QtWidgets.QGraphicsPathItem):
         path.cubicTo(ctrl1, ctrl2, self.target_point)
 
         self.setPath(path)
+
+
+class settingsItem(QtWidgets.QWidget):
+
+    def __init__(self, widgets):
+        super(settingsItem, self).__init__(None)
+        self.layout = QtWidgets.QFormLayout()
+        self.buildUI(widgets)
+        self.setLayout(self.layout)
+        
+    def buildUI(self, widgets):
+        for widget in widgets:
+            label = QtWidgets.QLabel(widget["text"])
+            widget = self.genWidget(widget["type"], widget["params"])
+            self.layout.insertRow(0, label, widget)
+            self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
+            self.setWindowTitle("Settings")
+            
+    def genWidget(self, widget, params):
+        if widget == "textbox":
+            w = QtWidgets.QLineEdit()
+        elif widget == "spinbox":
+            w = QtWidgets.QSpinBox()
+            w.setMinimum(params["minimum"])
+            w.setMaximum(param["maximum"])
+            w.setValue(params["value"])
+        elif widget == "checkbox":
+            w = QtWidgets.QCheckBox()
+        return w
+        
+    def closeEvent(self, event):
+        print("Exiting")
+        event.accept()
+            
