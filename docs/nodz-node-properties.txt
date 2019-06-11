@@ -1,0 +1,6 @@
+Additional Nodz node properties:
+inputs/types
+outputs/types
+parameters
+code/template
+
