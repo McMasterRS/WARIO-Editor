@@ -1,6 +1,22 @@
 Additional Nodz node properties:
-inputs/types
-outputs/types
-parameters
-code/template
 
+-inputs/types -> sockets
+-outputs/types -> plugs
+-parameters -> local variables/constants for code
+-code/template -> pointer/path to code snippet that is a consecution node
+
+*Routing/GroupByNode needs to be examined for data/diagram timing of multiple plug/socket values
+
+Custom Nodz nodes...
+There should be three types of custom nodes available:
+
+-Input -> provides a data source to nodz diagram
+-Ouput -> deals with resulting data of a nodz diagram
+-General -> processes data from sockets and produces results to a plug
+
+Need to be able to add/delete/modify plug/socket names and types
+Need to have an editor (with load/save functionality) and provide a consecution type template
+Node plug/socket names/types should be available as a self.<variable> to the custom node code.
+e.g: A socket called "ValueA" and type "float" should be available to the custom node code as self.ValueA
+
+todo: - decide on how to deal with spaces in plug/socket names?
