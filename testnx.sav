@@ -1,0 +1,116 @@
+{
+    "directed": true,
+    "multigraph": true,
+    "graph": {},
+    "nodes": [
+        {
+            "preset": "node_preset_1",
+            "position": [
+                820.0,
+                785.0
+            ],
+            "alternate": true,
+            "attributes": [
+                {
+                    "name": "Integer A",
+                    "socket": true,
+                    "plug": false,
+                    "preset": "attr_preset_1",
+                    "dataType": "<class 'int'>"
+                },
+                {
+                    "name": "Integer B",
+                    "socket": true,
+                    "plug": false,
+                    "preset": "attr_preset_1",
+                    "dataType": "<class 'int'>"
+                },
+                {
+                    "name": "Sum",
+                    "socket": false,
+                    "plug": true,
+                    "preset": "attr_preset_1",
+                    "dataType": "<class 'int'>"
+                }
+            ],
+            "id": "Adder"
+        },
+        {
+            "preset": "node_preset_1",
+            "position": [
+                1097.0,
+                838.0
+            ],
+            "alternate": true,
+            "attributes": [
+                {
+                    "name": "Integer",
+                    "socket": true,
+                    "plug": false,
+                    "preset": "attr_preset_1",
+                    "dataType": "<class 'int'>"
+                }
+            ],
+            "id": "Output"
+        },
+        {
+            "preset": "node_preset_1",
+            "position": [
+                441.0,
+                775.0
+            ],
+            "alternate": true,
+            "attributes": [
+                {
+                    "name": "Integer",
+                    "socket": false,
+                    "plug": true,
+                    "preset": "attr_preset_1",
+                    "dataType": "<class 'int'>"
+                }
+            ],
+            "id": "Source A"
+        },
+        {
+            "preset": "node_preset_1",
+            "position": [
+                431.0,
+                913.0
+            ],
+            "alternate": true,
+            "attributes": [
+                {
+                    "name": "Integer",
+                    "socket": false,
+                    "plug": true,
+                    "preset": "attr_preset_1",
+                    "dataType": "<class 'int'>"
+                }
+            ],
+            "id": "Source B"
+        }
+    ],
+    "links": [
+        {
+            "plug": "Sum",
+            "socket": "Integer",
+            "source": "Adder",
+            "target": "Output",
+            "key": 0
+        },
+        {
+            "plug": "Integer",
+            "socket": "Integer A",
+            "source": "Source A",
+            "target": "Adder",
+            "key": 0
+        },
+        {
+            "plug": "Integer",
+            "socket": "Integer B",
+            "source": "Source B",
+            "target": "Adder",
+            "key": 0
+        }
+    ]
+}

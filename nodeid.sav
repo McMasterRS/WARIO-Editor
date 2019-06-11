@@ -1,0 +1,46 @@
+{
+    "CONNECTIONS": [
+        [
+            "261ff81a98e54d54a816e82ad7f5a0a1.Out",
+            "81cab96531eb40c8a6a339718b693d0f.In"
+        ]
+    ],
+    "NODES": {
+        "261ff81a98e54d54a816e82ad7f5a0a1": {
+            "alternate": true,
+            "attributes": [
+                {
+                    "dataType": "int",
+                    "name": "Out",
+                    "plug": true,
+                    "preset": "attr_preset_1",
+                    "socket": false
+                }
+            ],
+            "name": "Data In",
+            "position": [
+                810.0,
+                830.0
+            ],
+            "preset": "node_default"
+        },
+        "81cab96531eb40c8a6a339718b693d0f": {
+            "alternate": true,
+            "attributes": [
+                {
+                    "dataType": "int",
+                    "name": "In",
+                    "plug": false,
+                    "preset": "attr_preset_1",
+                    "socket": true
+                }
+            ],
+            "name": "Data Out",
+            "position": [
+                1197.0,
+                821.0
+            ],
+            "preset": "node_default"
+        }
+    }
+}
