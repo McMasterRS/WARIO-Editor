@@ -1,11 +1,13 @@
 from Qt import QtCore, QtWidgets
 import nodz_main
+import sys
 
 try:
     app = QtWidgets.QApplication([])
 except:
     # I guess we're running somewhere that already has a QApp created
     app = None
+
 
 nodz = nodz_main.Nodz(None)
 # nodz.loadConfig(filePath='')

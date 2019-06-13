@@ -66,12 +66,12 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Load nodz configuration.
         self.loadConfig(configPath)
-
         # General data.
         self.gridVisToggle = True
         self.gridSnapToggle = False
         self._nodeSnap = False
         self.selectedNodes = None
+
 
         # Connections data.
         self.drawingConnection = False
@@ -132,14 +132,20 @@ class Nodz(QtWidgets.QGraphicsView):
             clearActuion = menu.addAction("Clear", functools.partial(self.clearGraph))
             quitAction = menu.addAction("Quit", functools.partial(sys.exit))
             subMenu = menu.addMenu("Nodes")
+            catMenu = dict()
+            for category in self.config['node_categories']:
+                catMenu[category] = subMenu.addMenu(category)
+
             nodeTypes = self.config['node_types']
             nodeAttr = dict()
             #print(nodeTypes)
             #nodeTypes = ['alpha','beta','gamma']
 
+
             for nt in nodeTypes:
                 nodeAttr[nt] = self.config['node_types'][nt]
-                action = subMenu.addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos())))
+                nodeCat = self.config['node_types'][nt]['category']
+                action = catMenu[nodeCat].addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos())))
                 #action = subMenu.addAction('Create ' + nt)
 
             menu.exec_(event.globalPos())
