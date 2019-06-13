@@ -13,8 +13,6 @@
     "attr_font_size": 10,
     "mouse_bounding_box": 80,
 
-    "node_categories": ["Input","Output","Operator"],
-
     // Shapes > Edit values BUT do not delete.
     "node_width": 200,
     "node_height": 25,
@@ -92,9 +90,9 @@
                 }
             },
             "parameters": {
-                "min": null,
-                "max": null,
-                "count": 10
+                "min": "int",
+                "max": "int",
+                "count": "int"
             }
         },
         "Random Float In": {
@@ -112,9 +110,9 @@
                 }
             },
             "parameters": {
-                "min": null,
-                "max": null,
-                "count": 10
+                "min": "float",
+                "max": "float",
+                "count": "int"
             }
         },
         "Integer Out": {
@@ -153,7 +151,7 @@
             "preset": "node_default",
             "alternate": true,
             "position": "none",
-            "category": "Operator",
+            "category": "",
             "attributes": {
                 "In A": {
                     "index": -1,

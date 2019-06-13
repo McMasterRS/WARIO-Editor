@@ -133,20 +133,21 @@ class Nodz(QtWidgets.QGraphicsView):
             quitAction = menu.addAction("Quit", functools.partial(sys.exit))
             subMenu = menu.addMenu("Nodes")
             catMenu = dict()
-            for category in self.config['node_categories']:
-                catMenu[category] = subMenu.addMenu(category)
+
 
             nodeTypes = self.config['node_types']
             nodeAttr = dict()
-            #print(nodeTypes)
-            #nodeTypes = ['alpha','beta','gamma']
+            nodeCat = dict()
 
 
             for nt in nodeTypes:
                 nodeAttr[nt] = self.config['node_types'][nt]
-                nodeCat = self.config['node_types'][nt]['category']
-                action = catMenu[nodeCat].addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos())))
-                #action = subMenu.addAction('Create ' + nt)
+                nodeCat[nt] = self.config['node_types'][nt]['category']
+                if nodeCat[nt] not in catMenu:
+                    if nodeCat[nt] == "":
+                        nodeCat[nt] = "Other"
+                    catMenu[nodeCat[nt]] = subMenu.addMenu(nodeCat[nt])
+                action = catMenu[nodeCat[nt]].addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos())))
 
             menu.exec_(event.globalPos())
 
