@@ -127,8 +127,8 @@ class Nodz(QtWidgets.QGraphicsView):
             subMenu = menu.addMenu("File")
             loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraphDialog))
             saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraphDialog))
-            #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./testnx.sav'))
-            #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./testnx.sav'))
+            #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./nx.sav'))
+            #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./nx.sav'))
             clearActuion = menu.addAction("Clear", functools.partial(self.clearGraph))
             quitAction = menu.addAction("Quit", functools.partial(sys.exit))
             subMenu = menu.addMenu("Nodes")
@@ -2427,4 +2427,3 @@ class settingsItem(QtWidgets.QWidget):
     def closeEvent(self, event):
         print("Exiting")
         event.accept()
-            

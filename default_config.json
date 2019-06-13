@@ -75,7 +75,7 @@
     },
 
     "node_types":{
-        "Data In": {
+        "Random Integer In": {
             "preset": "node_default",
             "alternate": true,
             "position": "none",
@@ -87,9 +87,33 @@
                     "socket": false,
                     "type": "int"
                 }
+            },
+            "parameters": {
+                "min": null,
+                "max": null,
+                "count": 10
             }
         },
-        "Data Out": {
+        "Random Float In": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "float"
+                }
+            },
+            "parameters": {
+                "min": null,
+                "max": null,
+                "count": 10
+            }
+        },
+        "Integer Out": {
             "preset": "node_default",
             "alternate": true,
             "position": "none",
@@ -101,9 +125,25 @@
                     "socket": true,
                     "type": "int"
                 }
-            }
+            },
+            "parameters": {}
         },
-        "Dual In - Single Out": {
+        "Float Out": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "In": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "float"
+                }
+            },
+            "parameters": {}
+        },
+        "Integer Adder": {
             "preset": "node_default",
             "alternate": true,
             "position": "none",
@@ -129,14 +169,22 @@
                     "socket": false,
                     "type": "int"
                 }
-            }
+            },
+            "parameters": {}
         },
-        "Single In - Single Out": {
+        "Integer Multiplier": {
             "preset": "node_default",
             "alternate": true,
             "position": "none",
             "attributes": {
-                "In": {
+                "In A": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "In B": {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": false,
@@ -150,7 +198,146 @@
                     "socket": false,
                     "type": "int"
                 }
-            }
+            },
+            "parameters": {}
+        },
+        "Integer Divider(R)": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "Numerator": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Denominator": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                },
+                "Remainder": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "parameters": {}
+        },
+        "Integer Divider(F)": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "Numerator": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Denominator": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "float"
+                }
+            },
+            "parameters": {}
+        },
+        "Integer Subtractor": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "In A": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "In B": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "parameters": {}
+        },
+        "Float to Integer": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "Float": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "float"
+                },
+                "Integer": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "parameters": {}
+        },
+        "Integer to Float": {
+            "preset": "node_default",
+            "alternate": true,
+            "position": "none",
+            "attributes": {
+                "Integer": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Float": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "float"
+                }
+            },
+            "parameters": {}
         }
     }
 }
