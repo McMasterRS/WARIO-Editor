@@ -67,12 +67,12 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Load nodz configuration.
         self.loadConfig(configPath)
-
         # General data.
         self.gridVisToggle = True
         self.gridSnapToggle = False
         self._nodeSnap = False
         self.selectedNodes = None
+
 
         # Connections data.
         self.drawingConnection = False
@@ -128,20 +128,27 @@ class Nodz(QtWidgets.QGraphicsView):
             subMenu = menu.addMenu("File")
             loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraphDialog))
             saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraphDialog))
-            #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./testnx.sav'))
-            #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./testnx.sav'))
+            #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./nx.sav'))
+            #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./nx.sav'))
             clearActuion = menu.addAction("Clear", functools.partial(self.clearGraph))
             quitAction = menu.addAction("Quit", functools.partial(sys.exit))
             subMenu = menu.addMenu("Nodes")
+            catMenu = dict()
+
+
             nodeTypes = self.config['node_types']
             nodeAttr = dict()
-            #print(nodeTypes)
-            #nodeTypes = ['alpha','beta','gamma']
- 
+            nodeCat = dict()
+
+
             for nt in nodeTypes:
                 nodeAttr[nt] = self.config['node_types'][nt]
-                action = subMenu.addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"]))
-                #action = subMenu.addAction('Create ' + nt)
+                nodeCat[nt] = self.config['node_types'][nt]['category']
+                if nodeCat[nt] not in catMenu:
+                    if nodeCat[nt] == "":
+                        nodeCat[nt] = "Other"
+                    catMenu[nodeCat[nt]] = subMenu.addMenu(nodeCat[nt])
+                action = catMenu[nodeCat[nt]].addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"]))
 
             menu.exec_(event.globalPos())
 
@@ -2470,4 +2477,3 @@ class settingsItem(QtWidgets.QWidget):
         print(data)
         self.parent.parameters = data
         event.accept()
-            
