@@ -18,7 +18,7 @@ nodz.show()
 ######################################################################
 # Test signals
 ######################################################################
-
+'''
 # Nodes
 @QtCore.Slot(str)
 def on_nodeCreated(nodeName):
@@ -105,7 +105,7 @@ nodz.signal_GraphCleared.connect(on_graphCleared)
 nodz.signal_GraphEvaluated.connect(on_graphEvaluated)
 
 nodz.signal_KeyPressed.connect(on_keyPressed)
-
+'''
 
 if app:
     # command line stand alone test... run our own event loop
