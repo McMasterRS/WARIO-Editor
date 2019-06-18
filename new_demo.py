@@ -1,4 +1,4 @@
-from Qt import QtCore, QtWidgets
+from Qt import QtCore, QtWidgets, QtGui
 import nodz_main
 
 try:
@@ -10,6 +10,19 @@ except:
 nodz = nodz_main.Nodz(None)
 # nodz.loadConfig(filePath='')
 nodz.initialize()
+
+#window = QtWidgets.QMainWindow()
+#window.setCentralWidget(nodz)
+#menu = window.menuBar()
+
+#saveAct = QtWidgets.QAction(QtGui.QIcon('save.png'), "&Save", window)
+#saveAct.setShortcut("Ctrl+S")
+#saveAct.setStatusTip("Save Application")
+#saveAct.triggered.connect(nodz.saveGraphDialog)
+
+#fileMenu = menu.addMenu('&File')
+#fileMenu.addAction(saveAct)  
+#window.show()
 nodz.show()
 #nodz.gridVisToggle = False
 

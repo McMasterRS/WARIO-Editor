@@ -87,6 +87,29 @@
                     "socket": false,
                     "type": "int"
                 }
+            },
+            "parameters" : {
+                "param1" : {
+                    "text"   : "test",
+                    "type"   : "textbox",
+                    "params" : {
+                        "text"   : ""
+                    }
+                },
+                "param2" : {
+                    "text"   : "Checkbox Test",
+                    "type"   : "checkbox",
+                    "params" : {}
+                },
+                "param3" : {
+                    "text"   : "Spinbox Test",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : 0,
+                        "maximum" : 100,
+                        "value"   : 0
+                    }
+                }
             }
         },
         "Data Out": {
@@ -101,7 +124,8 @@
                     "socket": true,
                     "type": "int"
                 }
-            }
+            },
+            "parameters" : {}
         },
         "Dual In - Single Out": {
             "preset": "node_default",
@@ -129,7 +153,8 @@
                     "socket": false,
                     "type": "int"
                 }
-            }
+            },
+            "parameters" : {}
         },
         "Single In - Single Out": {
             "preset": "node_default",
@@ -150,7 +175,8 @@
                     "socket": false,
                     "type": "int"
                 }
-            }
+            },
+            "parameters" : {}
         }
     }
 }

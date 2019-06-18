@@ -18,6 +18,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 import nodz_utils as utils
+from stylesh import stylesh
 
 
 
@@ -136,10 +137,10 @@ class Nodz(QtWidgets.QGraphicsView):
             nodeAttr = dict()
             #print(nodeTypes)
             #nodeTypes = ['alpha','beta','gamma']
-
+ 
             for nt in nodeTypes:
                 nodeAttr[nt] = self.config['node_types'][nt]
-                action = subMenu.addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos())))
+                action = subMenu.addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"]))
                 #action = subMenu.addAction('Create ' + nt)
 
             menu.exec_(event.globalPos())
@@ -526,7 +527,7 @@ class Nodz(QtWidgets.QGraphicsView):
         return self.createNode(name, preset, position, alternate, extended_attributes)
 
     # NODES
-    def createNode(self, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None):
+    def createNode(self, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None, parameters=None):
         """
         Create a new node with a given name, position and color.
 
@@ -559,7 +560,8 @@ class Nodz(QtWidgets.QGraphicsView):
             return
         else:
             nodeItem = NodeItem(nodeId=nodeId, name=name, alternate=alternate, preset=preset,
-                                config=self.config, extended_attributes=extended_attributes)
+                                config=self.config, extended_attributes=extended_attributes,
+                                parameters=parameters)
 
             # Store node in scene.
             self.scene().nodes[nodeId] = nodeItem
@@ -829,7 +831,8 @@ class Nodz(QtWidgets.QGraphicsView):
                                     'preset': preset,
                                     'position': [nodeInst.pos().x(), nodeInst.pos().y()],
                                     'alternate': nodeAlternate,
-                                    'attributes': []}
+                                    'attributes': [],
+                                    'parameters': nodeInst.parameters}
 
             attrs = nodeInst.attrs
             for attr in attrs:
@@ -926,8 +929,8 @@ class Nodz(QtWidgets.QGraphicsView):
     def buildNodeCommand(self, node):
         return 'aasdfa'
 
-    def newNode(self,name,attrs,position):
-        node = self.createNode(name=name,preset=attrs['preset'],position=position)
+    def newNode(self,name,attrs,position,parameters):
+        node = self.createNode(name=name,preset=attrs['preset'],position=position, parameters = parameters)
 
         for attr in attrs['attributes']:
             self.createAttribute(node,name=attr,index=attrs['attributes'][attr]['index'],preset=attrs['attributes'][attr]['preset'],plug=attrs['attributes'][attr]['plug'],socket=attrs['attributes'][attr]['socket'],dataType=attrs['attributes'][attr]['type'])
@@ -1068,13 +1071,16 @@ class Nodz(QtWidgets.QGraphicsView):
             position = nodesData[nodeId]['position']
             position = QtCore.QPointF(position[0], position[1])
             alternate = nodesData[nodeId]['alternate']
+            parameters = nodesData[nodeId]['parameters']
 
             node = self.createNode( nodeId=nodeId,
                                     name=name,
                                     preset=preset,
                                     position=position,
-                                    alternate=alternate)
-
+                                    alternate=alternate,
+                                    parameters=parameters)
+                                    
+            
             # Apply attributes data.
             attrsData = nodesData[nodeId]['attributes']
 
@@ -1323,7 +1329,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
     """
 
-    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None):
+    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, parameters=None):
         """
         Initialize the class.
 
@@ -1368,9 +1374,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         # Methods.
         self._createStyle(config)
         
-        item = {"text" : "test", "type" : "textbox", "params" : ""}
-        
-        self.settings = settingsItem([item, item, item] )
+        self.settings = settingsItem(self, parameters)
 
     @property
     def height(self):
@@ -2395,36 +2399,75 @@ class ConnectionItem(QtWidgets.QGraphicsPathItem):
 
         self.setPath(path)
 
-
+class loadWidget(QtWidgets.QHBoxLayout):
+    def __init__(self):
+        super(loadWidget, self).__init__()
+        self.textbox = QtWidgets.QLineEdit()
+        self.button = QtWidgets.QPushButton("Load")
+        self.button.clicked.connect(self.loadFile)
+        self.addWidget(self.textbox)
+        self.addWidget(self.button)
+        
+    def loadFile(self):
+        f = QtWidgets.QFileDialog.getOpenFileName()[0]
+        if f is not "":
+            self.textbox.setText(f)
+    
 class settingsItem(QtWidgets.QWidget):
 
-    def __init__(self, widgets):
+    def __init__(self, parent, widgets):
         super(settingsItem, self).__init__(None)
+        self.parent = parent
+        
         self.layout = QtWidgets.QFormLayout()
         self.buildUI(widgets)
         self.setLayout(self.layout)
         
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
+        self.setWindowTitle("Settings")
+        #self.setStyleSheet(stylesh)
+        
     def buildUI(self, widgets):
-        for widget in widgets:
-            label = QtWidgets.QLabel(widget["text"])
-            widget = self.genWidget(widget["type"], widget["params"])
-            self.layout.insertRow(0, label, widget)
-            self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
-            self.setWindowTitle("Settings")
+        print(widgets)
+        if widgets == {}:
+            return
+        for i in widgets:
+            print(widgets[i]["type"])
+            label = QtWidgets.QLabel(widgets[i]["text"])
+            widget = self.genWidget(widgets[i]["type"], widgets[i]["params"])
+            self.layout.insertRow(-1, label, widget)
             
+    # Generate the settings row based on its defined widget
     def genWidget(self, widget, params):
         if widget == "textbox":
             w = QtWidgets.QLineEdit()
+            w.setText(params["text"])
         elif widget == "spinbox":
             w = QtWidgets.QSpinBox()
             w.setMinimum(params["minimum"])
-            w.setMaximum(param["maximum"])
+            w.setMaximum(params["maximum"])
             w.setValue(params["value"])
         elif widget == "checkbox":
             w = QtWidgets.QCheckBox()
+        elif widget == "loadbox":
+            w = loadWidget()
         return w
         
     def closeEvent(self, event):
-        print("Exiting")
+        data = []
+        for i in range(0, self.layout.rowCount()):
+            w = self.layout.itemAt(i,1)
+            if isinstance(w.widget(), QtWidgets.QLineEdit):
+                data.append(w.widget().text())
+            elif isinstance(w.widget(), QtWidgets.QCheckBox):
+                data.append(w.widget().isChecked())
+            elif isinstance(w.widget(), QtWidgets.QSpinBox):
+                data.append( w.widget().value())
+            elif isinstance(w, loadWidget):
+                data.append(w.textbox.text())               
+            else:          
+                data.append("")
+        print(data)
+        self.parent.parameters = data
         event.accept()
             
