@@ -127,10 +127,28 @@
                     "type": "float"
                 }
             },
-            "parameters": {
-                "min": "float",
-                "max": "float",
-                "count": "int"
+            "parameters" : {
+                "param1" : {
+                    "text"   : "test",
+                    "type"   : "textbox",
+                    "params" : {
+                        "text"   : ""
+                    }
+                },
+                "param2" : {
+                    "text"   : "Checkbox Test",
+                    "type"   : "checkbox",
+                    "params" : {}
+                },
+                "param3" : {
+                    "text"   : "Spinbox Test",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : 0,
+                        "maximum" : 100,
+                        "value"   : 0
+                    }
+                }
             }
         },
         "Integer Out": {
