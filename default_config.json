@@ -90,25 +90,34 @@
                 }
             },
             "parameters" : {
-                "param1" : {
+                "param0" : {
                     "text"   : "test",
                     "type"   : "textbox",
                     "params" : {
                         "text"   : ""
                     }
                 },
-                "param2" : {
+                "param1" : {
                     "text"   : "Checkbox Test",
                     "type"   : "checkbox",
-                    "params" : {}
+                    "params" : {
+                        "checked" : false
+                    }
                 },
-                "param3" : {
+                "param2" : {
                     "text"   : "Spinbox Test",
                     "type"   : "spinbox",
                     "params" : {
                         "minimum" : 0,
                         "maximum" : 100,
                         "value"   : 0
+                    }
+                },
+                "param3" : {
+                    "text" : "Load Data",
+                    "type" : "loadbox",
+                    "params" : {
+                        "text" : ""
                     }
                 }
             }

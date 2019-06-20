@@ -2435,11 +2435,9 @@ class settingsItem(QtWidgets.QWidget):
         #self.setStyleSheet(stylesh)
         
     def buildUI(self, widgets):
-        print(widgets)
         if widgets == {}:
             return
         for i in widgets:
-            print(widgets[i]["type"])
             label = QtWidgets.QLabel(widgets[i]["text"])
             widget = self.genWidget(widgets[i]["type"], widgets[i]["params"])
             self.layout.insertRow(-1, label, widget)
@@ -2456,24 +2454,36 @@ class settingsItem(QtWidgets.QWidget):
             w.setValue(params["value"])
         elif widget == "checkbox":
             w = QtWidgets.QCheckBox()
+            w.setChecked(params["checked"])
         elif widget == "loadbox":
             w = loadWidget()
+            w.textbox.setText(params["text"])
         return w
         
     def closeEvent(self, event):
-        data = []
+        self.genParameters()
+        event.accept()
+
+    def genParameters(self):
+        data = {}
         for i in range(0, self.layout.rowCount()):
+            param = {'text' : "", 'type' : "", 'params' : {}}
+            param['text'] = self.layout.itemAt(i,0).widget().text()
+            
             w = self.layout.itemAt(i,1)
             if isinstance(w.widget(), QtWidgets.QLineEdit):
-                data.append(w.widget().text())
+                param['type'] = "textbox"
+                param['params'] = {'text' : w.widget().text()}
             elif isinstance(w.widget(), QtWidgets.QCheckBox):
-                data.append(w.widget().isChecked())
+                param['type'] = "checkbox"
+                param['params']  = {'checked' : w.widget().isChecked()}
             elif isinstance(w.widget(), QtWidgets.QSpinBox):
-                data.append( w.widget().value())
-            elif isinstance(w, loadWidget):
-                data.append(w.textbox.text())               
-            else:          
-                data.append("")
-        print(data)
+                param['type'] = "spinbox"
+                param['params'] = {'minimum' : w.widget().minimum(), 'maximum' : w.widget().maximum(), 'value' : w.widget().value()}
+            elif isinstance(w, loadWidget):  
+                param['type'] = "loadbox"
+                param['params'] = {'text' : w.textbox.text()}
+                
+            data["param{0}".format(i)] = param
+
         self.parent.parameters = data
-        event.accept()
