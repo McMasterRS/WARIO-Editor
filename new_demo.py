@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 import nodz_main
 import sys
 
@@ -13,19 +13,31 @@ nodz = nodz_main.Nodz(None)
 # nodz.loadConfig(filePath='')
 nodz.initialize()
 
-#window = QtWidgets.QMainWindow()
-#window.setCentralWidget(nodz)
-#menu = window.menuBar()
+window = QtWidgets.QMainWindow()
+window.setCentralWidget(nodz)
+menu = window.menuBar()
 
-#saveAct = QtWidgets.QAction(QtGui.QIcon('save.png'), "&Save", window)
-#saveAct.setShortcut("Ctrl+S")
-#saveAct.setStatusTip("Save Application")
-#saveAct.triggered.connect(nodz.saveGraphDialog)
+saveAct = QtWidgets.QAction(QtGui.QIcon('save.png'), "&Save", window)
+saveAct.setShortcut("Ctrl+S")
+saveAct.setStatusTip("Save Flowchart")
+saveAct.triggered.connect(nodz.saveGraphDialog)
 
-#fileMenu = menu.addMenu('&File')
-#fileMenu.addAction(saveAct)  
-#window.show()
-nodz.show()
+loadAct = QtWidgets.QAction(QtGui.QIcon('load.png'), "&Load", window)
+loadAct.setShortcut("Ctrl+O")
+loadAct.setStatusTip("Load Flowchart")
+loadAct.triggered.connect(nodz.loadGraphDialog)
+
+duplicateAct = QtWidgets.QAction(QtGui.QIcon('copy.png'), "&Duplicate", window)
+duplicateAct.setShortcut("Ctrl+C")
+duplicateAct.setStatusTip("Duplicate selected nodes")
+
+fileMenu = menu.addMenu('&File')
+editMenu = menu.addMenu('&Edit')
+fileMenu.addAction(saveAct)  
+fileMenu.addAction(loadAct)
+editMenu.addAction(duplicateAct)
+window.show()
+#nodz.show()
 #nodz.gridVisToggle = False
 
 ######################################################################

@@ -2433,6 +2433,7 @@ class settingsItem(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
         self.setWindowTitle("Settings")
         #self.setStyleSheet(stylesh)
+        self.genParameters()
         
     def buildUI(self, widgets):
         if widgets == {}:
@@ -2447,17 +2448,24 @@ class settingsItem(QtWidgets.QWidget):
         if widget == "textbox":
             w = QtWidgets.QLineEdit()
             w.setText(params["text"])
+            
         elif widget == "spinbox":
             w = QtWidgets.QSpinBox()
             w.setMinimum(params["minimum"])
             w.setMaximum(params["maximum"])
             w.setValue(params["value"])
+            
         elif widget == "checkbox":
             w = QtWidgets.QCheckBox()
             w.setChecked(params["checked"])
+            
         elif widget == "loadbox":
             w = loadWidget()
             w.textbox.setText(params["text"])
+            
+        elif widget == "combobox":
+            w = QtWidgets.QComboBox()
+            
         return w
         
     def closeEvent(self, event):

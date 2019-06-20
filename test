@@ -1,0 +1,55 @@
+{
+    "CONNECTIONS": [],
+    "NODES": {
+        "6d75a27cdb4543c9b1bc753a46176b5e": {
+            "alternate": true,
+            "attributes": [
+                {
+                    "dataType": "int",
+                    "name": "Out",
+                    "plug": true,
+                    "preset": "attr_preset_1",
+                    "socket": false
+                }
+            ],
+            "name": "Random Integer In",
+            "parameters": {
+                "param0": {
+                    "params": {
+                        "text": ""
+                    },
+                    "text": "test",
+                    "type": "textbox"
+                },
+                "param1": {
+                    "params": {
+                        "checked": false
+                    },
+                    "text": "Checkbox Test",
+                    "type": "checkbox"
+                },
+                "param2": {
+                    "params": {
+                        "maximum": 100,
+                        "minimum": 0,
+                        "value": 0
+                    },
+                    "text": "Spinbox Test",
+                    "type": "spinbox"
+                },
+                "param3": {
+                    "params": {
+                        "text": ""
+                    },
+                    "text": "Load Data",
+                    "type": "loadbox"
+                }
+            },
+            "position": [
+                763.0,
+                901.0
+            ],
+            "preset": "node_default"
+        }
+    }
+}
