@@ -1,4 +1,4 @@
-from Qt import QtCore, QtWidgets, QtGui
+from PyQt5 import QtWidgets
 import nodz_main
 import sys
 
