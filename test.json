@@ -1,7 +1,7 @@
 {
     "CONNECTIONS": [],
     "NODES": {
-        "6d75a27cdb4543c9b1bc753a46176b5e": {
+        "a132a962ec544626a3f1818f11d8d795": {
             "alternate": true,
             "attributes": [
                 {
@@ -12,23 +12,23 @@
                     "socket": false
                 }
             ],
-            "name": "Random Integer In",
+            "name": "renamed node",
             "parameters": {
-                "param0": {
+                "param1": {
                     "params": {
                         "text": ""
                     },
                     "text": "test",
                     "type": "textbox"
                 },
-                "param1": {
+                "param2": {
                     "params": {
                         "checked": false
                     },
                     "text": "Checkbox Test",
                     "type": "checkbox"
                 },
-                "param2": {
+                "param3": {
                     "params": {
                         "maximum": 100,
                         "minimum": 0,
@@ -37,7 +37,7 @@
                     "text": "Spinbox Test",
                     "type": "spinbox"
                 },
-                "param3": {
+                "param4": {
                     "params": {
                         "text": ""
                     },
@@ -46,8 +46,8 @@
                 }
             },
             "position": [
-                763.0,
-                901.0
+                938.0,
+                884.0
             ],
             "preset": "node_default"
         }

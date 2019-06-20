@@ -1039,13 +1039,13 @@ class Nodz(QtWidgets.QGraphicsView):
     def loadGraphDialog(self):
         if (not self.clearGraph()):
             return
-        dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.')
+        dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.', filter="JSON files (*.json)")
         if (dialog != ''):
             #print(dialog[0])
             self.loadGraph(filePath=dialog[0])
 
     def saveGraphDialog(self):
-        dialog = QtWidgets.QFileDialog.getSaveFileName(directory='.')
+        dialog = QtWidgets.QFileDialog.getSaveFileName(directory='.', filter="JSON files (*.json)")
         if (dialog != ''):
             #print(dialog[0])
             self.saveGraph(filePath=dialog[0])
@@ -2436,6 +2436,9 @@ class settingsItem(QtWidgets.QWidget):
         self.genParameters()
         
     def buildUI(self, widgets):
+        label = QtWidgets.QLabel("Node Name")
+        widget = self.genWidget("textbox", {'text': self.parent.name})
+        self.layout.insertRow(-1, label, widget)
         if widgets == {}:
             return
         for i in widgets:
@@ -2473,8 +2476,11 @@ class settingsItem(QtWidgets.QWidget):
         event.accept()
 
     def genParameters(self):
+    
+        self.parent.name = self.layout.itemAt(0,1).widget().text()
+    
         data = {}
-        for i in range(0, self.layout.rowCount()):
+        for i in range(1, self.layout.rowCount()):
             param = {'text' : "", 'type' : "", 'params' : {}}
             param['text'] = self.layout.itemAt(i,0).widget().text()
             

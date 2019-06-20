@@ -27,15 +27,17 @@ loadAct.setShortcut("Ctrl+O")
 loadAct.setStatusTip("Load Flowchart")
 loadAct.triggered.connect(nodz.loadGraphDialog)
 
-duplicateAct = QtWidgets.QAction(QtGui.QIcon('copy.png'), "&Duplicate", window)
+duplicateAct = QtWidgets.QAction(QtGui.QIcon('copy.png'), "&Duplicate (WIP)", window)
 duplicateAct.setShortcut("Ctrl+C")
 duplicateAct.setStatusTip("Duplicate selected nodes")
 
 fileMenu = menu.addMenu('&File')
-editMenu = menu.addMenu('&Edit')
 fileMenu.addAction(saveAct)  
 fileMenu.addAction(loadAct)
+
+editMenu = menu.addMenu('&Edit')
 editMenu.addAction(duplicateAct)
+
 window.show()
 #nodz.show()
 #nodz.gridVisToggle = False
