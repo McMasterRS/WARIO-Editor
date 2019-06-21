@@ -30,6 +30,7 @@ loadAct.triggered.connect(nodz.loadGraphDialog)
 duplicateAct = QtWidgets.QAction(QtGui.QIcon('copy.png'), "&Duplicate (WIP)", window)
 duplicateAct.setShortcut("Ctrl+C")
 duplicateAct.setStatusTip("Duplicate selected nodes")
+duplicateAct.triggered.connect(nodz._copySelectedNodes)
 
 fileMenu = menu.addMenu('&File')
 fileMenu.addAction(saveAct)  

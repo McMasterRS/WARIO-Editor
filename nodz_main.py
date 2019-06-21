@@ -148,7 +148,7 @@ class Nodz(QtWidgets.QGraphicsView):
                     if nodeCat[nt] == "":
                         nodeCat[nt] = "Other"
                     catMenu[nodeCat[nt]] = subMenu.addMenu(nodeCat[nt])
-                action = catMenu[nodeCat[nt]].addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"]))
+                action = catMenu[nodeCat[nt]].addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=nt))
 
             menu.exec_(event.globalPos())
 
@@ -476,6 +476,22 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Emit signal.
         self.signal_NodeSelected.emit(selected_nodes)
+        
+    def _copySelectedNodes(self):
+    
+        newNodes = list()
+
+        for node in self.scene().selectedItems():
+            nt = node.type
+            pos = QtCore.QPointF(node.pos().x() + 20, node.pos().y() + 20)
+            newNode = self.newNode(name = node.name,
+                                   attrs = self.config['node_types'][nt],
+                                   position = pos   , 
+                                   parameters = self.config['node_types'][nt]["parameters"],
+                                   type = nt)
+            node.setSelected(False)
+            newNode.setSelected(True)
+    
 
 
     ##################################################################
@@ -534,7 +550,7 @@ class Nodz(QtWidgets.QGraphicsView):
         return self.createNode(name, preset, position, alternate, extended_attributes)
 
     # NODES
-    def createNode(self, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None, parameters=None):
+    def createNode(self, type, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None, parameters=None):
         """
         Create a new node with a given name, position and color.
 
@@ -568,7 +584,7 @@ class Nodz(QtWidgets.QGraphicsView):
         else:
             nodeItem = NodeItem(nodeId=nodeId, name=name, alternate=alternate, preset=preset,
                                 config=self.config, extended_attributes=extended_attributes,
-                                parameters=parameters)
+                                parameters=parameters, type=type)
 
             # Store node in scene.
             self.scene().nodes[nodeId] = nodeItem
@@ -833,8 +849,10 @@ class Nodz(QtWidgets.QGraphicsView):
             name = nodeInst.name
             preset = nodeInst.nodePreset
             nodeAlternate = nodeInst.alternate
+            nodeType = nodeInst.type
 
             data['NODES'][node] = { 'name': name,
+                                    'type': nodeType,
                                     'preset': preset,
                                     'position': [nodeInst.pos().x(), nodeInst.pos().y()],
                                     'alternate': nodeAlternate,
@@ -936,11 +954,13 @@ class Nodz(QtWidgets.QGraphicsView):
     def buildNodeCommand(self, node):
         return 'aasdfa'
 
-    def newNode(self,name,attrs,position,parameters):
-        node = self.createNode(name=name,preset=attrs['preset'],position=position, parameters = parameters)
+    def newNode(self,name,attrs,position,parameters,type):
+        node = self.createNode(name=name,preset=attrs['preset'],position=position, parameters = parameters, type = type)
 
         for attr in attrs['attributes']:
             self.createAttribute(node,name=attr,index=attrs['attributes'][attr]['index'],preset=attrs['attributes'][attr]['preset'],plug=attrs['attributes'][attr]['plug'],socket=attrs['attributes'][attr]['socket'],dataType=attrs['attributes'][attr]['type'])
+            
+        return node
 
 
     def saveGraphAsNetworkX(self, filePath='path'):
@@ -1074,6 +1094,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         for nodeId in nodeIds:
             name = nodesData[nodeId]['name']
+            nodeType = nodesData[nodeId]['type']
             preset = nodesData[nodeId]['preset']
             position = nodesData[nodeId]['position']
             position = QtCore.QPointF(position[0], position[1])
@@ -1082,6 +1103,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
             node = self.createNode( nodeId=nodeId,
                                     name=name,
+                                    type=type,
                                     preset=preset,
                                     position=position,
                                     alternate=alternate,
@@ -1336,7 +1358,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
     """
 
-    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, parameters=None):
+    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, parameters=None, type=None):
         """
         Initialize the class.
 
@@ -1363,6 +1385,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.alternate = alternate
         self.nodePreset = preset
         self.attrPreset = None
+        self.type = type
 
         # Attributes storage.
         self.attrs = list()

@@ -147,7 +147,8 @@
                 "param2" : {
                     "text"   : "Checkbox Test",
                     "type"   : "checkbox",
-                    "params" : {}
+                    "params" : {
+                        "checked" : false}
                 },
                 "param3" : {
                     "text"   : "Spinbox Test",

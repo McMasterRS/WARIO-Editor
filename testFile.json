@@ -1,0 +1,107 @@
+{
+    "CONNECTIONS": [],
+    "NODES": {
+        "b3001790f1644f2184eccb27ab982f07": {
+            "alternate": true,
+            "attributes": [
+                {
+                    "dataType": "int",
+                    "name": "Out",
+                    "plug": true,
+                    "preset": "attr_preset_1",
+                    "socket": false
+                }
+            ],
+            "name": "Random Integer In",
+            "parameters": {
+                "param1": {
+                    "params": {
+                        "text": ""
+                    },
+                    "text": "test",
+                    "type": "textbox"
+                },
+                "param2": {
+                    "params": {
+                        "checked": false
+                    },
+                    "text": "Checkbox Test",
+                    "type": "checkbox"
+                },
+                "param3": {
+                    "params": {
+                        "maximum": 100,
+                        "minimum": 0,
+                        "value": 0
+                    },
+                    "text": "Spinbox Test",
+                    "type": "spinbox"
+                },
+                "param4": {
+                    "params": {
+                        "text": ""
+                    },
+                    "text": "Load Data",
+                    "type": "loadbox"
+                }
+            },
+            "position": [
+                849.0,
+                991.0
+            ],
+            "preset": "node_default",
+            "type": "Random Integer In"
+        },
+        "ffcafe1a224f46a68254c8ab1af6a293": {
+            "alternate": true,
+            "attributes": [
+                {
+                    "dataType": "int",
+                    "name": "Out",
+                    "plug": true,
+                    "preset": "attr_preset_1",
+                    "socket": false
+                }
+            ],
+            "name": "Random Integer In",
+            "parameters": {
+                "param1": {
+                    "params": {
+                        "text": ""
+                    },
+                    "text": "test",
+                    "type": "textbox"
+                },
+                "param2": {
+                    "params": {
+                        "checked": false
+                    },
+                    "text": "Checkbox Test",
+                    "type": "checkbox"
+                },
+                "param3": {
+                    "params": {
+                        "maximum": 100,
+                        "minimum": 0,
+                        "value": 0
+                    },
+                    "text": "Spinbox Test",
+                    "type": "spinbox"
+                },
+                "param4": {
+                    "params": {
+                        "text": ""
+                    },
+                    "text": "Load Data",
+                    "type": "loadbox"
+                }
+            },
+            "position": [
+                774.0,
+                840.0
+            ],
+            "preset": "node_default",
+            "type": "Random Integer In"
+        }
+    }
+}
