@@ -1,65 +1,89 @@
+from collections import deque
+
 class Pipeline():
     
     """
-    proccess flow pipeline. Oversees/orchestrates the running of a directed graph of arbitrary function nodes
+    proccess flow pipeline. Oversees/orchestrates the running of a directed graph of arbitrary tasks
     
     """
 
-    def __init__(self, nodes=None):
+    tasks = {}
+    graph = {}         # Each connection, indexed by parent node. edges are always between two task nodes
+    roots = {}         # Nodes with no parents
+    leaves = []        # Nodes with no children
+    results = {}
+
+    def __init__(self):
         
         """
         initializes a pipeline, optionally with a set of nodes
         
         """
 
-        self.nodes = nodes
-        self.pipes = {} # each connection, indexed by parent node. Pipes are always between two nodes
-        self.roots = []
-        self.leaves = []
-        self.longest_path = 0
-        self.shortest_path = 0
-
-    def add_node(self, node, children=None, parents=None):
+    def add_task(self, task, children=None, parents=None):
         
         """
-        add a single node
+        add a single task to the pipeline
         
         """
 
-        self.nodes[node.name] = node
-
-        # TODO: check if this is iteratible
-        for child in children:
-            self.connect(node, child)
-
-        for parent in parents:
-            self.connect(parent, node)
-
+        self.tasks[task.name] = task
+        self.graph[task.name] = {}
+        self.results[task.name] = []
+        if parents is None:
+            self.roots[task.name] = task
 
     def connect(self, parent, child):
 
-        # if the parent isn't already in the pipeline somewhere, add it in.
-        if parent.name not in self.nodes:
-            self.add_node(parent, children=[child])
+        self.graph[parent.name][child.name] = child
 
         # if the parent was a leaf node, remove it.
-        elif parent.name in self.leaves:
+        if parent.name in self.leaves:
             self.leaves.pop(parent.name)
 
-        # if the child isn't in the pipeline, add it in.
-        if child.name not in self.nodes:
-            self.add_node(child, parents=[parent])
-
         # if the child was a root node, remove it.
-        elif child.name in self.roots:
+        if child.name in self.roots:
             self.roots.pop(child.name)
+    
+    def _topological_sort(self, node, visited, queue):
+        visited[node.name] = node
+        for i in self.graph[node.name]:
+            if i not in visited:
+                self._topological_sort(self.tasks[i], visited, queue)
+        queue.append(node)
+        print(node.name)
+
+    def topological_sort(self):
+
+        visited = {}
+        queue = []
+
+        for root in self.roots:
+            self.results[root] = [0]
+            if self.roots[root] not in visited:
+                self._topological_sort(self.roots[root], visited, queue)
+        
+        return queue
+
+    def start(self, ):
+
+        # sort the tasks in the correct order so that all dependancies are fulfilled
+
+        ordered_tasks = self.topological_sort()
+
+        # pops each task off the stack and runs it
+        
+        print('---')
+        while len(ordered_tasks) > 0:
+
+            task = ordered_tasks.pop()
+            print("Running: ", task.name)
+            # we get the approprate incoming data
+            result = task.run(self.results[task.name])
+            print("Result: ", result)
+
+            for child in self.graph[task.name]:
+                self.results[child].append(result)
 
 
-    def node_beginning(self, node):
-        pass
-
-    def node_running(self, node):
-        pass
-
-    def node_ending(self, node):
-        pass
+    # def run_task():
