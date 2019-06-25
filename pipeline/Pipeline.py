@@ -1,4 +1,8 @@
 from collections import deque
+from Task import Task
+import json
+
+from tasks import *
 
 class Pipeline():
     
@@ -20,7 +24,7 @@ class Pipeline():
         
         """
 
-    def add_task(self, task, children=None, parents=None):
+    def add_task(self, task, children=None, parents=None, type=None):
         
         """
         add a single task to the pipeline
@@ -85,5 +89,16 @@ class Pipeline():
             for child in self.graph[task.name]:
                 self.results[child].append(result)
 
+    # TODO: Assumes a well formatted json file, should validate this
+    def from_nodz(self, nodz_json):
 
-    # def run_task():
+        for node in nodz_json["NODES"]:
+            self.add_task(Task(node), type=nodz_json["NODES"][node]["type"])
+
+        for connection in nodz_json["CONNECTIONS"]:
+            self.connect(self.tasks[connection[0].split(".")[0]], self.tasks[connection[1].split(".")[0]])
+
+    def read_nodz(self, file_location):
+        with open(file_location, 'r') as f:
+            d = json.load(f)
+            self.from_nodz(d)
