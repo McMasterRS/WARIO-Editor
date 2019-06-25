@@ -16,41 +16,26 @@ class Task():
     # Or can we, we really should be starting a standard specification so that the front and back ends communicate effectively
     # A common interface description should mean that we can garentee this somewhat. but is it worth it?
     # Lets just try both.
-    def _begin(self, incoming, *args):
 
-        """
-        Internal begin hook, this is called as part of a pipeline's operation first before the task is run
-        
-        """
-
-        return self.begin(incoming)
-
-    def _run(self, incoming):
+    def _run(self, *arg, item=None):
 
         """
         Internal run hook, the primary function called as part of a pipeline's operation. Runs user's code
         
         """
+        item = self.begin(*arg, item)
+        item = self.run(*arg, item)
+        item = self.end(*arg, item)
+        return item
 
-        return self.run(incoming)
-
-    def _end(self, outgoing):
-
-        """
-        Internal end hook, this is called as part of a pipeline's operation after the task is run
-        
-        """
-
-        return self.end(outgoing)        
-    
-    def begin(self, incoming, *arg):
+    def begin(self, *arg, item=None):
 
         """
         Overwritable begin hook, this is called by the internal begin hook
 
         """
 
-        return incoming
+        return item
 
     def run(self, *arg, item=None):
 
@@ -61,10 +46,10 @@ class Task():
         print(self.name, item)
         return item
 
-    def end(self, outgoing):
+    def end(self, *arg, item=None):
 
         """
         Overwritable end hook, this is called by the internal end hook
                 
         """
-        return outgoing
+        return item

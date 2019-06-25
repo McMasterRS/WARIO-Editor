@@ -1,25 +1,12 @@
 from Pipeline import Pipeline
 from tasks.HelloTask import HelloTask
+from TaskFactory import TaskFactory
 
-
-
-def increment(incoming):
-    sum = 0
-    for i in incoming:
-        sum = sum+i
-
-    return sum + 1
-
-def decrement (incoming):
-    sum = 0
-    for i in incoming:
-        sum = sum+i
-    return sum - 1
-
+factory = TaskFactory(["HelloTask", "RandomTask"])
 
 pipeline = Pipeline()
 pipeline.read_nodz("./saves/sample.json")
-
+pipeline.start()
 # B = Task("B")
 # C = Task("C")
 # D = Task("D")
