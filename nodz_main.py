@@ -20,10 +20,7 @@ from PyQt5 import uic
 import nodz_utils as utils
 from stylesh import stylesh
 
-
-
-defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'default_config.json')
-
+defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'toolkits\default\config.json')
 
 class Nodz(QtWidgets.QGraphicsView):
 
@@ -67,12 +64,13 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Load nodz configuration.
         self.loadConfig(configPath)
+        self.toolkits = ["default"]
+        
         # General data.
         self.gridVisToggle = True
         self.gridSnapToggle = False
         self._nodeSnap = False
         self.selectedNodes = None
-
 
         # Connections data.
         self.drawingConnection = False
@@ -101,8 +99,6 @@ class Nodz(QtWidgets.QGraphicsView):
 
         self.scale(zoomFactor, zoomFactor)
 
-
-
         self.currentState = 'DEFAULT'
 
     def mousePressEvent(self, event):
@@ -124,34 +120,37 @@ class Nodz(QtWidgets.QGraphicsView):
 
             self.currentState = 'MENU'
             menu = QtWidgets.QMenu(self)
-
-            subMenu = menu.addMenu("File")
-            loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraphDialog))
-            saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraphDialog))
-            #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./nx.sav'))
-            #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./nx.sav'))
-            clearActuion = menu.addAction("Clear", functools.partial(self.clearGraph))
-            quitAction = menu.addAction("Quit", functools.partial(sys.exit))
-            subMenu = menu.addMenu("Nodes")
             catMenu = dict()
-
+            tbMenu = dict()
 
             nodeTypes = self.config['node_types']
             nodeAttr = dict()
             nodeCat = dict()
-
-
+            nodeTb = dict()
+            
             for nt in nodeTypes:
-                nodeAttr[nt] = self.config['node_types'][nt]
+                nodeTb[nt] = self.config['node_types'][nt]['toolkit']
+                if nodeTb[nt] not in tbMenu:
+                    if nodeTb[nt] == "":
+                        nodeTb[nt] = "Other"
+                    tbMenu[nodeTb[nt]] = menu.addMenu(nodeTb[nt])
+                    catMenu[nodeTb[nt]] = dict()
+                    
                 nodeCat[nt] = self.config['node_types'][nt]['category']
-                if nodeCat[nt] not in catMenu:
+                if nodeCat[nt] not in catMenu[nodeTb[nt]]:
                     if nodeCat[nt] == "":
-                        nodeCat[nt] = "Other"
-                    catMenu[nodeCat[nt]] = subMenu.addMenu(nodeCat[nt])
-                action = catMenu[nodeCat[nt]].addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=nt))
+                            nodeCat[nt] = "Other"
+                    catMenu[nodeTb[nt]][nodeCat[nt]] = tbMenu[nodeTb[nt]].addMenu(nodeCat[nt])
+                    
+                nodeAttr[nt] = self.config['node_types'][nt]
+                name = ""
+                if nodeTb[nt] == "default":
+                    name = nt
+                else:
+                    name = nt[len(nodeTb[nt]):]
+                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction('Create ' + name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=nt, toolkit=nodeTb[nt]))
 
             menu.exec_(event.globalPos())
-
 
             #super(Nodz, self).contextMenuEvent()
 
@@ -488,11 +487,26 @@ class Nodz(QtWidgets.QGraphicsView):
                                    attrs = self.config['node_types'][nt],
                                    position = pos   , 
                                    parameters = self.config['node_types'][nt]["parameters"],
-                                   type = nt)
+                                   type = nt,
+                                   toolkit = node.toolkit)
             node.setSelected(False)
             newNode.setSelected(True)
     
+    def checkClose(self):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Warning)
+        msg.setText("Save before closing?")
+        msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Close | QtWidgets.QMessageBox.Cancel)
+        
+        ret = msg.exec_()
 
+        if ret == 2048:
+            self.saveGraphDialog()
+        elif ret == 4194304:
+            return
+            
+        sys.exit()
+            
 
     ##################################################################
     # API
@@ -509,6 +523,34 @@ class Nodz(QtWidgets.QGraphicsView):
         """
         self.config = utils._loadConfig(filePath)
 
+    def reloadConfig(self, name, state):
+        # Update the toolkit list
+        if state == True: 
+            if name not in self.toolkits:
+                self.toolkits.append(name)
+        else:
+            if name in self.toolkits:
+                self.toolkits.remove(name)
+                
+            nodes = self.scene().nodes.keys()
+            for node in nodes:
+                if self.scene().nodes[node].toolkit == name:
+                    QtWidgets.QMessageBox.warning(self, "WARNING", "You have removed a toolkit that is currently in use. Please make sure to remove all nodes from that toolkit before continuing.")
+                    break
+                
+        self.loadConfig(defaultConfigPath)
+        
+        for tb in self.toolkits:
+            if tb is not "default":
+                path = ".\\toolkits\{0}\config.json".format(name)
+                _types = utils._loadConfig(path)['node_types']
+                types = {}
+                # Rename the types for all nodes to include toolkit
+                # This avoids duplication
+                for key, type in _types.items():
+                    types[name+key] = type
+                self.config['node_types'].update(types)
+            
 
     def initialize(self):
         """
@@ -550,7 +592,7 @@ class Nodz(QtWidgets.QGraphicsView):
         return self.createNode(name, preset, position, alternate, extended_attributes)
 
     # NODES
-    def createNode(self, type, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None, parameters=None):
+    def createNode(self, type, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None, parameters=None, toolkit=None):
         """
         Create a new node with a given name, position and color.
 
@@ -584,7 +626,7 @@ class Nodz(QtWidgets.QGraphicsView):
         else:
             nodeItem = NodeItem(nodeId=nodeId, name=name, alternate=alternate, preset=preset,
                                 config=self.config, extended_attributes=extended_attributes,
-                                parameters=parameters, type=type)
+                                parameters=parameters, type=type, toolkit=toolkit)
 
             # Store node in scene.
             self.scene().nodes[nodeId] = nodeItem
@@ -954,8 +996,8 @@ class Nodz(QtWidgets.QGraphicsView):
     def buildNodeCommand(self, node):
         return 'aasdfa'
 
-    def newNode(self,name,attrs,position,parameters,type):
-        node = self.createNode(name=name,preset=attrs['preset'],position=position, parameters = parameters, type = type)
+    def newNode(self,name,attrs,position,parameters,type,toolkit):
+        node = self.createNode(name=name,preset=attrs['preset'],position=position, parameters = parameters, type = type, toolkit = toolkit)
 
         for attr in attrs['attributes']:
             self.createAttribute(node,name=attr,index=attrs['attributes'][attr]['index'],preset=attrs['attributes'][attr]['preset'],plug=attrs['attributes'][attr]['plug'],socket=attrs['attributes'][attr]['socket'],dataType=attrs['attributes'][attr]['type'])
@@ -1100,6 +1142,7 @@ class Nodz(QtWidgets.QGraphicsView):
             position = QtCore.QPointF(position[0], position[1])
             alternate = nodesData[nodeId]['alternate']
             parameters = nodesData[nodeId]['parameters']
+            toolkit = nodesData[nodeID]['toolkit']
 
             node = self.createNode( nodeId=nodeId,
                                     name=name,
@@ -1107,7 +1150,8 @@ class Nodz(QtWidgets.QGraphicsView):
                                     preset=preset,
                                     position=position,
                                     alternate=alternate,
-                                    parameters=parameters)
+                                    parameters=parameters,
+                                    toolkit=toolkit)
                                     
             
             # Apply attributes data.
@@ -1358,7 +1402,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
     """
 
-    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, parameters=None, type=None):
+    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, parameters=None, type=None, toolkit=None):
         """
         Initialize the class.
 
@@ -1386,6 +1430,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.nodePreset = preset
         self.attrPreset = None
         self.type = type
+        self.toolkit = toolkit
 
         # Attributes storage.
         self.attrs = list()
@@ -2430,8 +2475,9 @@ class ConnectionItem(QtWidgets.QGraphicsPathItem):
         self.setPath(path)
 
 class loadWidget(QtWidgets.QHBoxLayout):
-    def __init__(self):
+    def __init__(self, parent):
         super(loadWidget, self).__init__()
+        self.parent = parent
         self.textbox = QtWidgets.QLineEdit()
         self.button = QtWidgets.QPushButton("Load")
         self.button.clicked.connect(self.loadFile)
@@ -2442,6 +2488,7 @@ class loadWidget(QtWidgets.QHBoxLayout):
         f = QtWidgets.QFileDialog.getOpenFileName()[0]
         if f is not "":
             self.textbox.setText(f)
+        self.parent.genParameters
     
 class settingsItem(QtWidgets.QWidget):
 
@@ -2486,7 +2533,7 @@ class settingsItem(QtWidgets.QWidget):
             w.setChecked(params["checked"])
             
         elif widget == "loadbox":
-            w = loadWidget()
+            w = loadWidget(self)
             w.textbox.setText(params["text"])
             
         elif widget == "combobox":
