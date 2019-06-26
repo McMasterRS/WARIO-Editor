@@ -524,6 +524,10 @@ class Nodz(QtWidgets.QGraphicsView):
         self.config = utils._loadConfig(filePath)
 
     def reloadConfig(self, name, state):
+        """ 
+        reloads the list of toolkits and from that the 
+        list of nodes available
+        """
         # Update the toolkit list
         if state == True: 
             if name not in self.toolkits:
@@ -892,9 +896,11 @@ class Nodz(QtWidgets.QGraphicsView):
             preset = nodeInst.nodePreset
             nodeAlternate = nodeInst.alternate
             nodeType = nodeInst.type
+            toolkit = nodeInst.toolkit
 
             data['NODES'][node] = { 'name': name,
                                     'type': nodeType,
+                                    'toolkit' : toolkit,
                                     'preset': preset,
                                     'position': [nodeInst.pos().x(), nodeInst.pos().y()],
                                     'alternate': nodeAlternate,
@@ -1142,7 +1148,10 @@ class Nodz(QtWidgets.QGraphicsView):
             position = QtCore.QPointF(position[0], position[1])
             alternate = nodesData[nodeId]['alternate']
             parameters = nodesData[nodeId]['parameters']
-            toolkit = nodesData[nodeID]['toolkit']
+            toolkit = nodesData[nodeId]['toolkit']
+            self.reloadConfig(toolkit, True)
+            if toolkit is not "default":
+                nodeType = toolkit+nodeType
 
             node = self.createNode( nodeId=nodeId,
                                     name=name,

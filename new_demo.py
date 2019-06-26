@@ -24,22 +24,34 @@ def startNodz():
     window = QtWidgets.QMainWindow()
     window.setCentralWidget(nodz)
     menu = window.menuBar()
+    
+    fileMenu = menu.addMenu('&File')
+    editMenu = menu.addMenu('&Edit')
+    toolkitMenu = menu.addMenu("&Toolkits")
 
     saveAct = QtWidgets.QAction(QtGui.QIcon('save.png'), "&Save", window)
     saveAct.setShortcut("Ctrl+S")
     saveAct.setStatusTip("Save Flowchart")
     saveAct.triggered.connect(nodz.saveGraphDialog)
+    
+    def loadFile():
+        nodz.loadGraphDialog()
+        toolkitList = nodz.toolkits
+        for tk in toolkitMenu.actions():
+            if tk.text() in toolkitList:
+                tk.setChecked(True)
+            else:
+                tk.setChecked(False)
 
     loadAct = QtWidgets.QAction(QtGui.QIcon('load.png'), "&Load", window)
     loadAct.setShortcut("Ctrl+O")
     loadAct.setStatusTip("Load Flowchart")
-    loadAct.triggered.connect(nodz.loadGraphDialog)
+    loadAct.triggered.connect(loadFile)
 
     quitAct = QtWidgets.QAction(QtGui.QIcon('quit.png'), "&Quit", window)
     quitAct.setStatusTip("Quit")
     quitAct.triggered.connect(nodz.checkClose)
 
-    fileMenu = menu.addMenu('&File')
     fileMenu.addAction(saveAct)  
     fileMenu.addAction(loadAct)
     fileMenu.addAction(quitAct)
@@ -53,11 +65,9 @@ def startNodz():
     clearAct.setStatusTip("Clear flowchart of all nodes")
     clearAct.triggered.connect(nodz.clearGraph)
 
-    editMenu = menu.addMenu('&Edit')
     editMenu.addAction(duplicateAct)
     editMenu.addAction(clearAct)
 
-    toolkitMenu = menu.addMenu("&Toolkits")
     for root, directories, files in os.walk('./toolkits'):
         for dir in directories:
             if dir != "default":
@@ -76,6 +86,8 @@ def startNodz():
     helpMenu.addAction(wikiAct)
 
     window.show()
+    
+
 
     ######################################################################
     # Test signals
