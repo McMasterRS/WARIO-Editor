@@ -12,7 +12,6 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 import nodz_utils as utils
-from stylesh import stylesh
 
 defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'toolkits\default\config.json')
 
@@ -524,7 +523,7 @@ class Nodz(QtWidgets.QGraphicsView):
         custom = utils._loadConfig(".\\toolkits\custom.json")
         self.config['node_types'].update(custom['node_types'])
 
-    def reloadConfig(self, name, state):
+    def reloadConfig(self, name = "", state = False):
         """ 
         reloads the list of toolkits and from that the 
         list of nodes available
@@ -543,20 +542,20 @@ class Nodz(QtWidgets.QGraphicsView):
             nodes = self.scene().nodes.keys()
             for node in nodes:
                 if self.scene().nodes[node].toolkit == name:
-                    QtWidgets.QMessageBox.warning(self, "WARNING", "You have removed a toolkit that is currently in use. Please make sure to remove all nodes from that toolkit before continuing.")
+                    QtWidgets.QMessageBox.critical(self, "WARNING", "You have removed a toolkit that is currently in use. Please make sure to remove all nodes from that toolkit before continuing. Failure to do so may render the flowchart unuseable upon saving")
                     break
                 
         self.loadConfig(defaultConfigPath)
         
         for tb in self.toolkits:
             if tb is not "default":
-                path = ".\\toolkits\{0}\config.json".format(name)
+                path = ".\\toolkits\{0}\config.json".format(tb)
                 _types = utils._loadConfig(path)['node_types']
                 types = {}
                 # Rename the types for all nodes to include toolkit
                 # This avoids duplication
                 for key, type in _types.items():
-                    types[name+key] = type
+                    types[tb+key] = type
                 self.config['node_types'].update(types)
             
 
@@ -897,6 +896,7 @@ class Nodz(QtWidgets.QGraphicsView):
             nodeAlternate = nodeInst.alternate
             nodeType = nodeInst.type
             toolkit = nodeInst.toolkit
+            variables = nodeInst.variables
 
             data['NODES'][node] = { 'name': name,
                                     'type': nodeType,
@@ -905,7 +905,8 @@ class Nodz(QtWidgets.QGraphicsView):
                                     'position': [nodeInst.pos().x(), nodeInst.pos().y()],
                                     'alternate': nodeAlternate,
                                     'attributes': [],
-                                    'parameters': nodeInst.parameters}
+                                    'parameters': nodeInst.parameters,
+                                    'variables' : variables}
 
             attrs = nodeInst.attrs
             for attr in attrs:
@@ -942,17 +943,15 @@ class Nodz(QtWidgets.QGraphicsView):
         return node
 
     def loadGraphDialog(self):
-        if (not self.clearGraph()):
-            return
         dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.', filter="JSON files (*.json)")
         if (dialog != ''):
-            #print(dialog[0])
+            if (not self.clearGraph()):
+                return
             self.loadGraph(filePath=dialog[0])
 
     def saveGraphDialog(self):
         dialog = QtWidgets.QFileDialog.getSaveFileName(directory='.', filter="JSON files (*.json)")
         if (dialog != ''):
-            #print(dialog[0])
             self.saveGraph(filePath=dialog[0])
 
     def loadGraph(self, filePath='path'):
@@ -1161,7 +1160,7 @@ class NodeScene(QtWidgets.QGraphicsScene):
         """
         super(NodeScene, self).__init__(parent)
         #self.setAcceptDrops(True)
-        print("SEL PAR: %s  ::  %s" % (parent, self.parent(),))
+        #print("SEL PAR: %s  ::  %s" % (parent, self.parent(),))
 
         # General.
         self.gridSize = parent.config['grid_size']
@@ -1286,6 +1285,9 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
         self.plugs = dict()
         self.sockets = dict()
+        
+        self.parameters = dict()
+        self.variables = dict()
 
         # Extended attributes
         self.extended_attributes = {}
@@ -2356,9 +2358,9 @@ class customWidget(loadWidget):
         obj = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(obj)
         
-        self.parent.parent.attrs = list()
-        self.parent.parent.attrsData = dict()
-        self.parent.parent.attrCount = 0
+        # Delete existing attributes and their connections
+        while len(self.parent.parent.attrs) > 0:
+            self.parent.parent._deleteAttribute(0)
         
         attribs = obj.getAttribs()
         for attrib in attribs:
@@ -2381,6 +2383,7 @@ class settingsItem(QtWidgets.QWidget):
     def __init__(self, parent, widgets):
         super(settingsItem, self).__init__(None)
         self.parent = parent
+        self.nameList = []
         
         self.layout = QtWidgets.QFormLayout()
         self.buildUI(widgets)
@@ -2388,88 +2391,126 @@ class settingsItem(QtWidgets.QWidget):
         
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
         self.setWindowTitle("Settings")
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
         #self.setStyleSheet(stylesh)
         self.genParameters()
         
+        
+    # Populate the parameters window    
     def buildUI(self, widgets, custom = False):
+        # If not building the custom node UI add the rename textbox
+        # to the top of the parameters menu
         if custom == False:
             label = QtWidgets.QLabel("Node Name")
             widget = self.genWidget("textbox", {'text': self.parent.name})
             self.layout.insertRow(-1, label, widget)
-        if widgets == {}:
-            return
+
+        # Loop through all the widgets in the json file and
+        # add them to the parameters menu
         for i in widgets:
+            self.nameList.append(i)
+            # Give error message if any essential info is missing
+            errors = []
+            if "text" not in widgets[i]: errors.append("text")
+            if "type" not in widgets[i]: errors.append("type")
+            if "params" not in widgets[i]: errors.append("params")
+            if len(errors) > 0:
+                QtWidgets.QMessageBox.critical(self, "ERROR", "'{0}' node parameter {1} missing values {2}".format(self.parent.name, i, errors))
+                continue
+            
             label = QtWidgets.QLabel(widgets[i]["text"])
             widget = self.genWidget(widgets[i]["type"], widgets[i]["params"])
             self.layout.insertRow(-1, label, widget)
-            
+                   
+    # Reset the parameters window to basic version
     def resetUI(self, custom = False):
         start = 1
+        # Custom windows keep name and file parameters
         if custom:
             start = 2
             
-        if self.layout.rowCount() <= start:
-            return
+        self.nameList = []
             
         for i in range(start, self.layout.rowCount()):
             self.layout.removeRow(i)
             
     # Generate the settings row based on its defined widget
     def genWidget(self, widget, params):
+        error = ""
         if widget == "textbox":
             w = QtWidgets.QLineEdit()
-            w.setText(params["text"])
-            
+            if "text" in params: w.setText(params["text"]) 
         elif widget == "spinbox":
             w = QtWidgets.QSpinBox()
-            w.setMinimum(params["minimum"])
-            w.setMaximum(params["maximum"])
-            w.setValue(params["value"])
+            if "minimum" in params: w.setMinimum(params["minimum"]) 
+            if "maximum" in params: w.setMaximum(params["maximum"]) 
+            if "value" in params: w.setValue(params["value"]) 
             
         elif widget == "checkbox":
             w = QtWidgets.QCheckBox()
-            w.setChecked(params["checked"])
+            if "checked" in params: w.setChecked(params["checked"]) 
             
         elif widget == "loadbox":
             w = loadWidget(self)
-            w.textbox.setText(params["text"])
+            if "text" in params: w.textbox.setText(params["text"]) 
             
         elif widget == "custombox":
             w = customWidget(self)
-            w.textbox.setText(params["text"])
+            if "text" in params: w.textbox.setText(params["text"]) 
             
         elif widget == "combobox":
             w = QtWidgets.QComboBox()
             
+        else:
+            QtWidgets.QMessageBox.critical(self, "ERROR", "Unrecognised parameter type for node {0}".format(self.parent.name))
+            return None
+            
         return w
         
+    # Catch window close and save parameters
     def closeEvent(self, event):
         self.genParameters()
         event.accept()
+    
+    def focusOutEvent(self, event):
+        self.genParameters()
+        event.accept()
 
+    # Return the values from each parameter type
     def genParameters(self):
     
         self.parent.name = self.layout.itemAt(0,1).widget().text()
     
         data = {}
+        vars = {}
         for i in range(1, self.layout.rowCount()):
             param = {'text' : "", 'type' : "", 'params' : {}}
             param['text'] = self.layout.itemAt(i,0).widget().text()
             
+            var = []
+            
             w = self.layout.itemAt(i,1)
+            if w is None:
+                continue
             if isinstance(w.widget(), QtWidgets.QLineEdit):
                 param['type'] = "textbox"
                 param['params'] = {'text' : w.widget().text()}
+                var = w.widget().text()
             elif isinstance(w.widget(), QtWidgets.QCheckBox):
                 param['type'] = "checkbox"
                 param['params']  = {'checked' : w.widget().isChecked()}
+                var = w.widget().isChecked()
             elif isinstance(w.widget(), QtWidgets.QSpinBox):
                 param['type'] = "spinbox"
                 param['params'] = {'minimum' : w.widget().minimum(), 'maximum' : w.widget().maximum(), 'value' : w.widget().value()}
+                var = w.widget().value()
             elif isinstance(w, loadWidget):  
                 param['type'] = "loadbox"
                 param['params'] = {'text' : w.textbox.text()}
+                var = w.textbox.text()
                 
-            data["param{0}".format(i)] = param
+            data[self.nameList[i-1]] = param
+            vars[self.nameList[i-1]] = var
 
         self.parent.parameters = data
+        self.parent.variables = vars

@@ -91,34 +91,22 @@
                 }
             },
             "parameters" : {
-                "param0" : {
-                    "text"   : "test",
-                    "type"   : "textbox",
-                    "params" : {
-                        "text"   : ""
-                    }
-                },
-                "param1" : {
-                    "text"   : "Checkbox Test",
-                    "type"   : "checkbox",
-                    "params" : {
-                        "checked" : false
-                    }
-                },
-                "param2" : {
-                    "text"   : "Spinbox Test",
+                "min" : {
+                    "text"   : "Minimum value",
                     "type"   : "spinbox",
                     "params" : {
                         "minimum" : 0,
-                        "maximum" : 100,
+                        "maximum" : 1e356,
                         "value"   : 0
                     }
-                },
-                "param3" : {
-                    "text" : "Load Data",
-                    "type" : "loadbox",
+                }
+                "max" : {
+                    "text"   : "Maximum value",
+                    "type"   : "spinbox",
                     "params" : {
-                        "text" : ""
+                        "minimum" : 0,
+                        "maximum" : 1e356,
+                        "value"   : 0
                     }
                 }
             }
@@ -139,25 +127,21 @@
                 }
             },
             "parameters" : {
-                "param1" : {
-                    "text"   : "test",
-                    "type"   : "textbox",
-                    "params" : {
-                        "text"   : ""
-                    }
-                },
-                "param2" : {
-                    "text"   : "Checkbox Test",
-                    "type"   : "checkbox",
-                    "params" : {
-                        "checked" : false}
-                },
-                "param3" : {
-                    "text"   : "Spinbox Test",
+                "min" : {
+                    "text"   : "Minimum value",
                     "type"   : "spinbox",
                     "params" : {
                         "minimum" : 0,
-                        "maximum" : 100,
+                        "maximum" : 1e356,
+                        "value"   : 0
+                    }
+                }
+                "max" : {
+                    "text"   : "Maximum value",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : 0,
+                        "maximum" : 1e356,
                         "value"   : 0
                     }
                 }
