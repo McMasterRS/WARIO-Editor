@@ -95,8 +95,8 @@
                     "text"   : "Minimum value",
                     "type"   : "spinbox",
                     "params" : {
-                        "minimum" : 0,
-                        "maximum" : 1e356,
+                        "minimum" : -2147483648,
+                        "maximum" : 2147483647,
                         "value"   : 0
                     }
                 },
@@ -104,8 +104,8 @@
                     "text"   : "Maximum value",
                     "type"   : "spinbox",
                     "params" : {
-                        "minimum" : 0,
-                        "maximum" : 1e356,
+                        "minimum" : -2147483648,
+                        "maximum" : 2147483647,
                         "value"   : 0
                     }
                 }
@@ -131,8 +131,8 @@
                     "text"   : "Minimum value",
                     "type"   : "spinbox",
                     "params" : {
-                        "minimum" : 0,
-                        "maximum" : 1e356,
+                        "minimum" : -2147483648,
+                        "maximum" : 2147483647,
                         "value"   : 0
                     }
                 },
@@ -140,8 +140,8 @@
                     "text"   : "Maximum value",
                     "type"   : "spinbox",
                     "params" : {
-                        "minimum" : 0,
-                        "maximum" : 1e356,
+                        "minimum" : -2147483648,
+                        "maximum" : 2147483647,
                         "value"   : 0
                     }
                 }
