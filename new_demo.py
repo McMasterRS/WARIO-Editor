@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtGui
 import nodz_main
-import sys, os, webbrowser
+import sys, os
 
 
     
