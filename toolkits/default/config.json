@@ -99,7 +99,7 @@
                         "maximum" : 1e356,
                         "value"   : 0
                     }
-                }
+                },
                 "max" : {
                     "text"   : "Maximum value",
                     "type"   : "spinbox",
@@ -135,7 +135,7 @@
                         "maximum" : 1e356,
                         "value"   : 0
                     }
-                }
+                },
                 "max" : {
                     "text"   : "Maximum value",
                     "type"   : "spinbox",
