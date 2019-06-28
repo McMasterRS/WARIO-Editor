@@ -151,7 +151,7 @@
         },
         "Integer Out": {
             "preset": "node_default",
-            "file": "",
+            "file": "intOut.py",
             "alternate": true,
             "position": "none",
             "category": "Output",
@@ -169,7 +169,7 @@
         },
         "Float Out": {
             "preset": "node_default",
-            "file": "",
+            "file": "floatOut.py",
             "alternate": true,
             "position": "none",
             "category": "Output",
@@ -219,7 +219,7 @@
         },
         "Integer Multiplier": {
             "preset": "node_default",
-            "file": "",
+            "file": "intMultiplier.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -251,7 +251,7 @@
         },
         "Integer Divider(R)": {
             "preset": "node_default",
-            "file": "",
+            "file": "intDividerR.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -290,7 +290,7 @@
         },
         "Integer Divider(F)": {
             "preset": "node_default",
-            "file": "",
+            "file": "intDividerF.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -322,7 +322,7 @@
         },
         "Integer Subtractor": {
             "preset": "node_default",
-            "file": "",
+            "file": "intSubtractor.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -354,7 +354,7 @@
         },
         "Float to Integer": {
             "preset": "node_default",
-            "file": "",
+            "file": "floatToInt.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -379,7 +379,7 @@
         },
         "Integer to Float": {
             "preset": "node_default",
-            "file": "",
+            "file": "intToFloat",
             "alternate": true,
             "position": "none",
             "category": "Operator",
