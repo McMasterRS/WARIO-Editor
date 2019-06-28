@@ -77,6 +77,7 @@
     "node_types":{
         "Random Integer In": {
             "preset": "node_default",
+            "file": "randomInt.py",
             "alternate": true,
             "position": "none",
             "category": "Input",
@@ -113,6 +114,7 @@
         },
         "Random Float In": {
             "preset": "node_default",
+            "file": "randomFloat.py",
             "alternate": true,
             "position": "none",
             "category": "Input",
@@ -149,6 +151,7 @@
         },
         "Integer Out": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Output",
@@ -166,6 +169,7 @@
         },
         "Float Out": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Output",
@@ -183,6 +187,7 @@
         },
         "Integer Adder": {
             "preset": "node_default",
+            "file": "intAdder.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -214,6 +219,7 @@
         },
         "Integer Multiplier": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -245,6 +251,7 @@
         },
         "Integer Divider(R)": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -283,6 +290,7 @@
         },
         "Integer Divider(F)": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -314,6 +322,7 @@
         },
         "Integer Subtractor": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -345,6 +354,7 @@
         },
         "Float to Integer": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Operator",
@@ -369,6 +379,7 @@
         },
         "Integer to Float": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Operator",

@@ -12,21 +12,22 @@ def getParams():
     return params
     
 def getAttribs():
-    attributes = {
-        "in0" : {
-            "index" : -1,
-            "preset" : "attr_preset_1",
-            "plug" : False,
-            "socket" : True,
-            "type" : "int"
+    attributes = {  
+        "Out" : {  
+            "index" : -1,  
+            "preset" : "attr_preset_1",  
+            "plug" : True,  
+            "socket" : False,  
+            "type" : "int"  
         },
-        "in1" : {
-            "index" : -1,
-            "preset" : "attr_preset_1",
-            "plug" : False,
-            "socket" : True,
-            "type" : "int"
+        "In" : {  
+            "index" : -1,  
+            "preset" : "attr_preset_1",  
+            "plug" : False,  
+            "socket" : True,  
+            "type" : "int"  
         }
-    }
+    }  
+
     
     return attributes
