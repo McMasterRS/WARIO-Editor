@@ -1,11 +1,34 @@
 def getParams():
     params = {
-        "param1" : {
-            "text" : "Custom test",
-            "type" : "checkbox",
+        "textboxExample" : {
+            "text"   : "Textbox Example",
+            "type"   : "textbox",
+            "params" : {
+                "text" : "example text"
+            }
+        },
+        "min" : {
+            "text"   : "Minimum value",
+            "type"   : "spinbox",
+            "params" : {
+                "minimum" : -2147483648,
+                "maximum" : 2147483647,
+                "value"   : 0
+            }
+        },        
+        "nodeEnabled" : {
+            "text"   : "Enabled",
+            "type"   : "checkbox",
             "params" : {
                 "checked" : False
-            }      
+            }
+        },
+        "loadCode" : {
+            "text"   : "File Location",
+            "type"   : "loadbox",
+            "params" : {
+                "text" : "file.exe"
+            }
         }
     }
     
@@ -29,5 +52,4 @@ def getAttribs():
         }
     }  
 
-    
     return attributes

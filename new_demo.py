@@ -92,7 +92,7 @@ def startNodz():
 
     for root, directories, files in os.walk('./toolkits'):
         for dir in directories:
-            if dir != "default":
+            if dir != "default" and dir != "__pycache__":
                 dirMenu = QtWidgets.QAction(QtGui.QIcon(''), dir, window, checkable=True)
                 dirMenu.triggered.connect(makeToolkitCall(dir))
                 toolkitMenu.addAction(dirMenu)
