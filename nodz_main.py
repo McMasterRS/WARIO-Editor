@@ -897,9 +897,11 @@ class Nodz(QtWidgets.QGraphicsView):
             nodeType = nodeInst.type
             toolkit = nodeInst.toolkit
             variables = nodeInst.variables
+            file = self.config['node_types'][nodeType]['file']
 
             data['NODES'][node] = { 'name': name,
                                     'type': nodeType,
+                                    'file': file,
                                     'toolkit' : toolkit,
                                     'preset': preset,
                                     'position': [nodeInst.pos().x(), nodeInst.pos().y()],
@@ -2424,12 +2426,14 @@ class settingsItem(QtWidgets.QWidget):
                    
     # Reset the parameters window to basic version
     def resetUI(self, custom = False):
-        start = 1
+        
         # Custom windows keep name and file parameters
         if custom:
             start = 2
-            
-        self.nameList = []
+            self.nameList = [self.nameList[0]]
+        else:
+            start = 1
+            self.nameList = []
             
         for i in range(start, self.layout.rowCount()):
             self.layout.removeRow(i)
@@ -2508,7 +2512,7 @@ class settingsItem(QtWidgets.QWidget):
                 param['type'] = "loadbox"
                 param['params'] = {'text' : w.textbox.text()}
                 var = w.textbox.text()
-                
+
             data[self.nameList[i-1]] = param
             vars[self.nameList[i-1]] = var
 
