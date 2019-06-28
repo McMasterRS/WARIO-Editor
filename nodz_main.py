@@ -4,13 +4,7 @@ import six
 import functools
 import sys
 import uuid
-
-try:
-    import networkx as nx
-    from networkx.readwrite import json_graph
-except ImportError:
-    nx = None
-    json_graph = None
+import importlib
 
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
@@ -18,12 +12,8 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 import nodz_utils as utils
-from stylesh import stylesh
 
-
-
-defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'default_config.json')
-
+defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'toolkits\default\config.json')
 
 class Nodz(QtWidgets.QGraphicsView):
 
@@ -67,12 +57,13 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Load nodz configuration.
         self.loadConfig(configPath)
+        self.toolkits = ["default"]
+        
         # General data.
         self.gridVisToggle = True
         self.gridSnapToggle = False
         self._nodeSnap = False
         self.selectedNodes = None
-
 
         # Connections data.
         self.drawingConnection = False
@@ -101,8 +92,6 @@ class Nodz(QtWidgets.QGraphicsView):
 
         self.scale(zoomFactor, zoomFactor)
 
-
-
         self.currentState = 'DEFAULT'
 
     def mousePressEvent(self, event):
@@ -124,34 +113,41 @@ class Nodz(QtWidgets.QGraphicsView):
 
             self.currentState = 'MENU'
             menu = QtWidgets.QMenu(self)
-
-            subMenu = menu.addMenu("File")
-            loadFromAction = subMenu.addAction("Open File...", functools.partial(self.loadGraphDialog))
-            saveToAction = subMenu.addAction("Save File...", functools.partial(self.saveGraphDialog))
-            #loadNXFromAction = subMenu.addAction("Open NX...", functools.partial(self.loadGraphAsNetworkx,filePath='./nx.sav'))
-            #saveNXToAction = subMenu.addAction("Save NX...", functools.partial(self.saveGraphAsNetworkX,filePath='./nx.sav'))
-            clearActuion = menu.addAction("Clear", functools.partial(self.clearGraph))
-            quitAction = menu.addAction("Quit", functools.partial(sys.exit))
-            subMenu = menu.addMenu("Nodes")
             catMenu = dict()
-
+            tbMenu = dict()
 
             nodeTypes = self.config['node_types']
             nodeAttr = dict()
             nodeCat = dict()
-
-
+            nodeTb = dict()
+            
             for nt in nodeTypes:
+                nodeTb[nt] = self.config['node_types'][nt]['toolkit']
                 nodeAttr[nt] = self.config['node_types'][nt]
+                if nt == "Custom":
+                    continue
+                if nodeTb[nt] not in tbMenu:
+                    if nodeTb[nt] == "":
+                        nodeTb[nt] = "Other"
+                    tbMenu[nodeTb[nt]] = menu.addMenu(nodeTb[nt])
+                    catMenu[nodeTb[nt]] = dict()
+                    
                 nodeCat[nt] = self.config['node_types'][nt]['category']
-                if nodeCat[nt] not in catMenu:
+                if nodeCat[nt] not in catMenu[nodeTb[nt]]:
                     if nodeCat[nt] == "":
-                        nodeCat[nt] = "Other"
-                    catMenu[nodeCat[nt]] = subMenu.addMenu(nodeCat[nt])
-                action = catMenu[nodeCat[nt]].addAction('Create ' + nt, functools.partial(self.newNode,name=nt,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=nt))
+                            nodeCat[nt] = "Other"
+                    catMenu[nodeTb[nt]][nodeCat[nt]] = tbMenu[nodeTb[nt]].addMenu(nodeCat[nt])
+                    
+                name = ""
+                if nodeTb[nt] == "default":
+                    name = nt
+                else:
+                    name = nt[len(nodeTb[nt]):]
+                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction('Create ' + name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=nt, toolkit=nodeTb[nt]))
+                
+            menu.addAction("Custom", functools.partial(self.newNode,name="Custom",attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=nt, toolkit=nodeTb[nt]))
 
             menu.exec_(event.globalPos())
-
 
             #super(Nodz, self).contextMenuEvent()
 
@@ -488,11 +484,26 @@ class Nodz(QtWidgets.QGraphicsView):
                                    attrs = self.config['node_types'][nt],
                                    position = pos   , 
                                    parameters = self.config['node_types'][nt]["parameters"],
-                                   type = nt)
+                                   type = nt,
+                                   toolkit = node.toolkit)
             node.setSelected(False)
             newNode.setSelected(True)
     
+    def checkClose(self):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Warning)
+        msg.setText("Save before closing?")
+        msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Close | QtWidgets.QMessageBox.Cancel)
+        
+        ret = msg.exec_()
 
+        if ret == 2048:
+            self.saveGraphDialog()
+        elif ret == 4194304:
+            return
+            
+        sys.exit()
+            
 
     ##################################################################
     # API
@@ -508,7 +519,45 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         self.config = utils._loadConfig(filePath)
+        
+        custom = utils._loadConfig(".\\toolkits\custom.json")
+        self.config['node_types'].update(custom['node_types'])
 
+    def reloadConfig(self, name = "", state = False):
+        """ 
+        reloads the list of toolkits and from that the 
+        list of nodes available
+        """
+        if name == "custom":
+            return
+        
+        # Update the toolkit list
+        if state == True: 
+            if name not in self.toolkits:
+                self.toolkits.append(name)
+        else:
+            if name in self.toolkits:
+                self.toolkits.remove(name)
+                
+            nodes = self.scene().nodes.keys()
+            for node in nodes:
+                if self.scene().nodes[node].toolkit == name:
+                    QtWidgets.QMessageBox.critical(self, "WARNING", "You have removed a toolkit that is currently in use. Please make sure to remove all nodes from that toolkit before continuing. Failure to do so may render the flowchart unuseable upon saving")
+                    break
+                
+        self.loadConfig(defaultConfigPath)
+        
+        for tb in self.toolkits:
+            if tb is not "default":
+                path = ".\\toolkits\{0}\config.json".format(tb)
+                _types = utils._loadConfig(path)['node_types']
+                types = {}
+                # Rename the types for all nodes to include toolkit
+                # This avoids duplication
+                for key, type in _types.items():
+                    types[tb+key] = type
+                self.config['node_types'].update(types)
+            
 
     def initialize(self):
         """
@@ -545,12 +594,8 @@ class Nodz(QtWidgets.QGraphicsView):
         # Connect signals.
         self.scene().selectionChanged.connect(self._returnSelection)
 
-
-    def createNxNode(self, name='default', preset='node_default', position=None, alternate=True, **extended_attributes):
-        return self.createNode(name, preset, position, alternate, extended_attributes)
-
     # NODES
-    def createNode(self, type, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None, parameters=None):
+    def createNode(self, type, name='default', preset='node_default', position=None, alternate=True, extended_attributes=None, nodeId=None, parameters=None, toolkit=None):
         """
         Create a new node with a given name, position and color.
 
@@ -584,7 +629,7 @@ class Nodz(QtWidgets.QGraphicsView):
         else:
             nodeItem = NodeItem(nodeId=nodeId, name=name, alternate=alternate, preset=preset,
                                 config=self.config, extended_attributes=extended_attributes,
-                                parameters=parameters, type=type)
+                                parameters=parameters, type=type, toolkit=toolkit)
 
             # Store node in scene.
             self.scene().nodes[nodeId] = nodeItem
@@ -850,14 +895,18 @@ class Nodz(QtWidgets.QGraphicsView):
             preset = nodeInst.nodePreset
             nodeAlternate = nodeInst.alternate
             nodeType = nodeInst.type
+            toolkit = nodeInst.toolkit
+            variables = nodeInst.variables
 
             data['NODES'][node] = { 'name': name,
                                     'type': nodeType,
+                                    'toolkit' : toolkit,
                                     'preset': preset,
                                     'position': [nodeInst.pos().x(), nodeInst.pos().y()],
                                     'alternate': nodeAlternate,
                                     'attributes': [],
-                                    'parameters': nodeInst.parameters}
+                                    'parameters': nodeInst.parameters,
+                                    'variables' : variables}
 
             attrs = nodeInst.attrs
             for attr in attrs:
@@ -885,189 +934,24 @@ class Nodz(QtWidgets.QGraphicsView):
         # Emit signal.
         self.signal_GraphSaved.emit()
 
-    def getNetworkxGraph(self):
-        if nx is None:
-            raise Exception("Failed to import networkx")
-        graph = nx.MultiDiGraph()
-        for name, node in self.scene().nodes.items():
-            attributes = []
-            for attr in node.attrs:
-                attrData = node.attrsData[attr]
-
-                # serialize dataType if needed.
-                if isinstance(attrData['dataType'], type):
-                    attrData['dataType'] = str(attrData['dataType'])
-
-                attributes.append(attrData)
-
-            graph.add_node(name,
-                           preset=node.nodePreset,
-                           position=(node.pos().x(), node.pos().y()),
-                           alternate=node.alternate,
-                           attributes=attributes, **node.extended_attributes)
-
-        edges = self.evaluateGraph(tuples=True)
-        for edge in edges:
-            (plugNode, plugAttr), (socketNode, socketAttr) = edge
-            graph.add_edge(plugNode, socketNode, plug=plugAttr, socket=socketAttr)
-
-        return graph
-
-    def executeGraph(self, filePath='path'):
-        graph = self.getNetworkxGraph()
-
-        if nx is None:
-            raise Exception("Failed to import networkx")
-        graph = nx.MultiDiGraph()
-
-        for name, node in self.scene().nodes.items():
-            attributes = []
-            for attr in node.attrs:
-                attrData = node.attrsData[attr]
-
-                # serialize dataType if needed.
-                if isinstance(attrData['dataType'], type):
-                    attrData['dataType'] = str(attrData['dataType'])
-
-                attributes.append(attrData)
-
-            graph.add_node(name,
-                           preset=node.nodePreset,
-                           position=(node.pos().x(), node.pos().y()),
-                           alternate=node.alternate,
-                           attributes=attributes)
-
-        edges = self.evaluateGraph(tuples=True)
-        for edge in edges:
-            (plugNode, plugAttr), (socketNode, socketAttr) = edge
-            graph.add_edge(plugNode, socketNode, plug=plugAttr, socket=socketAttr)
-
-
-        commands = []
-        for node in graph.nodes:
-            if graph.predecessors(node):
-                continue
-            command = self.buildNodeCommand(node)
-            commands.append(command)
-
-
-    def buildNodeCommand(self, node):
-        return 'aasdfa'
-
-    def newNode(self,name,attrs,position,parameters,type):
-        node = self.createNode(name=name,preset=attrs['preset'],position=position, parameters = parameters, type = type)
+    def newNode(self,name,attrs,position,parameters,type,toolkit):
+        node = self.createNode(name=name,preset=attrs['preset'],position=position, parameters = parameters, type = type, toolkit = toolkit)
 
         for attr in attrs['attributes']:
             self.createAttribute(node,name=attr,index=attrs['attributes'][attr]['index'],preset=attrs['attributes'][attr]['preset'],plug=attrs['attributes'][attr]['plug'],socket=attrs['attributes'][attr]['socket'],dataType=attrs['attributes'][attr]['type'])
             
         return node
 
-
-    def saveGraphAsNetworkX(self, filePath='path'):
-        graph = self.getNetworkxGraph()
-
-        if nx is None:
-            raise Exception("Failed to import networkx")
-        graph = nx.MultiDiGraph()
-        for name, node in self.scene().nodes.items():
-            attributes = []
-            for attr in node.attrs:
-                attrData = node.attrsData[attr]
-
-                # serialize dataType if needed.
-                if isinstance(attrData['dataType'], type):
-                    attrData['dataType'] = str(attrData['dataType'])
-
-                attributes.append(attrData)
-
-            graph.add_node(name,
-                           preset=node.nodePreset,
-                           position=(node.pos().x(), node.pos().y()),
-                           alternate=node.alternate,
-                           attributes=attributes)
-
-        edges = self.evaluateGraph(tuples=True)
-        for edge in edges:
-            (plugNode, plugAttr), (socketNode, socketAttr) = edge
-            graph.add_edge(plugNode, socketNode, plug=plugAttr, socket=socketAttr)
-
-
-        serialized = json_graph.node_link_data(graph)
-        jsonized = json.dumps(serialized, indent=4)
-        try:
-            fh = open(filePath, 'w')
-            fh.write(jsonized)
-            fh.close()
-        except Exception as e:
-            print("Failed to write JSON data to file '%s': %s" % (filePath, e))
-            raise
-
-    def loadGraphAsNetworkx(self, filePath):
-        try:
-            fh = open(filePath, 'r')
-            data = json.load(fh)
-            fh.close()
-        except Exception as e:
-            print("Failed to open json file at '%s': %s" % (filePath, e))
-            raise e
-        graph = json_graph.node_link_graph(data)
-        print('nodes')
-        nodes = list(graph.nodes(data=True))
-        for nodename, nodedata in nodes:
-            print(nodename)
-            p = nodedata['position']
-            point = QtCore.QPointF(p[0], p[1])
-            node = self.createNode(name=nodename,
-                                   preset=nodedata['preset'],
-                                   position=point,
-                                   alternate=nodedata['alternate'])
-
-            for index, attrData in enumerate(nodedata['attributes']):
-
-                name = attrData['name']
-                plug = attrData['plug']
-                socket = attrData['socket']
-                preset = attrData['preset']
-                dataType = attrData['dataType']
-
-                # un-serialize data type if needed
-                if (isinstance(dataType, six.text_type) and dataType.find('<') == 0):
-                    dataType = eval(str(dataType.split('\'')[1]))
-
-                self.createAttribute(node=node,
-                                     name=name,
-                                     index=index,
-                                     preset=preset,
-                                     plug=plug,
-                                     socket=socket,
-                                     dataType=dataType)
-
-        # Apply connections data.
-        edges = graph.edges(data=True)
-        print(edges)
-        for source, target, data in edges:
-            print(source)
-
-            self.createConnection(source, data['plug'],
-                                  target, data['socket'])
-
-        self.scene().update()
-
-        # Emit signal.
-        self.signal_GraphLoaded.emit()
-
     def loadGraphDialog(self):
-        if (not self.clearGraph()):
-            return
         dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.', filter="JSON files (*.json)")
         if (dialog != ''):
-            #print(dialog[0])
+            if (not self.clearGraph()):
+                return
             self.loadGraph(filePath=dialog[0])
 
     def saveGraphDialog(self):
         dialog = QtWidgets.QFileDialog.getSaveFileName(directory='.', filter="JSON files (*.json)")
         if (dialog != ''):
-            #print(dialog[0])
             self.saveGraph(filePath=dialog[0])
 
     def loadGraph(self, filePath='path'):
@@ -1100,6 +984,10 @@ class Nodz(QtWidgets.QGraphicsView):
             position = QtCore.QPointF(position[0], position[1])
             alternate = nodesData[nodeId]['alternate']
             parameters = nodesData[nodeId]['parameters']
+            toolkit = nodesData[nodeId]['toolkit']
+            self.reloadConfig(toolkit, True)
+            if toolkit is not "default":
+                nodeType = toolkit+nodeType
 
             node = self.createNode( nodeId=nodeId,
                                     name=name,
@@ -1107,7 +995,8 @@ class Nodz(QtWidgets.QGraphicsView):
                                     preset=preset,
                                     position=position,
                                     alternate=alternate,
-                                    parameters=parameters)
+                                    parameters=parameters,
+                                    toolkit=toolkit)
                                     
             
             # Apply attributes data.
@@ -1271,7 +1160,7 @@ class NodeScene(QtWidgets.QGraphicsScene):
         """
         super(NodeScene, self).__init__(parent)
         #self.setAcceptDrops(True)
-        print("SEL PAR: %s  ::  %s" % (parent, self.parent(),))
+        #print("SEL PAR: %s  ::  %s" % (parent, self.parent(),))
 
         # General.
         self.gridSize = parent.config['grid_size']
@@ -1358,7 +1247,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
     """
 
-    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, parameters=None, type=None):
+    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, parameters=None, type=None, toolkit=None):
         """
         Initialize the class.
 
@@ -1386,6 +1275,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.nodePreset = preset
         self.attrPreset = None
         self.type = type
+        self.toolkit = toolkit
 
         # Attributes storage.
         self.attrs = list()
@@ -1395,6 +1285,9 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
         self.plugs = dict()
         self.sockets = dict()
+        
+        self.parameters = dict()
+        self.variables = dict()
 
         # Extended attributes
         self.extended_attributes = {}
@@ -2430,8 +2323,9 @@ class ConnectionItem(QtWidgets.QGraphicsPathItem):
         self.setPath(path)
 
 class loadWidget(QtWidgets.QHBoxLayout):
-    def __init__(self):
+    def __init__(self, parent):
         super(loadWidget, self).__init__()
+        self.parent = parent
         self.textbox = QtWidgets.QLineEdit()
         self.button = QtWidgets.QPushButton("Load")
         self.button.clicked.connect(self.loadFile)
@@ -2442,12 +2336,54 @@ class loadWidget(QtWidgets.QHBoxLayout):
         f = QtWidgets.QFileDialog.getOpenFileName()[0]
         if f is not "":
             self.textbox.setText(f)
+        self.parent.genParameters
+        
+class customWidget(loadWidget):
+    def __init__(self, parent):
+        super(customWidget, self).__init__(parent)
+        
+    def loadFile(self):
+        f = QtWidgets.QFileDialog.getOpenFileName()[0]
+        if f is not "":
+            self.textbox.setText(f)
+            
+        spec = importlib.util.spec_from_file_location("getParams", f)
+        obj = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(obj)
+        
+        self.parent.resetUI(custom = True)
+        self.parent.buildUI(obj.getParams(), custom = True)
+        
+        spec = importlib.util.spec_from_file_location("getAttribs", f)
+        obj = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(obj)
+        
+        # Delete existing attributes and their connections
+        while len(self.parent.parent.attrs) > 0:
+            self.parent.parent._deleteAttribute(0)
+        
+        attribs = obj.getAttribs()
+        for attrib in attribs:
+            index = attribs[attrib]['index']
+            name = attrib
+            plug = attribs[attrib]['plug']
+            socket = attribs[attrib]['socket']
+            preset = attribs[attrib]['preset']
+            dataType = attribs[attrib]['type']
+            self.parent.parent._createAttribute(name=name,
+                                            index=index,
+                                            preset=preset,
+                                            plug=plug,
+                                            socket=socket,
+                                            dataType=dataType)
+        self.parent.genParameters()
     
 class settingsItem(QtWidgets.QWidget):
 
     def __init__(self, parent, widgets):
         super(settingsItem, self).__init__(None)
         self.parent = parent
+        self.nameList = []
         
         self.layout = QtWidgets.QFormLayout()
         self.buildUI(widgets)
@@ -2455,72 +2391,126 @@ class settingsItem(QtWidgets.QWidget):
         
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
         self.setWindowTitle("Settings")
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
         #self.setStyleSheet(stylesh)
         self.genParameters()
         
-    def buildUI(self, widgets):
-        label = QtWidgets.QLabel("Node Name")
-        widget = self.genWidget("textbox", {'text': self.parent.name})
-        self.layout.insertRow(-1, label, widget)
-        if widgets == {}:
-            return
+        
+    # Populate the parameters window    
+    def buildUI(self, widgets, custom = False):
+        # If not building the custom node UI add the rename textbox
+        # to the top of the parameters menu
+        if custom == False:
+            label = QtWidgets.QLabel("Node Name")
+            widget = self.genWidget("textbox", {'text': self.parent.name})
+            self.layout.insertRow(-1, label, widget)
+
+        # Loop through all the widgets in the json file and
+        # add them to the parameters menu
         for i in widgets:
+            self.nameList.append(i)
+            # Give error message if any essential info is missing
+            errors = []
+            if "text" not in widgets[i]: errors.append("text")
+            if "type" not in widgets[i]: errors.append("type")
+            if "params" not in widgets[i]: errors.append("params")
+            if len(errors) > 0:
+                QtWidgets.QMessageBox.critical(self, "ERROR", "'{0}' node parameter {1} missing values {2}".format(self.parent.name, i, errors))
+                continue
+            
             label = QtWidgets.QLabel(widgets[i]["text"])
             widget = self.genWidget(widgets[i]["type"], widgets[i]["params"])
             self.layout.insertRow(-1, label, widget)
+                   
+    # Reset the parameters window to basic version
+    def resetUI(self, custom = False):
+        start = 1
+        # Custom windows keep name and file parameters
+        if custom:
+            start = 2
+            
+        self.nameList = []
+            
+        for i in range(start, self.layout.rowCount()):
+            self.layout.removeRow(i)
             
     # Generate the settings row based on its defined widget
     def genWidget(self, widget, params):
+        error = ""
         if widget == "textbox":
             w = QtWidgets.QLineEdit()
-            w.setText(params["text"])
-            
+            if "text" in params: w.setText(params["text"]) 
         elif widget == "spinbox":
             w = QtWidgets.QSpinBox()
-            w.setMinimum(params["minimum"])
-            w.setMaximum(params["maximum"])
-            w.setValue(params["value"])
+            if "minimum" in params: w.setMinimum(params["minimum"]) 
+            if "maximum" in params: w.setMaximum(params["maximum"]) 
+            if "value" in params: w.setValue(params["value"]) 
             
         elif widget == "checkbox":
             w = QtWidgets.QCheckBox()
-            w.setChecked(params["checked"])
+            if "checked" in params: w.setChecked(params["checked"]) 
             
         elif widget == "loadbox":
-            w = loadWidget()
-            w.textbox.setText(params["text"])
+            w = loadWidget(self)
+            if "text" in params: w.textbox.setText(params["text"]) 
+            
+        elif widget == "custombox":
+            w = customWidget(self)
+            if "text" in params: w.textbox.setText(params["text"]) 
             
         elif widget == "combobox":
             w = QtWidgets.QComboBox()
             
+        else:
+            QtWidgets.QMessageBox.critical(self, "ERROR", "Unrecognised parameter type for node {0}".format(self.parent.name))
+            return None
+            
         return w
         
+    # Catch window close and save parameters
     def closeEvent(self, event):
         self.genParameters()
         event.accept()
+    
+    def focusOutEvent(self, event):
+        self.genParameters()
+        event.accept()
 
+    # Return the values from each parameter type
     def genParameters(self):
     
         self.parent.name = self.layout.itemAt(0,1).widget().text()
     
         data = {}
+        vars = {}
         for i in range(1, self.layout.rowCount()):
             param = {'text' : "", 'type' : "", 'params' : {}}
             param['text'] = self.layout.itemAt(i,0).widget().text()
             
+            var = []
+            
             w = self.layout.itemAt(i,1)
+            if w is None:
+                continue
             if isinstance(w.widget(), QtWidgets.QLineEdit):
                 param['type'] = "textbox"
                 param['params'] = {'text' : w.widget().text()}
+                var = w.widget().text()
             elif isinstance(w.widget(), QtWidgets.QCheckBox):
                 param['type'] = "checkbox"
                 param['params']  = {'checked' : w.widget().isChecked()}
+                var = w.widget().isChecked()
             elif isinstance(w.widget(), QtWidgets.QSpinBox):
                 param['type'] = "spinbox"
                 param['params'] = {'minimum' : w.widget().minimum(), 'maximum' : w.widget().maximum(), 'value' : w.widget().value()}
+                var = w.widget().value()
             elif isinstance(w, loadWidget):  
                 param['type'] = "loadbox"
                 param['params'] = {'text' : w.textbox.text()}
+                var = w.textbox.text()
                 
-            data["param{0}".format(i)] = param
+            data[self.nameList[i-1]] = param
+            vars[self.nameList[i-1]] = var
 
         self.parent.parameters = data
+        self.parent.variables = vars
