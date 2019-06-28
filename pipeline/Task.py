@@ -17,39 +17,41 @@ class Task():
     # A common interface description should mean that we can garentee this somewhat. but is it worth it?
     # Lets just try both.
 
-    def _run(self, *arg, item=None):
+    # arg is the paramaters for configuring it, upstream is the data coming from its parents nodes
+    # Configuration is named variables, arguments are upstream data
+    def _run(self, *arg, **kwargs):
 
         """
         Internal run hook, the primary function called as part of a pipeline's operation. Runs user's code
         
         """
-        item = self.begin(*arg, item)
-        item = self.run(*arg, item)
-        item = self.end(*arg, item)
+        item = self.begin(*arg, **kwargs)
+        item = self.run(*arg, **kwargs)
+        item = self.end(*arg, **kwargs)
         return item
 
-    def begin(self, *arg, item=None):
+    def begin(self, *args, **kwargs):
 
         """
-        Overwritable begin hook, this is called by the internal begin hook
+        Overwritable begin hook, this is called by the internal _run hook
 
         """
 
-        return item
+        return args
 
-    def run(self, *arg, item=None):
+    def run(self, *args, **kwargs):
 
         """
         Overwritable run hook, this is called by the internal _run hook.
                 
         """
-        print(self.name, item)
-        return item
+        print(self.name, args)
+        return args
 
-    def end(self, *arg, item=None):
+    def end(self, *args, **kwargs):
 
         """
-        Overwritable end hook, this is called by the internal end hook
+        Overwritable end hook, this is called by the internal _run hook
                 
         """
-        return item
+        return args

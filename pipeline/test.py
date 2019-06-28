@@ -2,35 +2,25 @@ from Pipeline import Pipeline
 from tasks.HelloTask import HelloTask
 from TaskFactory import TaskFactory
 
-factory = TaskFactory(["HelloTask", "RandomTask"])
+factory = TaskFactory(["ReadFileTask", "ConsoleLogTask", "RandomIntTask"])
 
 pipeline = Pipeline()
-pipeline.read_nodz("./saves/sample.json")
-pipeline.start()
-# B = Task("B")
-# C = Task("C")
-# D = Task("D")
-# E = Task("E")
-# F = Task("F")
 
-# A.run = increment
-# B.run = increment
-# C.run = decrement
-# D.run = increment
-# E.run = decrement
-# F.run = increment
+A = factory.create_task("ReadFileTask", "ReadFileTask")
 
-# pipeline.add_task(A)
-# pipeline.add_task(B)
-# pipeline.add_task(C)
-# pipeline.add_task(D)
-# pipeline.add_task(E)
-# pipeline.add_task(F)
+B = factory.create_task("ConsoleLogTask", "ConsoleLogTask")
 
-# pipeline.connect(A, B)
-# pipeline.connect(C, D)
-# pipeline.connect(B, C)
-# pipeline.connect(C, D)
-# pipeline.connect(D, E)
-# pipeline.connect(D, F)
+C = factory.create_task("RandomIntTask", "RandomIntTask")
 
+pipeline.add_task(A)
+
+pipeline.add_task(B)
+
+pipeline.add_task(C)
+
+pipeline.connect(A, B)
+pipeline.connect(C, B)
+
+print(pipeline.tasks)
+
+pipeline.start("./test.txt")
