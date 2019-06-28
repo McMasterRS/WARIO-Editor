@@ -1,4 +1,4 @@
-from consecution import Node
+from Tasks import Task
 import random
 
 class randomInt(Node):
