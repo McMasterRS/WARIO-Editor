@@ -1,4 +1,4 @@
-from Task import Task
+from pipeline.Task import Task
 
 class intToFloat(Task):
     def run(self, upstream_int):

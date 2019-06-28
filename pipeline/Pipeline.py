@@ -1,6 +1,6 @@
 import json
 from inspect import signature
-from Task import Task
+from pipeline.Task import Task
 
 class Pipeline():
     
@@ -14,6 +14,7 @@ class Pipeline():
     leaves = []     # Nodes with no children. Updated as needed when new tasks are added, reduces need to search the whole graph
     upstream_state = {}         # Holding variable for upstream tasks to load their results. This will automatically be consumed into the direct child's arguments when it is run.
     upstream_connections = {}   # Shallow tree of each tasks direct children. Only one ever one child deep to simplofy traversing complex trees
+    pipes = {}        # helps resolve the differences in argument names between outflowing data, and inflowing data by parents and children.
 
     def __init__(self, tasks=None):
         
@@ -28,14 +29,12 @@ class Pipeline():
         add a single task to the pipeline
         
         """
-
         self.tasks[task.name] = task                # initializes itself into the task dictionary
         self.upstream_connections[task.name] = {}   # initializes itself into the connections hierarchy
         self.upstream_state[task.name] = []         # initializes an upstream state for itself
         sig = signature(task.run)
         params = sig.parameters
         keys = params.keys()
-        print(params)
         self.upstream_state[task.name] = {key: None for key in keys}
 
         # if this task has no parents, by definition it is a root node
@@ -149,4 +148,3 @@ class Pipeline():
         with open(file_location, 'r') as f:
             d = json.load(f)
             self.from_nodz(d)
-

@@ -1,5 +1,7 @@
-from Task import Task
+from pipeline.Task import Task
 
 class floatToInteger(Task):
     def run(self, upstream_float):
-        return int(upstream_float)
+        return {
+            int(upstream_float)
+            }
