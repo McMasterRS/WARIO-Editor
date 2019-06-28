@@ -1,4 +1,5 @@
 import json
+from inspect import signature
 from Task import Task
 
 class Pipeline():
@@ -31,6 +32,11 @@ class Pipeline():
         self.tasks[task.name] = task                # initializes itself into the task dictionary
         self.upstream_connections[task.name] = {}   # initializes itself into the connections hierarchy
         self.upstream_state[task.name] = []         # initializes an upstream state for itself
+        sig = signature(task.run)
+        params = sig.parameters
+        keys = params.keys()
+        print(params)
+        self.upstream_state[task.name] = {key: None for key in keys}
 
         # if this task has no parents, by definition it is a root node
         if parents is None:
@@ -85,7 +91,7 @@ class Pipeline():
         
         return queue # returns an iteratible queue of task objects in correct running order
 
-    def start(self, *args):
+    def start(self, *args, **kwargs):
         """ 
         Starts the processing of the pipeline.
         """
@@ -96,6 +102,7 @@ class Pipeline():
         ordered_tasks = self.topological_sort()
         # task = ordered_tasks.pop()
         # task._run(*args) # Runs all root nodes with the arguments passed into the pipeline at the start.
+        print("start state:", self.upstream_state)
 
         print('---')
 
@@ -106,18 +113,23 @@ class Pipeline():
             print("Running: ", task.name)
 
             if(task.name in self.roots):
-                result = task.run(*args)
+                result = task.run(*args, **kwargs)
             else:
-                result = task.run(self.upstream_state[task.name])
+                # print(self.upstream_state[task.name])
+                result = task.run(*self.upstream_state[task.name])
             
             # Each tasks incoming data is stored in that tasks respective spot
 
             print("Result: ", result)
 
             for child in self.upstream_connections[task.name]:
-                self.upstream_state[child].append(result)
-
-            print(self.upstream_state)
+                for key in self.upstream_state[child].keys():
+                    if key in result:
+                        if self.upstream_state[child][key] is None:
+                            self.upstream_state[child][key] = result[key]
+                        else:
+                            self.upstream_state[child][key] = self.upstream_state[child][key] + result[key]
+                        print("changed state:", self.upstream_state[child])
 
     def run_task(self, task):
         result = task.run(task.data)
