@@ -1,5 +1,5 @@
 def getParams():
-    params = {
+    params = '''{
         "textboxExample" : {
             "text"   : "Textbox Example",
             "type"   : "textbox",
@@ -20,7 +20,7 @@ def getParams():
             "text"   : "Enabled",
             "type"   : "checkbox",
             "params" : {
-                "checked" : False
+                "checked" : false
             }
         },
         "loadCode" : {
@@ -30,26 +30,26 @@ def getParams():
                 "text" : "file.exe"
             }
         }
-    }
+    }'''
     
     return params
     
 def getAttribs():
-    attributes = {  
+    attributes = '''{  
         "Out" : {  
             "index" : -1,  
             "preset" : "attr_preset_1",  
-            "plug" : True,  
-            "socket" : False,  
+            "plug" : true,  
+            "socket" : false,  
             "type" : "int"  
         },
         "In" : {  
             "index" : -1,  
             "preset" : "attr_preset_1",  
-            "plug" : False,  
-            "socket" : True,  
+            "plug" : false,  
+            "socket" : true,  
             "type" : "int"  
         }
-    }  
+    }'''  
 
     return attributes

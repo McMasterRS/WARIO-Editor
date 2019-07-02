@@ -11,9 +11,9 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
-import nodz_utils as utils
+import nodz.nodz_utils as utils
 
-defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'toolkits\default\config.json')
+defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..\\toolkits\default\config.json')
 
 class Nodz(QtWidgets.QGraphicsView):
 
@@ -2354,7 +2354,7 @@ class customWidget(loadWidget):
         spec.loader.exec_module(obj)
         
         self.parent.resetUI(custom = True)
-        self.parent.buildUI(obj.getParams(), custom = True)
+        self.parent.buildUI(json.loads(obj.getParams()), custom = True)
         
         spec = importlib.util.spec_from_file_location("getAttribs", f)
         obj = importlib.util.module_from_spec(spec)
@@ -2364,7 +2364,7 @@ class customWidget(loadWidget):
         while len(self.parent.parent.attrs) > 0:
             self.parent.parent._deleteAttribute(0)
         
-        attribs = obj.getAttribs()
+        attribs = json.loads(obj.getAttribs())
         for attrib in attribs:
             index = attribs[attrib]['index']
             name = attrib

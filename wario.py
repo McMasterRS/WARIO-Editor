@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtGui
-import nodz_main
+import nodz.nodz_main as nodz_main
 import sys, os
 
 def startNodz():
@@ -7,7 +7,7 @@ def startNodz():
     app = QtWidgets.QApplication([])
 
     nodz = nodz_main.Nodz(None)  
-    nodz.initialize()
+    nodz.initialize()   
 
     window = QtWidgets.QMainWindow()
     window.setWindowTitle("WARIO")
