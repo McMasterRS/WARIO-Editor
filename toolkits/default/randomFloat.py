@@ -1,4 +1,4 @@
-from Task import Task
+from pipeline.Task import Task
 import random
 
 class randomFloat(Task):

@@ -1,28 +1,33 @@
-from TaskFactory import TaskFactory
+from pipeline.TaskFactory import TaskFactory
 import json
 
-NODZ_SAVE = "./sample.json"
-NODZ_CONFIG = ""
-TASKS = TaskFactory()
+NODZ_SAVE = "./pipeline/saves/sample.json"
 
 class NodeLayer():
-    def __init__():
-        pass
-    # def read_nodz(self):
-    #     with open(NODZ_FILE, 'r') as f:
-    #         d = json.load(f)
-    #         self.parse_nodz(d)
 
-    # # TODO: Assumes a well formatted json file, should validate this.
-    # # TODO: Much better name for this function
-    # def parse_nodz(self, nodz_json):
-    #     tasks = []
+    def __init__(self):
+        with open(NODZ_SAVE, 'r') as f:
+            d = json.load(f)
+            self.data = d
 
-    #     for nod in nodz_json["NODES"]:
-    #         self.nod_to_task(nod)
+    # TODO: Assumes a well formatted json file, should validate this.
+    # TODO: Much better name for this function
+    def parse_nodz(self):
+        nodz_json = self.data
+        tasks = {}
+        connections = []
+        node_types = {}
 
-    #     for connection in nodz_json["CONNECTIONS"]:
-    #         self.connect(self.tasks[connection[0].split(".")[0]], self.tasks[connection[1].split(".")[0]])
+        for nod in nodz_json["NODES"]:
+            #TODO: this is not how it should be done, the saves for nodz are formated file.py. we dont want the py
+            node_types[nod] = nodz_json["NODES"][nod]["file"].split(".")[0]
 
-    # def nod_to_task(self, nod):
-    #     return Task()
+        print(list(node_types.values()))
+
+        task_factory = TaskFactory(list(node_types.values()))
+        for nod in nodz_json["NODES"]:
+            tasks[nod] = task_factory.create_task(node_types[nod], nod)
+        for connection in nodz_json["CONNECTIONS"]:
+            connections.append([tasks[connection[0].split(".")[0]], tasks[connection[1].split(".")[0]]])
+    
+        return [tasks, connections]

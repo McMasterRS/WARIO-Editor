@@ -1,4 +1,4 @@
-from Task import Task
+from pipeline.Task import Task
 
 class intSubtractor(Task):
     def run(self, inA, inB):
