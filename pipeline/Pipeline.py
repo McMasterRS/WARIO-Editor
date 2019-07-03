@@ -1,150 +1,179 @@
 import json
-from inspect import signature
-from pipeline.Task import Task
+
+    #######
+    #
+    #
+    #
+    #######
 
 class Pipeline():
-    
-    """
-    Proccess flow pipeline. Oversees/orchestrates the running of a directed graph of arbitrary tasks
-    
-    """
+    """  Proccess flow pipeline. Oversees/orchestrates the running of a directed graph of arbitrary tasks  """
 
-    tasks = {}      # Record of all the tasks loaded into the pipeline. Indexed by task.id.
-    roots = {}      # Nodes with no parents. Updated as needed when new tasks are added, reduces need to search the whole graph
-    leaves = []     # Nodes with no children. Updated as needed when new tasks are added, reduces need to search the whole graph
-    upstream_state = {}         # Holding variable for upstream tasks to load their results. This will automatically be consumed into the direct child's arguments when it is run.
-    upstream_connections = {}   # Shallow tree of each tasks direct children. Only one ever one child deep to simplofy traversing complex trees
-    pipes = {}        # helps resolve the differences in argument names between outflowing data, and inflowing data by parents and children.
+    tasks = {}          # Record of all the tasks loaded into the pipeline. Indexed by task.id, this also has each tasks single level deep children?
+    pipes = {}          # Pipes connect upstream tasks with their approprate downstream attributes. Pipes also keep data stored when a task must wait for multiple upstream dependancies. Could queue them?
+    state = {}          # The upstream state of all nodes. This is where parents store their results once they finish   
 
-    def __init__(self, tasks=None):
-        
-        """
-        initializes a pipeline, optionally with a set of tasks
-        
-        """
+    roots = {}          # Nodes with no parents. Updated as needed when new tasks are added, reduces need to search the whole graph
+    leaves = {}         # Nodes with no children. Updated as needed when new tasks are added, reduces need to search the whole graph
 
-    def add_task(self, task, children=None, parents=None, type=None):
-        
-        """
-        add a single task to the pipeline
-        
-        """
-        self.tasks[task.name] = task                # initializes itself into the task dictionary
-        self.upstream_connections[task.name] = {}   # initializes itself into the connections hierarchy
-        self.upstream_state[task.name] = []         # initializes an upstream state for itself
-        sig = signature(task.run)
-        params = sig.parameters
-        keys = params.keys()
-        self.upstream_state[task.name] = {key: None for key in keys}
+    #######
+    #
+    # 
+    #
+    #######
 
-        # if this task has no parents, by definition it is a root node
-        if parents is None:
-            self.roots[task.name] = task
-        
-        # if this task has no children, by definition it is a leaf node
-        # if children is None:
-        #     self.roots[task.name] = task
+    def __init__(self, tasks=None, pipes=None):
+        """  initializes a pipeline, optionally with a set of tasks  """
 
-    def connect(self, parent, child):
+    #######
+    #
+    # Pipeline.add: Adds a single task to the pipeline, not connected to any other tasks and is both a root and leaf node
+    # - task: the task you want to add to the pipeline
+    #
+    # TODO: allow you to add multiple tasks at once
+    # TODO: allow you to initialize them with children and parents (this was in but removed for simplicity when attributes were added)
+    #
+    #######
 
-        # inserts the child downstream of the parent
-        self.upstream_connections[parent.name][child.name] = child
+    def add(self, task, params=None):
 
-        # if the parent was a leaf node, remove it.
-        if parent.name in self.leaves:
-            self.leaves.pop(parent.name)
+        """  add a single task to the pipeline  """
 
-        # if the child was a root node, remove it.
-        if child.name in self.roots:
-            self.roots.pop(child.name)
-    
-    def _topological_sort(self, node, visited, queue):
+        self.tasks[task.name] = task    # Store the task, indexed by name/id
+        self.roots[task.name] = task    # 
+        self.leaves[task.name] = task   #
+        self.pipes[task.name] = {}      # Initializes a dictionary for collecting the task's upstream data.
+        self.state[task.name] = {}
 
-        """
-        Recursive helper function to sort the graph of tasks into running order respectful of dependance.
-        """
+        # print(type(params))
+        if params is not None:
+            for param in params:
+                self.state[task.name][param] = params[param]
 
-        visited[node.name] = node # marks a node as visited, allows it to only run once per node
+    #######
+    #
+    # Pipeline.connect: connects a parent with a child along their respective attributes so that when it runs it correctly passes its results downstream
+    # - parent: The task that will act as the upstream parent
+    # - child: The task that will be downstream and recieving the parents results
+    # - parent_attrib: the outgoing attribute on the parent's side, this will match the associating attribute on the child
+    # - child_attrib: the incoming attribute on the child's side, this will match the associated attribute on the parent
+    #
+    #######
 
-        # Iterates through each child of this task, if it hasnt already been visited we want to traverse through it's children as well.
-        for i in self.upstream_connections[node.name]:
-            if i not in visited:
-                self._topological_sort(self.tasks[i], visited, queue)
+    def connect(self, parent_name, child_name, parent_attrib, child_attrib):
 
-        # Enqueues the node into what will be the resulting running order
-        queue.append(node)
+        """  Connect two nodes along the specified attributes. Data output by the parent will collect for the child on that attribute.  """
+
+        # store the relationship so the parent can reference it
+        self.pipes[parent_name][parent_attrib] = [parent_name, child_attrib]
+
+        # store the relationship so the parent can reference it
+        self.pipes[child_name][child_attrib] = [child_name, parent_attrib]
+
+        # if the parent was a leaf node, since it has children now, it no longer is.
+        if parent_name in self.leaves:
+            self.leaves.pop(parent_name)
+
+        # if the child was a root node, since it has a parent now, it no longer is.
+        if child_name in self.roots:
+            self.roots.pop(child_name)
+
+    #######
+    #
+    # Pipeline.topological_sort: internally sorts the tasks in to a linear sequence respectful of each tasks dependacies
+    # TODO: Right now, this is done each time the pipeline is started in case there were changes to the topology. Consider alternatives
+    #
+    #######
 
     def topological_sort(self):
-        """
-        Starts the recursive depth first sorting of each task into a sequential sequence respecting parent child relationships. O(V+E)
-        
-        """
 
-        visited = {}    # Record of what nodes have been visited
-        queue = []      # Final running order of the tasks
+        """ Starts the recursive depth first sorting of each task into a sequential sequence respecting parent child relationships. O(V+E) """
+
+        ####
+        #
+        # Recursive helper function for topological sorting
+        #
+        ####
+        def sort(node, visited, queue):
+
+            """ Recursive helper function to sort the graph of tasks into running order respectful of dependance. """
+
+            # marks a node as visited, allows it to only run once per node. The check simply checks for its presence in this dictionary
+            visited[node.name] = True
+
+            # Iterates through each child of this task, if it hasnt already been visited we want to traverse through it's children as well.
+            for attribute in self.pipes[node.name]: # i is the attribute
+    
+                # retrives the child that is downstream from that attribute. We only want the task not the attribute hence the [0]
+                child = self.pipes[node.name][attribute][0]
+
+                # if the child hasnt been visited, visit it and sort it's children as well. 
+                if child not in visited:
+                    sort(self.tasks[child], visited, queue)
+
+            # Enqueues the node into what will be the resulting running order
+            queue.append(node)
+
+
+        # Record of what nodes have been visited
+        visited = {}    
+        
+        # Final running order of the tasks
+        queue = []      
 
         # starting at the top with our known roots, recurse through the tree of tasks
         for root in self.roots:
             if self.roots[root] not in visited:
-                self._topological_sort(self.roots[root], visited, queue)
+                sort(self.roots[root], visited, queue)
         
         return queue # returns an iteratible queue of task objects in correct running order
 
+    #######
+    #
+    # pipeline.start: 
+    #
+    #######
+
     def start(self, *args, **kwargs):
-        """ 
-        Starts the processing of the pipeline.
-        """
+
+        """  Starts the processing of the pipeline.  """
 
         # Sort the tasks in the correct order so that all upstream data dependancies are fulfilled.
-        # TODO: Right now, this is done each time the pipeline is started in case there were changes to the topology. Consider alternatives
-
         ordered_tasks = self.topological_sort()
-        # task = ordered_tasks.pop()
-        # task._run(*args) # Runs all root nodes with the arguments passed into the pipeline at the start.
-        print("start state:", self.upstream_state)
-
-        print('---')
 
         while len(ordered_tasks) > 0:
-
-            task = ordered_tasks.pop()
             
-            print("Running: ", task.name)
+            # Retrieves the next task to run from the end of the queue
+            task = ordered_tasks.pop() 
 
-            if(task.name in self.roots):
-                result = task.run(*args, **kwargs)
-            else:
-                # print(self.upstream_state[task.name])
-                result = task.run(*self.upstream_state[task.name])
+            # Runs the task using the available upstream data.
+            print("Running: ", task.name, self.state[task.name])
+            results = task.run(**self.state[task.name])
+            print("Result: ", results)
             
-            # Each tasks incoming data is stored in that tasks respective spot
+            # Stores its results in the approprate attribute location of it's children downstream
+            if type(results) is dict:
+                for attribute in results:
+                    self.push(task, attribute, results[attribute])
 
-            print("Result: ", result)
+    #######
+    #
+    # Pipeline.Push: resolves the downstream passing of data between a parent and it's children along a particular attribute.
+    # - task: The upstream task that has some data to pass
+    # - attribute: The attribute along which the task is trying to pass data
+    # - data: the results of the tasks particular computation that is to be passed to it's child
+    #
+    #######
 
-            for child in self.upstream_connections[task.name]:
-                for key in self.upstream_state[child].keys():
-                    if key in result:
-                        if self.upstream_state[child][key] is None:
-                            self.upstream_state[child][key] = result[key]
-                        else:
-                            self.upstream_state[child][key] = self.upstream_state[child][key] + result[key]
-                        print("changed state:", self.upstream_state[child])
+    def push(self, task, attribute, data):
 
-    def run_task(self, task):
-        result = task.run(task.data)
-        return result
+        """  Resolves the transfer of data out of a task and into the appropriate downstream locations.  """
 
-    # TODO: Assumes a well formatted json file, should validate this.
-    # TODO: Much better name for this function
-    def from_nodz(self, nodz_json):
+        print(self.pipes, task.name, attribute)
+        if attribute in self.pipes[task.name]:
 
-        for node in nodz_json["NODES"]:
-            self.add_task(Task(node), type=nodz_json["NODES"][node]["type"])
+            # look up what nodes are downstream and what it connects to.
+            child, child_attribute = self.pipes[task.name][attribute]
 
-        for connection in nodz_json["CONNECTIONS"]:
-            self.connect(self.tasks[connection[0].split(".")[0]], self.tasks[connection[1].split(".")[0]])
-
-    def read_nodz(self, file_location):
-        with open(file_location, 'r') as f:
-            d = json.load(f)
-            self.from_nodz(d)
+            # stores the data in that childs respective attribute, ready to be consumed when the child runs.
+            self.state[child.name][child_attribute] = data
