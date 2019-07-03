@@ -11,7 +11,11 @@ class Pipeline():
 
     tasks = {}          # Record of all the tasks loaded into the pipeline. Indexed by task.id, this also has each tasks single level deep children?
     pipes = {}          # Pipes connect upstream tasks with their approprate downstream attributes. Pipes also keep data stored when a task must wait for multiple upstream dependancies. Could queue them?
-    state = {}          # The upstream state of all nodes. This is where parents store their results once they finish   
+
+     # we need something, somewhere, that knows how to turn the nodz attribute names into function attribute names.
+     # without that, right now, we assume the order of attributes coming in from nodz is correct, and the params handle named attributes
+    state = {}          # The upstream state of all nodes. This is where parents store their results once they finish.
+    params = {}         # perhaps temporary, stores each tasks params.
 
     roots = {}          # Nodes with no parents. Updated as needed when new tasks are added, reduces need to search the whole graph
     leaves = {}         # Nodes with no children. Updated as needed when new tasks are added, reduces need to search the whole graph
@@ -45,10 +49,12 @@ class Pipeline():
         self.pipes[task.name] = {}      # Initializes a dictionary for collecting the task's upstream data.
         self.state[task.name] = {}
 
-        # print(type(params))
+        self.params[task.name] = {}
+
         if params is not None:
             for param in params:
-                self.state[task.name][param] = params[param]
+                self.params[task.name][param] = params[param]
+                # self.state[task.name][param] = params[param]
 
     #######
     #
@@ -64,11 +70,19 @@ class Pipeline():
 
         """  Connect two nodes along the specified attributes. Data output by the parent will collect for the child on that attribute.  """
 
-        # store the relationship so the parent can reference it
-        self.pipes[parent_name][parent_attrib] = [parent_name, child_attrib]
+        # print(parent_name, child_name, parent_attrib, child_attrib)
 
-        # store the relationship so the parent can reference it
-        self.pipes[child_name][child_attrib] = [child_name, parent_attrib]
+        # store the relationship so the parent can reference the child when passing data downstream
+        if parent_attrib not in self.pipes[parent_name]:
+            self.pipes[parent_name][parent_attrib] = []
+
+        self.pipes[parent_name][parent_attrib].append([child_name, child_attrib])
+
+        # store the relationship so the child can reference the parent, if that is ever needed
+        if child_attrib not in self.pipes[child_name]:
+            self.pipes[child_name][child_attrib] = []
+
+        self.pipes[child_name][child_attrib].append([parent_name, parent_attrib])
 
         # if the parent was a leaf node, since it has children now, it no longer is.
         if parent_name in self.leaves:
@@ -94,6 +108,7 @@ class Pipeline():
         # Recursive helper function for topological sorting
         #
         ####
+
         def sort(node, visited, queue):
 
             """ Recursive helper function to sort the graph of tasks into running order respectful of dependance. """
@@ -102,14 +117,15 @@ class Pipeline():
             visited[node.name] = True
 
             # Iterates through each child of this task, if it hasnt already been visited we want to traverse through it's children as well.
-            for attribute in self.pipes[node.name]: # i is the attribute
-    
-                # retrives the child that is downstream from that attribute. We only want the task not the attribute hence the [0]
-                child = self.pipes[node.name][attribute][0]
+            for attribute in self.pipes[node.name]:
+                for child in self.pipes[node.name][attribute]:
 
-                # if the child hasnt been visited, visit it and sort it's children as well. 
-                if child not in visited:
-                    sort(self.tasks[child], visited, queue)
+                    # Retrives the child that is downstream from that attribute. We only want the task not the attribute hence the [0]
+                    child_name = child[0]
+
+                    # If the child hasnt been visited, visit it and sort it's children as well. 
+                    if child_name not in visited:
+                        sort(self.tasks[child_name], visited, queue)
 
             # Enqueues the node into what will be the resulting running order
             queue.append(node)
@@ -134,7 +150,7 @@ class Pipeline():
     #
     #######
 
-    def start(self, *args, **kwargs):
+    def start(self):
 
         """  Starts the processing of the pipeline.  """
 
@@ -146,9 +162,9 @@ class Pipeline():
             # Retrieves the next task to run from the end of the queue
             task = ordered_tasks.pop() 
 
-            # Runs the task using the available upstream data.
-            print("Running: ", task.name, self.state[task.name])
-            results = task.run(**self.state[task.name])
+            # Runs the task using the available upstream data. Right now this unfortunately requires the order of the arguments to be correct
+            print("Running: ", task.name, self.state[task.name], self.params[task.name])
+            results = task.run(*self.state[task.name].values(), **self.params[task.name])
             print("Result: ", results)
             
             # Stores its results in the approprate attribute location of it's children downstream
@@ -169,11 +185,10 @@ class Pipeline():
 
         """  Resolves the transfer of data out of a task and into the appropriate downstream locations.  """
 
-        print(self.pipes, task.name, attribute)
         if attribute in self.pipes[task.name]:
-
-            # look up what nodes are downstream and what it connects to.
-            child, child_attribute = self.pipes[task.name][attribute]
-
-            # stores the data in that childs respective attribute, ready to be consumed when the child runs.
-            self.state[child.name][child_attribute] = data
+            # since one outgoing attribute can connect to many incoming attributes, we loop through them all
+            for child in self.pipes[task.name][attribute]:
+                child_name = child[0]
+                child_attribute = child[1]
+                # stores the data in that childs respective attribute, ready to be consumed when the child runs.
+                self.state[child_name][child_attribute] = data

@@ -14,7 +14,8 @@ for task_name in tasks:
 
 for parent_name in connections:
     for parent_attribute in connections[parent_name]:
-        child_name, child_attribute = connections[parent_name][parent_attribute]
-        pipeline.connect(parent_name, child_name, parent_attribute, child_attribute)
-
+        for child in connections[parent_name][parent_attribute]:
+            child_name, child_attribute = child
+            pipeline.connect(parent_name, child_name, parent_attribute, child_attribute)
+        
 pipeline.start()

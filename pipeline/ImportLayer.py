@@ -64,8 +64,9 @@ class NodzImporter():
             parent_attribute = connection[0].split(".")[1]
             child_name = connection[1].split(".")[0]
             child_attribute = connection[1].split(".")[1]
-
-            connections[parent_name][parent_attribute] = [child_name, child_attribute]
-            connections[child_name][child_attribute] = [child_name, child_attribute]
+            if parent_attribute not in connections[parent_name]:
+                connections[parent_name][parent_attribute] = []
+            connections[parent_name][parent_attribute].append([child_name, child_attribute])
+            # connections[child_name][child_attribute] = [parent_name, parent_attribute]
 
         return [task_types, tasks, connections]
