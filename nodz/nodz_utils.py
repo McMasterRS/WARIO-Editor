@@ -149,7 +149,7 @@ def _saveData(filePath, data):
     """
     f = open(filePath, "w")
     f.write(json.dumps(data,
-                       sort_keys = True,
+                       sort_keys = False,
                        indent = 4,
                        ensure_ascii=False))
     f.close()

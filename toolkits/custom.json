@@ -2,13 +2,14 @@
     "node_types":{
         "Custom": {
             "preset": "node_default",
+            "file": "",
             "alternate": true,
             "position": "none",
             "category": "Output",
             "toolkit" : "custom",
             "attributes": {},
             "parameters": {
-                "param0" : {
+                "custombox" : {
                         "text" : "Select File",
                         "type" : "custombox",
                         "params" : {

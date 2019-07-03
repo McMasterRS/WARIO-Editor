@@ -5,6 +5,7 @@ import functools
 import sys
 import uuid
 import importlib
+import collections
 
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
@@ -143,9 +144,9 @@ class Nodz(QtWidgets.QGraphicsView):
                     name = nt
                 else:
                     name = nt[len(nodeTb[nt]):]
-                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction('Create ' + name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=nt, toolkit=nodeTb[nt]))
+                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction('Create ' + name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=name, toolkit=nodeTb[nt]))
                 
-            menu.addAction("Custom", functools.partial(self.newNode,name="Custom",attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),parameters=self.config['node_types'][nt]["parameters"], type=nt, toolkit=nodeTb[nt]))
+            menu.addAction('Custom', functools.partial(self.newNode,name='Custom',attrs=self.config['node_types']['Custom'],position=self.mapToScene(event.pos()),parameters=self.config['node_types']['Custom']["parameters"], type='Custom', toolkit='custom'))
 
             menu.exec_(event.globalPos())
 
@@ -480,27 +481,36 @@ class Nodz(QtWidgets.QGraphicsView):
         for node in self.scene().selectedItems():
             nt = node.type
             pos = QtCore.QPointF(node.pos().x() + 20, node.pos().y() + 20)
+            
+            params = node.parameters
+            
+            #for param in params:
+            #    params[param]['params'] = node.parameters[param]['params']
             newNode = self.newNode(name = node.name,
                                    attrs = self.config['node_types'][nt],
                                    position = pos   , 
-                                   parameters = self.config['node_types'][nt]["parameters"],
+                                   parameters = params,
                                    type = nt,
                                    toolkit = node.toolkit)
+
             node.setSelected(False)
             newNode.setSelected(True)
+            if newNode.type == "Custom":
+               newNode.settings.initCustom()
     
     def checkClose(self):
-        msg = QtWidgets.QMessageBox()
-        msg.setIcon(QtWidgets.QMessageBox.Warning)
-        msg.setText("Save before closing?")
-        msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Close | QtWidgets.QMessageBox.Cancel)
-        
-        ret = msg.exec_()
+        if len(self.scene().nodes) > 0:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Warning)
+            msg.setText("Save before closing?")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Close | QtWidgets.QMessageBox.Cancel)
+            
+            ret = msg.exec_()
 
-        if ret == 2048:
-            self.saveGraphDialog()
-        elif ret == 4194304:
-            return
+            if ret == 2048:
+                self.saveGraphDialog()
+            elif ret == 4194304:
+                return
             
         sys.exit()
             
@@ -528,8 +538,15 @@ class Nodz(QtWidgets.QGraphicsView):
         reloads the list of toolkits and from that the 
         list of nodes available
         """
+        
         if name == "custom":
             return
+            
+        nodes = self.scene().nodes.keys()
+        for node in nodes:
+            if self.scene().nodes[node].toolkit == name and state == False:
+                QtWidgets.QMessageBox.critical(self, "WARNING", "Cannot remove toolkit in use")
+                return False
         
         # Update the toolkit list
         if state == True: 
@@ -538,13 +555,7 @@ class Nodz(QtWidgets.QGraphicsView):
         else:
             if name in self.toolkits:
                 self.toolkits.remove(name)
-                
-            nodes = self.scene().nodes.keys()
-            for node in nodes:
-                if self.scene().nodes[node].toolkit == name:
-                    QtWidgets.QMessageBox.critical(self, "WARNING", "You have removed a toolkit that is currently in use. Please make sure to remove all nodes from that toolkit before continuing. Failure to do so may render the flowchart unuseable upon saving")
-                    break
-                
+      
         self.loadConfig(defaultConfigPath)
         
         for tb in self.toolkits:
@@ -558,6 +569,8 @@ class Nodz(QtWidgets.QGraphicsView):
                     types[tb+key] = type
                 self.config['node_types'].update(types)
             
+        return True
+
 
     def initialize(self):
         """
@@ -890,7 +903,12 @@ class Nodz(QtWidgets.QGraphicsView):
         nodes = self.scene().nodes.keys()
 
         for node in nodes:
+        
             nodeInst = self.scene().nodes[node]
+            
+            # Make sure parameters are up to date before saving
+            nodeInst.settings.genParameters()
+            
             name = nodeInst.name
             preset = nodeInst.nodePreset
             nodeAlternate = nodeInst.alternate
@@ -898,7 +916,6 @@ class Nodz(QtWidgets.QGraphicsView):
             toolkit = nodeInst.toolkit
             variables = nodeInst.variables
             file = self.config['node_types'][nodeType]['file']
-
             data['NODES'][node] = { 'name': name,
                                     'type': nodeType,
                                     'file': file,
@@ -988,19 +1005,19 @@ class Nodz(QtWidgets.QGraphicsView):
             parameters = nodesData[nodeId]['parameters']
             toolkit = nodesData[nodeId]['toolkit']
             self.reloadConfig(toolkit, True)
-            if toolkit is not "default":
+            if toolkit != "default" and toolkit != "custom":
                 nodeType = toolkit+nodeType
 
             node = self.createNode( nodeId=nodeId,
                                     name=name,
-                                    type=type,
+                                    type=nodeType,
                                     preset=preset,
                                     position=position,
                                     alternate=alternate,
                                     parameters=parameters,
                                     toolkit=toolkit)
-                                    
             
+               
             # Apply attributes data.
             attrsData = nodesData[nodeId]['attributes']
 
@@ -1024,7 +1041,11 @@ class Nodz(QtWidgets.QGraphicsView):
                                      socket=socket,
                                      dataType=dataType)
 
+        # If custom node, finish initialization
+        if nodeType == "Custom":
+           node.settings.initCustom()
 
+        
         # Apply connections data.
         connectionsData = data['CONNECTIONS']
 
@@ -1162,7 +1183,6 @@ class NodeScene(QtWidgets.QGraphicsScene):
         """
         super(NodeScene, self).__init__(parent)
         #self.setAcceptDrops(True)
-        #print("SEL PAR: %s  ::  %s" % (parent, self.parent(),))
 
         # General.
         self.gridSize = parent.config['grid_size']
@@ -1288,7 +1308,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.plugs = dict()
         self.sockets = dict()
         
-        self.parameters = dict()
+        self.parameters = collections.OrderedDict()
         self.variables = dict()
 
         # Extended attributes
@@ -1688,6 +1708,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         
     def mouseDoubleClickEvent(self, event):
         self.settings.show()
+        self.settings.activateWindow()
 
 
 class SlotItem(QtWidgets.QGraphicsItem):
@@ -2343,18 +2364,44 @@ class loadWidget(QtWidgets.QHBoxLayout):
 class customWidget(loadWidget):
     def __init__(self, parent):
         super(customWidget, self).__init__(parent)
+        self.tempParams = {}
         
     def loadFile(self):
         f = QtWidgets.QFileDialog.getOpenFileName()[0]
         if f is not "":
             self.textbox.setText(f)
-            
+            self.buildCustomUI()
+        else:
+            return
+
+    def buildCustomUI(self):
+        f = self.textbox.text()
         spec = importlib.util.spec_from_file_location("getParams", f)
         obj = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(obj)
         
         self.parent.resetUI(custom = True)
         self.parent.buildUI(json.loads(obj.getParams()), custom = True)
+        
+        i = 2
+        # Fill in the values for the custom genned parameters
+        # Used when duplicating or loading
+        for p in self.tempParams:
+            param = self.tempParams[p]
+            if param["type"] == "custombox":
+                continue
+            w = self.parent.layout.itemAt(i, 1)
+            if param["type"] == "textbox":
+                if "text" in param["params"]: w.widget().setText(param["params"]["text"])
+            elif param["type"] == "spinbox":
+                if "value" in param["params"]: w.widget().setValue(param["params"]["value"]) 
+            elif param["type"] == "checkbox":
+                if "checked" in param["params"]: w.widget().setChecked(param["params"]["checked"]) 
+            elif param["type"] == "loadbox":
+                if "text" in param["params"]: w.textbox.setText(param["params"]["text"])
+            i += 1
+            
+        self.tempParams = {}
         
         spec = importlib.util.spec_from_file_location("getAttribs", f)
         obj = importlib.util.module_from_spec(spec)
@@ -2392,11 +2439,31 @@ class settingsItem(QtWidgets.QWidget):
         self.setLayout(self.layout)
         
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
+        self.setWindowIcon(self.style().standardIcon(getattr(QtWidgets.QStyle,"SP_TitleBarMenuButton")))
         self.setWindowTitle("Settings")
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.installEventFilter(self)
         #self.setStyleSheet(stylesh)
         self.genParameters()
         
+    def eventFilter(self, object, event):
+        if event.type() == QtCore.QEvent.Close:
+            self.genParameters()
+            event.accept()
+        elif event.type() == QtCore.QEvent.WindowDeactivate:
+            self.genParameters()
+            event.accept()
+            
+        return False
+        
+    def initCustom(self):
+        for i in range(0, self.layout.rowCount()):
+            w = self.layout.itemAt(i,1)
+            if isinstance(w, customWidget):
+                if w.textbox.text() != "":
+                    w.buildCustomUI()
+                
+                
         
     # Populate the parameters window    
     def buildUI(self, widgets, custom = False):
@@ -2410,7 +2477,6 @@ class settingsItem(QtWidgets.QWidget):
         # Loop through all the widgets in the json file and
         # add them to the parameters menu
         for i in widgets:
-            self.nameList.append(i)
             # Give error message if any essential info is missing
             errors = []
             if "text" not in widgets[i]: errors.append("text")
@@ -2420,23 +2486,27 @@ class settingsItem(QtWidgets.QWidget):
                 QtWidgets.QMessageBox.critical(self, "ERROR", "'{0}' node parameter {1} missing values {2}".format(self.parent.name, i, errors))
                 continue
             
+            self.nameList.append(i)
             label = QtWidgets.QLabel(widgets[i]["text"])
             widget = self.genWidget(widgets[i]["type"], widgets[i]["params"])
             self.layout.insertRow(-1, label, widget)
-                   
+            if widgets[i]["type"] == "custombox":
+                widget.tempParams = widgets
+                break
+                
+           
     # Reset the parameters window to basic version
     def resetUI(self, custom = False):
-        
-        # Custom windows keep name and file parameters
+
+        start = 1
         if custom:
             start = 2
             self.nameList = [self.nameList[0]]
         else:
-            start = 1
             self.nameList = []
-            
-        for i in range(start, self.layout.rowCount()):
-            self.layout.removeRow(i)
+
+        while self.layout.rowCount() > start:
+            self.layout.removeRow(self.layout.rowCount() - 1)
             
     # Generate the settings row based on its defined widget
     def genWidget(self, widget, params):
@@ -2460,7 +2530,8 @@ class settingsItem(QtWidgets.QWidget):
             
         elif widget == "custombox":
             w = customWidget(self)
-            if "text" in params: w.textbox.setText(params["text"]) 
+            if "text" in params: 
+                w.textbox.setText(params["text"])
             
         elif widget == "combobox":
             w = QtWidgets.QComboBox()
@@ -2470,23 +2541,14 @@ class settingsItem(QtWidgets.QWidget):
             return None
             
         return w
-        
-    # Catch window close and save parameters
-    def closeEvent(self, event):
-        self.genParameters()
-        event.accept()
-    
-    def focusOutEvent(self, event):
-        self.genParameters()
-        event.accept()
 
     # Return the values from each parameter type
     def genParameters(self):
     
         self.parent.name = self.layout.itemAt(0,1).widget().text()
     
-        data = {}
-        vars = {}
+        data = collections.OrderedDict()
+        vars = collections.OrderedDict()
         for i in range(1, self.layout.rowCount()):
             param = {'text' : "", 'type' : "", 'params' : {}}
             param['text'] = self.layout.itemAt(i,0).widget().text()
@@ -2496,7 +2558,12 @@ class settingsItem(QtWidgets.QWidget):
             w = self.layout.itemAt(i,1)
             if w is None:
                 continue
-            if isinstance(w.widget(), QtWidgets.QLineEdit):
+            
+            if isinstance(w, customWidget):
+                param['type'] = 'custombox'
+                param['params'] = {'text' : w.textbox.text()}
+                var = w.textbox.text()
+            elif isinstance(w.widget(), QtWidgets.QLineEdit):
                 param['type'] = "textbox"
                 param['params'] = {'text' : w.widget().text()}
                 var = w.widget().text()
@@ -2515,6 +2582,6 @@ class settingsItem(QtWidgets.QWidget):
 
             data[self.nameList[i-1]] = param
             vars[self.nameList[i-1]] = var
-
+            
         self.parent.parameters = data
         self.parent.variables = vars

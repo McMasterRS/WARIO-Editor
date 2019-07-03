@@ -81,7 +81,7 @@
             "alternate": true,
             "position": "none",
             "category": "Input",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "Out": {
                     "index": -1,
@@ -118,7 +118,7 @@
             "alternate": true,
             "position": "none",
             "category": "Input",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "Out": {
                     "index": -1,
@@ -151,11 +151,11 @@
         },
         "Integer Out": {
             "preset": "node_default",
-            "file": "",
+            "file": "intOut.py",
             "alternate": true,
             "position": "none",
             "category": "Output",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "In": {
                     "index": -1,
@@ -169,11 +169,11 @@
         },
         "Float Out": {
             "preset": "node_default",
-            "file": "",
+            "file": "floatOut.py",
             "alternate": true,
             "position": "none",
             "category": "Output",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "In": {
                     "index": -1,
@@ -191,7 +191,7 @@
             "alternate": true,
             "position": "none",
             "category": "Operator",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "In A": {
                     "index": -1,
@@ -219,11 +219,11 @@
         },
         "Integer Multiplier": {
             "preset": "node_default",
-            "file": "",
+            "file": "intMultiplier.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "In A": {
                     "index": -1,
@@ -251,11 +251,11 @@
         },
         "Integer Divider(R)": {
             "preset": "node_default",
-            "file": "",
+            "file": "intDividerR.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "Numerator": {
                     "index": -1,
@@ -290,11 +290,11 @@
         },
         "Integer Divider(F)": {
             "preset": "node_default",
-            "file": "",
+            "file": "intDividerF.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "Numerator": {
                     "index": -1,
@@ -322,11 +322,11 @@
         },
         "Integer Subtractor": {
             "preset": "node_default",
-            "file": "",
+            "file": "intSubtractor.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "In A": {
                     "index": -1,
@@ -354,11 +354,11 @@
         },
         "Float to Integer": {
             "preset": "node_default",
-            "file": "",
+            "file": "floatToInt.py",
             "alternate": true,
             "position": "none",
             "category": "Operator",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "Float": {
                     "index": -1,
@@ -379,11 +379,11 @@
         },
         "Integer to Float": {
             "preset": "node_default",
-            "file": "",
+            "file": "intToFloat",
             "alternate": true,
             "position": "none",
             "category": "Operator",
-            "toolkit" : "default",
+            "toolkit" : "test",
             "attributes": {
                 "Integer": {
                     "index": -1,
