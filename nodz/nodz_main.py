@@ -153,7 +153,7 @@ class Nodz(QtWidgets.QGraphicsView):
             #super(Nodz, self).contextMenuEvent()
 
         # Drag view
-        if (event.button() == QtCore.Qt.MiddleButton and
+        if (event.button() == QtCore.Qt.LeftButton and
               event.modifiers() == QtCore.Qt.AltModifier):
             self.currentState = 'DRAG_VIEW'
             self.prevPos = event.pos()
@@ -2345,6 +2345,7 @@ class ConnectionItem(QtWidgets.QGraphicsPathItem):
 
         self.setPath(path)
 
+# Loadbox widget with file dialog
 class loadWidget(QtWidgets.QHBoxLayout):
     def __init__(self, parent):
         super(loadWidget, self).__init__()
@@ -2361,27 +2362,35 @@ class loadWidget(QtWidgets.QHBoxLayout):
             self.textbox.setText(f)
         self.parent.genParameters
         
+# Loadbox exclusively for loading custom widget code
 class customWidget(loadWidget):
     def __init__(self, parent):
         super(customWidget, self).__init__(parent)
         self.tempParams = {}
         
     def loadFile(self):
-        f = QtWidgets.QFileDialog.getOpenFileName()[0]
+        f = QtWidgets.QFileDialog.getOpenFileName(directory='.', filter="Python source files (*.py)")[0]
         if f is not "":
             self.textbox.setText(f)
             self.buildCustomUI()
         else:
             return
 
+    # Turns file selected in textbox into a parameter UI
     def buildCustomUI(self):
         f = self.textbox.text()
-        spec = importlib.util.spec_from_file_location("getParams", f)
-        obj = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(obj)
         
-        self.parent.resetUI(custom = True)
-        self.parent.buildUI(json.loads(obj.getParams()), custom = True)
+        try:
+            # Load in parameter JSON
+            spec = importlib.util.spec_from_file_location("getParams", f)
+            obj = importlib.util.module_from_spec(spec)
+   
+            spec.loader.exec_module(obj)
+            self.parent.resetUI(custom = True)
+            self.parent.buildUI(json.loads(obj.getParams()), custom = True)
+        except:
+            QtWidgets.QMessageBox.critical(self.parent, "ERROR", "Unable to import parameters")
+            return
         
         i = 2
         # Fill in the values for the custom genned parameters
@@ -2403,15 +2412,21 @@ class customWidget(loadWidget):
             
         self.tempParams = {}
         
-        spec = importlib.util.spec_from_file_location("getAttribs", f)
-        obj = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(obj)
-        
-        # Delete existing attributes and their connections
-        while len(self.parent.parent.attrs) > 0:
-            self.parent.parent._deleteAttribute(0)
-        
-        attribs = json.loads(obj.getAttribs())
+        try:
+            # Load in the attribute json
+            spec = importlib.util.spec_from_file_location("getAttribs", f)
+            obj = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(obj)
+            attribs = json.loads(obj.getAttribs())
+            
+            # Delete existing attributes and their connections
+            while len(self.parent.parent.attrs) > 0:
+                self.parent.parent._deleteAttribute(0)
+        except:
+            QtWidgets.QMessageBox.critical(self.parent, "ERROR", "Unable to import attributes: ")
+            return    
+
+        # Create attributes
         for attrib in attribs:
             index = attribs[attrib]['index']
             name = attrib
@@ -2425,8 +2440,11 @@ class customWidget(loadWidget):
                                             plug=plug,
                                             socket=socket,
                                             dataType=dataType)
+        
+        # Initialize the parameters for saving/duplicating
         self.parent.genParameters()
     
+# Window that displays node parameters
 class settingsItem(QtWidgets.QWidget):
 
     def __init__(self, parent, widgets):
@@ -2443,9 +2461,10 @@ class settingsItem(QtWidgets.QWidget):
         self.setWindowTitle("Settings")
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.installEventFilter(self)
-        #self.setStyleSheet(stylesh)
+
         self.genParameters()
         
+    # Catches window close/loss of focus events
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.Close:
             self.genParameters()
@@ -2456,7 +2475,9 @@ class settingsItem(QtWidgets.QWidget):
             
         return False
         
+    # Initialise the custom UI elements 
     def initCustom(self):
+        # find the custom box widget
         for i in range(0, self.layout.rowCount()):
             w = self.layout.itemAt(i,1)
             if isinstance(w, customWidget):
@@ -2490,6 +2511,11 @@ class settingsItem(QtWidgets.QWidget):
             label = QtWidgets.QLabel(widgets[i]["text"])
             widget = self.genWidget(widgets[i]["type"], widgets[i]["params"])
             self.layout.insertRow(-1, label, widget)
+            
+            # Cancel building the UI after a custom node
+            # If loading/duplicating, the generation code in the custom box
+            # handles the rest of the UI generation but we need to make sure
+            # it has the values held in the duplicated/loaded noded
             if widgets[i]["type"] == "custombox":
                 widget.tempParams = widgets
                 break
@@ -2510,10 +2536,11 @@ class settingsItem(QtWidgets.QWidget):
             
     # Generate the settings row based on its defined widget
     def genWidget(self, widget, params):
-        error = ""
+        
         if widget == "textbox":
             w = QtWidgets.QLineEdit()
             if "text" in params: w.setText(params["text"]) 
+            
         elif widget == "spinbox":
             w = QtWidgets.QSpinBox()
             if "minimum" in params: w.setMinimum(params["minimum"]) 
@@ -2545,10 +2572,15 @@ class settingsItem(QtWidgets.QWidget):
     # Return the values from each parameter type
     def genParameters(self):
     
+        # Update the name of the node
         self.parent.name = self.layout.itemAt(0,1).widget().text()
-    
+        
+        # Ordered dicts so that we get the same parameter order when we load
         data = collections.OrderedDict()
         vars = collections.OrderedDict()
+        
+        # Loop through rows and extract dict of parameter data
+        # for saving/duplicating
         for i in range(1, self.layout.rowCount()):
             param = {'text' : "", 'type' : "", 'params' : {}}
             param['text'] = self.layout.itemAt(i,0).widget().text()
@@ -2559,6 +2591,7 @@ class settingsItem(QtWidgets.QWidget):
             if w is None:
                 continue
             
+            # Save appropriate details based on the type of the widget
             if isinstance(w, customWidget):
                 param['type'] = 'custombox'
                 param['params'] = {'text' : w.textbox.text()}

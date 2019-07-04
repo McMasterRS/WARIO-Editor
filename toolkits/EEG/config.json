@@ -1,0 +1,48 @@
+{   
+    "node_types": {
+        "Data to Raw": {
+            "preset": "node_default",
+            "file": "data2raw.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Preprocessing",
+            "toolkit" : "EEG",
+            "attributes": {
+                "Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Raw": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "parameters" : {
+                "filter1" : {
+                    "text"   : "Low-pass filter cutoff",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : 1,
+                        "maximum" : 2147483647,
+                        "value"   : 1
+                    }
+                },
+                "filter2" : {
+                    "text"   : "High-pass filter cutoff",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : 1,
+                        "maximum" : 2147483647,
+                        "value"   : 1
+                    }
+                }
+            }
+        }
+    }
+}
