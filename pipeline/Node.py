@@ -73,7 +73,7 @@ class InputNode(Node):
     batch_finished = False
     run_finished = False
     row_finished = False
-    ready = True
+    ready = False
 
     def load_batch(self):
         return [[[]]]

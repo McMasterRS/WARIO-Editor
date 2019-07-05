@@ -7,18 +7,27 @@ import json
 class Pipeline():
     """  Proccess flow pipeline. Oversees/orchestrates the running of a directed graph of arbitrary tasks  """
 
-    nodes = {}
-    edges = {}
-    data = {}
-    batch = [[[]]]
+    nodes = {}          # All of the functional nodes
+    edges = {}          # The connective relationships between each node
+    data = {}           # The data before it is consumed by a node in processing, this is filled each time a node is tried to run
+    roots = {}          # Nodes with no parents. Updated as needed when new tasks are added, reduces need to search the whole graph
 
-    def add(self, node, node_id):
+    delayed_nodes = {
+        'batch': [],
+        'run': [],
+        'row': [] 
+    }
+
+    def add(self, node, node_id, delay=False):
         self.nodes[node_id] = node
         self.edges[node_id] = {
             'outgoing': {},
             'incoming': {}
         }
         self.data[node_id] = {}
+        if delay:
+            print(delay, node_id)
+            self.delayed_nodes[delay].append(node_id)
 
     def delete(self, ID):
         self.nodes[ID].delete()
@@ -63,51 +72,59 @@ class Pipeline():
 
         return child_data
 
-    def start(self):
-        pass
-
-    def stop(self):
-        pass
-
     def process_input(self, node_id, visited):
         # Parts out the different data types into easier to work with variables
         node = self.nodes[node_id]                          # the node we want to run
         outgoing = self.edges[node_id]['outgoing']          # the outgoing connections, one terminal can connect to multiple children
 
-        batch = node.load_batch()
-        n_runs = len(batch) * len(batch[0]) * len(batch[0][0]) # the total number of runs equals the number of files x rows x items
-        print(n_runs)
+        batch = node.load_batch() # this is an extremely confusing use of this
+
         for run in batch:
             for row in run:
                 for item in row:
-                    self.process_node(node_id, {})
+                    self.process_node(node_id, {}, item)
                     print("--------------------------------------- DONE ROW ---------------------------------------")
+                    self.process_delayed("row")
             print("--------------------------------------- DONE RUN ---------------------------------------")
+            self.process_delayed("run")
         print("--------------------------------------- DONE BATCH ---------------------------------------")
+        self.process_delayed("batch")
         
         
-    def process_node(self, node_id, visited):
-        print("RUNNING: ", node_id)
+    def process_node(self, node_id, visited, *args, **kwargs):
 
         # Parts out the different data types into easier to work with variables
         node = self.nodes[node_id]                          # the node we want to run
         outgoing = self.edges[node_id]['outgoing']          # the outgoing connections, one terminal can connect to multiple children
         data = self.data[node_id]                           # the data that the node will run on
 
-        visited[node_id] = True # passed recursively when visiting the nodes. we only want to run nodes once, unless there is a batch.
+        if node_id not in self.delayed_nodes['batch'] and node_id not in self.delayed_nodes['run'] and node_id not in self.delayed_nodes['row']:
+            print("RUNNING: ", node_id)
+            visited[node_id] = True # passed recursively when visiting the nodes. we only want to run nodes once, unless there is a batch.
 
-        results = node._process(*data) # processes the node
-        print("PROCESS RESULTS: ", node_id, results)
+            results = node._process(*data) # processes the node
+            print("PROCESS RESULTS: ", node_id, results)
 
-        # we want to child nodes to have acces to the results of this node/task, we do this by 'flowing' it down
-        for outgoing_terminal in results:
-            if outgoing_terminal in outgoing:
-                self.flow(node_id, outgoing_terminal, results[outgoing_terminal])
+            # we want to child nodes to have acces to the results of this node/task, we do this by 'flowing' it down
+            for outgoing_terminal in results:
+                if outgoing_terminal in outgoing:
+                    self.flow(node_id, outgoing_terminal, results[outgoing_terminal])
 
-        # Next we want to run all of the child nodes that connect to this node through its outgoing terminals
-        for edges in outgoing:
-            for edge in outgoing[edges]:
-                child_id = edge[0]
-                if child_id not in visited:
-                    self.process_node(child_id, visited)
+            # Next we want to run all of the child nodes that connect to this node through its outgoing terminals
+            for edges in outgoing:
+                for edge in outgoing[edges]:
+                    child_id = edge[0]
+                    if child_id not in visited:
+                        self.process_node(child_id, visited)
+
         return node_id
+
+    def process_delayed(self, delay_id):
+        if delay_id in self.delayed_nodes:
+            length = range(len(self.delayed_nodes[delay_id]))
+            print(delay_id, " delayed: ", self.delayed_nodes[delay_id])
+            for i in length:
+                node = self.delayed_nodes[delay_id].pop()
+                print("============================", node)
+                self.process_node(node, {})
+                print("============================", node)

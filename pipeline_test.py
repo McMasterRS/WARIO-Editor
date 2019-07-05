@@ -5,13 +5,16 @@ from pipeline.Task import Task
 
 from pipeline.Node import FileInputNode, PrintNode
 
-input_node = FileInputNode("input")
-print_node = PrintNode("print")
+INPUT = FileInputNode("input")
+A = PrintNode("A")
+B = PrintNode("B")
 
 pipeline = Pipeline()
-pipeline.add(input_node, 'input')
-pipeline.add(print_node, 'print')
-pipeline.connect('input', 'print', "out", "in")
+pipeline.add(INPUT, 'input')
+pipeline.add(A, 'A')
+pipeline.add(B, 'B', delay="run")
+pipeline.connect('input', 'A', "out", "in")
+pipeline.connect('input', 'B', "out", "in")
 
 pipeline.process_input('input', {})
 
