@@ -75,6 +75,26 @@
     },
 
     "node_types":{
+        "Import CSV": {
+            "preset": "node_default",
+            "file": "importCSV.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Input",
+            "toolkit" : "default",
+            "attributes": {
+                "Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "csv"
+                }
+            },
+            "settings" : {
+                
+            }
+        },
         "Random Integer In": {
             "preset": "node_default",
             "file": "randomInt.py",
@@ -91,7 +111,7 @@
                     "type": "int"
                 }
             },
-            "parameters" : {
+            "settings" : {
                 "min" : {
                     "text"   : "Minimum value",
                     "type"   : "spinbox",
@@ -128,7 +148,7 @@
                     "type": "float"
                 }
             },
-            "parameters" : {
+            "settings" : {
                 "min" : {
                     "text"   : "Minimum value",
                     "type"   : "spinbox",
@@ -165,7 +185,7 @@
                     "type": "int"
                 }
             },
-            "parameters" : {}
+            "settings" : {}
         },
         "Float Out": {
             "preset": "node_default",
@@ -183,7 +203,7 @@
                     "type": "float"
                 }
             },
-            "parameters": {}
+            "settings": {}
         },
         "Integer Adder": {
             "preset": "node_default",
@@ -215,7 +235,7 @@
                     "type": "int"
                 }
             },
-            "parameters" : {}
+            "settings" : {}
         },
         "Integer Multiplier": {
             "preset": "node_default",
@@ -247,7 +267,7 @@
                     "type": "int"
                 }
             },
-            "parameters" : {}
+            "settings" : {}
         },
         "Integer Divider(R)": {
             "preset": "node_default",
@@ -286,7 +306,7 @@
                     "type": "int"
                 }
             },
-            "parameters": {}
+            "settings": {}
         },
         "Integer Divider(F)": {
             "preset": "node_default",
@@ -318,7 +338,7 @@
                     "type": "float"
                 }
             },
-            "parameters": {}
+            "settings": {}
         },
         "Integer Subtractor": {
             "preset": "node_default",
@@ -350,7 +370,7 @@
                     "type": "int"
                 }
             },
-            "parameters": {}
+            "settings": {}
         },
         "Float to Integer": {
             "preset": "node_default",
@@ -375,7 +395,7 @@
                     "type": "int"
                 }
             },
-            "parameters": {}
+            "settings": {}
         },
         "Integer to Float": {
             "preset": "node_default",
@@ -400,7 +420,7 @@
                     "type": "float"
                 }
             },
-            "parameters": {}
+            "settings": {}
         }
     }
 }

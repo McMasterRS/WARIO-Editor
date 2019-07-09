@@ -1,5 +1,24 @@
 {   
     "node_types": {
+        "Import Data": {
+            "preset": "node_default",
+            "file": "importData.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Preprocessing",
+            "toolkit" : "EEG",
+            "attributes": {
+                "Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "parameters" : {}
+        },
+            
         "Data to Raw": {
             "preset": "node_default",
             "file": "data2raw.py",
