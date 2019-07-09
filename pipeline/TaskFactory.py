@@ -6,7 +6,6 @@ class TaskFactory():
 
     loaded = {}
 
-    #TODO: This should not have to happen, its just in there since for whatever reason all of the types are formated file.py
     def __init__(self, type_list):
         """ Upon creation, import just the tasks we need """
 
@@ -20,4 +19,6 @@ class TaskFactory():
                 print("This is not a module I know")
 
     def create_task(self, task_type, task_id):
-        return self.loaded[task_type](task_id)
+        task = self.loaded[task_type](task_id)
+        print("creating", task, task.ready)
+        return task

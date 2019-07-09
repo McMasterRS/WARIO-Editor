@@ -1,9 +1,10 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 
-class intMultiplier(Task):    
+class intMultiplier(Node):    
 
     def __init__(self, name):
         super(intMultiplier, self).__init__(name)
         
-    def run(self, inA, inB):
-        return {"Out": inA*inB}
+    # def process(self, inA, inB):
+    def process(self):
+        return {"Out": self.state['In A'] * self.state['In B']}

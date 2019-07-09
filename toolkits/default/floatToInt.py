@@ -1,9 +1,9 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 
-class floatToInteger(Task):
+class floatToInteger(Node):
 
     def __init__(self, name):
         super(floatToInteger, self).__init__(name)
         
-    def run(self, floatIn):
+    def process(self, floatIn):
         return {int(floatIn)}
