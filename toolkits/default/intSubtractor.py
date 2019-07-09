@@ -1,9 +1,9 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 
-class intSubtractor(Task):
+class intSubtractor(Node):
 
     def __init__(self, name):
         super(intSubtractor, self).__init__(name)
 
-    def run(self, inA, inB):
+    def process(self, inA, inB):
         return inA-inB

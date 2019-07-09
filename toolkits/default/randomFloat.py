@@ -1,7 +1,7 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 import random
 
-class randomFloat(Task):
+class randomFloat(Node):
 
     def __init__(self, name):
         super(randomFloat, self).__init__(name)

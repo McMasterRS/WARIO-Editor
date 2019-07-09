@@ -1,10 +1,10 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 
-class intOut(Task):
+class intOut(Node):
 
     def __init__(self, name):
         super(intOut, self).__init__(name)
 
-    def run(self, intIn):
-        print("Float: ", intIn)
-        return intIn
+    def process(self):
+        print("Float: ", self.state["In"])
+        return self.state["In"]

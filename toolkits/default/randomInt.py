@@ -1,10 +1,10 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 import random
 
-class randomInt(Task):
+class randomInt(Node):
 
     def __init__(self, name):
         super(randomInt, self).__init__(name)
         
-    def run(self, min=0, max=10):
+    def process(self, min=0, max=10):
         return {"Out": int(random.randrange(min, max))}

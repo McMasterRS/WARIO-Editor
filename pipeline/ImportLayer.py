@@ -29,6 +29,7 @@ class NodzImporter():
         tasks = {}
         task_types = {}
         connections = {}
+        variables = {}
 
         # Populates the types of tasks, key = task type string, value = the file name
         for nod in data["NODES"]:
@@ -37,17 +38,17 @@ class NodzImporter():
             task_signature = {
                 "in": [],
                 "out": [],
-                "paramaters": None,
+                "variables": None,
                 "type": None
             }
 
             for attribute in data["NODES"][nod]["attributes"]:
-                if attribute["socket"]:
-                    task_signature["out"].append(attribute["name"])
                 if attribute["plug"]:
+                    task_signature["out"].append(attribute["name"])
+                if attribute["socket"]:
                     task_signature["in"].append(attribute["name"])
             
-            task_signature["paramaters"] = data["NODES"][nod]["variables"] # silly name mismatch here, should standardize the name of things
+            task_signature["variables"] = data["NODES"][nod]["variables"] # silly name mismatch here, should standardize the name of things
             task_signature["type"] = data['NODES'][nod]["type"]
             tasks[task_name] = task_signature
 
@@ -56,6 +57,7 @@ class NodzImporter():
             task_types[task_type] = file_location
 
             connections[nod] = {}
+            variables[nod] = task_signature["variables"]
 
         # Populates the connections
         for connection in data["CONNECTIONS"]:
@@ -69,4 +71,4 @@ class NodzImporter():
             connections[parent_name][parent_attribute].append([child_name, child_attribute])
             # connections[child_name][child_attribute] = [parent_name, parent_attribute]
 
-        return [task_types, tasks, connections]
+        return [task_types, tasks, connections, variables]

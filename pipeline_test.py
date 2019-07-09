@@ -1,34 +1,37 @@
-from pipeline.ImportLayer import NodzImporter
 from pipeline.TaskFactory import TaskFactory
-from pipeline.Pipeline  import Pipeline
-from pipeline.Task import Task
+from pipeline.ImportLayer import NodzImporter
+from pipeline.Pipeline import Pipeline
+from pipeline.Node import TestImportNode, TestAddNode, TestNode
+from inspect import signature
 
-from pipeline.Node import FileInputNode, PrintNode
 
-input_node = FileInputNode("input")
-print_node = PrintNode("print")
-
+task_types, tasks, connections, configuration = NodzImporter().parsed
+factory = TaskFactory(task_types)
 pipeline = Pipeline()
-pipeline.add(input_node, 'input')
-pipeline.add(print_node, 'print')
-pipeline.connect('input', 'print', "out", "in")
 
-pipeline.process_input('input', {})
+new_tasks = {}
 
-# pipeline.start_processing()
+# print(configuration)
 
-# task_types, tasks, connections = NodzImporter().parsed
-# task_factory = TaskFactory(task_types)
+for task_id in tasks:
+    task = factory.create_task(tasks[task_id]['type'], task_id)
 
-# # simply loops through the loaded tasks and turns them into the appropriate Task classes
-# for task_name in tasks:
-#     task = task_factory.create_task(tasks[task_name]["type"], task_name)
-#     pipeline.add(task, params=tasks[task_name]["paramaters"])
+    for terminal in tasks[task_id]['in']:
+        task.ready[terminal] = False
 
-# for parent_name in connections:
-#     for parent_attribute in connections[parent_name]:
-#         for child in connections[parent_name][parent_attribute]:
-#             child_name, child_attribute = child
-#             pipeline.connect(parent_name, child_name, parent_attribute, child_attribute)
-        
-# pipeline.start()
+    if task_id in configuration:
+        for value in configuration[task_id]:
+            task.state[value] = configuration[task_id][value]
+            task.ready[value] = True
+
+    print("configured state", task.ready)
+    pipeline.add(task)
+    new_tasks[task_id] = task
+
+for parent_id in connections:
+    for parent_terminal in connections[parent_id]:
+        for child_id, child_terminal in connections[parent_id][parent_terminal]:        
+            pipeline.connect(new_tasks[parent_id], new_tasks[child_id], parent_terminal, child_terminal)
+
+
+pipeline.start()
