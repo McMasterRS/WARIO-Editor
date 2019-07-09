@@ -71,6 +71,10 @@ def startNodz():
     saveAct.setStatusTip("Save Flowchart")
     saveAct.triggered.connect(nodz.saveGraphDialog)
     
+    saveRunAct = QtWidgets.QAction(getIcon('SP_DriveHDIcon'), "&Run", window)
+    saveRunAct.setShortcut("Ctrl+R")
+    saveRunAct.setStatusTip("Save flowchart and run")
+    
     def loadFile():
         nodz.loadGraphDialog()
         # Auto check toolkit options based on what the loaded file uses
@@ -91,6 +95,7 @@ def startNodz():
     quitAct.triggered.connect(nodz.checkClose)
 
     fileMenu.addAction(saveAct)  
+    fileMenu.addAction(saveRunAct)
     fileMenu.addAction(loadAct)
     fileMenu.addAction(quitAct)
     

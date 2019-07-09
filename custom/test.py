@@ -1,5 +1,5 @@
-def getParams():
-    params = '''{
+def getSettings():
+    settings = '''{
         "textboxExample" : {
             "text"   : "Textbox Example",
             "type"   : "textbox",
@@ -32,7 +32,7 @@ def getParams():
         }
     }'''
     
-    return params
+    return settings
     
 def getAttribs():
     attributes = '''{  

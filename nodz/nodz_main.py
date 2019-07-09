@@ -2010,7 +2010,7 @@ class PlugItem(SlotItem):
             self.connected_slots.remove(connection.socketItem)
         # Remove connection
         self.connections.remove(connection)
-
+ 
 
 class SocketItem(SlotItem):
 

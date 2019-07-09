@@ -2,7 +2,7 @@
 
 Workplace Automation and Research I/O
 
-A flowchart based pipeline development 
+A flowchart based pipeline development suit based on the Nodz library
 
 ###
 ## Prerequisites
