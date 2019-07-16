@@ -6,5 +6,5 @@ class intOut(Node):
         super(intOut, self).__init__(name)
 
     def process(self):
-        print("Float: ", self.state["In"])
-        return self.state["In"]
+        print("Float: ", self.args["In"])
+        return self.args["In"]

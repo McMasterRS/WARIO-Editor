@@ -1,9 +1,9 @@
 from pipeline.Node import Node
 
-class floatToInteger(Node):
+class floatToInt(Node):
 
     def __init__(self, name):
-        super(floatToInteger, self).__init__(name)
+        super(floatToInt, self).__init__(name)
         
     def process(self, floatIn):
         return {int(floatIn)}

@@ -22,3 +22,26 @@ class TaskFactory():
         task = self.loaded[task_type](task_id)
         print("creating", task, task.ready)
         return task
+
+class NodeFactory():
+ 
+    registered_nodes = {}
+
+    @classmethod
+    def register_node(cls, type_id, type_class):
+        cls.registered_nodes[type_id] = type_class
+        print("Factory Register: ", type_class)
+
+    @classmethod
+    def create_node(cls, node_id, type_id):
+        node = cls.registered_nodes[type_id](node_id)
+        return node
+
+    @classmethod
+    def import_node(cls, type_id, toolkit_id, class_name):
+        if type_id not in cls.registered_nodes:
+            module_name = "toolkits." + toolkit_id + '.' + class_name
+            module = importlib.import_module(module_name)
+            cls.register_node(type_id, getattr(module, class_name))
+
+        return cls.registered_nodes[type_id]

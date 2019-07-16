@@ -25,6 +25,7 @@ class NodzImporter():
 
     def parse(self, data):
         """ """
+        nodz = NodzDefinition(data)
 
         tasks = {}
         task_types = {}
@@ -72,3 +73,65 @@ class NodzImporter():
             # connections[child_name][child_attribute] = [parent_name, parent_attribute]
 
         return [task_types, tasks, connections, variables]
+
+from pipeline.NodeFactory import NodeFactory
+
+class PipelineDefinition():
+    nodes = {}
+    node_types = []
+    global_vars = [] 
+
+    def __init__(self):
+        pass
+    def __str__(self):
+        return "nope"
+
+class NodzDefinition():
+    def __init__(self, json, factory=None):
+        self.nodes = {}
+        self.configuration_parameters = []
+        self.node_types = []
+        self.globals = []
+    def parse_json_definition(self, json_definition):
+        
+        for node_name in json["NODES"]:
+            node = json["NODES"][node_name]
+            self.nodes.append(node)
+            self.node_types.append(node["type"])
+            self.configuration_parameters.append()
+
+            node_type = node["type"]
+            params = node['params']
+
+            self.node_types.append(node_type)
+            self.node[node_name] =
+            print("Node", node)
+
+        for connection_name in json["CONNECTIONS"]:
+            print("Connection", connection_name)
+
+
+from pipeline.TaskFactory import TaskFactory as NodeFactory
+
+LOADED_DEFINITIONS = {
+    "nodz": NodzDefinition
+}
+
+
+### Creates a collection of nodes from a compatible pipeline definition
+### also creates a factory definition for creating new nodes
+
+class PipelineLoader():
+
+    def __init__(self, factory=None):
+        self.factory = NodeFactory() if factory is not None else factory
+
+    def load_from_file(self, fs_location):
+        pass
+
+    def load_from_url(self, url):
+        pass
+
+class NodzDefinition():
+    def __init__(self):
+        pass

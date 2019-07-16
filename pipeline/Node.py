@@ -1,5 +1,7 @@
 from inspect import signature, Parameter
 from collections import OrderedDict
+from pipeline.TaskFactory import NodeFactory
+
 ###################################################################################################
 # Node/Task
 # + Abstract node for handling the running of a discrete task in a workflow
@@ -10,14 +12,14 @@ class Node():
 
     ################################################################################################
     ################################################################################################
-    def __init__(self, name):
-        self.name = name
-        self.ready = {}
-        self.state = {}
-        self.done = True
-        print("__init__", self.ready)
-        # self.state = OrderedDict.fromkeys(signature(self.process).parameters.keys())
-        # print("initial state", self.state)
+    def __init__(self, node_id=None):
+
+        self.node_id = node_id  # identifier for the node
+        self.ready = {}         # Flags for each argument, all true indicates the node should run
+        self.state = {}         # Variables local to the node, set internally by itself. Persits
+        self.args = {}          # Variables local to the node, set externally by it's parents
+        self.global_vars = {}       # Variables global to the entire pipeline.
+        self.done = True        # Flag indicating if this node requires multple passes
 
     ################################################################################################
     ################################################################################################
@@ -26,7 +28,7 @@ class Node():
         
     ################################################################################################
     ################################################################################################
-    def process(self, *args, **kwargs):
+    def process(self):
         return {}
 
     ################################################################################################
@@ -55,7 +57,7 @@ class TestImportNode(Node):
         self.data = [0,1,2,3,4,5,6,7,8,9]
         self.done = False
 
-    def process(self, *args, **kwargs):
+    def process(self):
         if len(self.data) == 0:
             self.done = True
             return { 'out': None}
