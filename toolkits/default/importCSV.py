@@ -1,8 +1,8 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 
 import csv
 
-class importCSV(Task):
+class importCSV(Node):
 
     def __init__(self, params):
         self.data = csv.reader(params["filename"], 'rb')

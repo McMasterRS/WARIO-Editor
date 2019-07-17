@@ -1,5 +1,8 @@
-from inspect import signature, Parameter
-from collections import OrderedDict
+from pipeline.NodeFactory import NodeFactory
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
+from PyQt5.QtGui import QIcon
+import csv
 ###################################################################################################
 # Node/Task
 # + Abstract node for handling the running of a discrete task in a workflow
@@ -9,34 +12,44 @@ class Node():
     """ Abstract Node class. This describes a single operational function in our process pipeline """
 
     ################################################################################################
+    # Node.__init__: Initializes the node
+    # + node_id: The unique id for the node.
     ################################################################################################
-    def __init__(self, name):
-        self.name = name
-        self.ready = {}
-        self.state = {}
-        self.done = True
-        print("__init__", self.ready)
-        # self.state = OrderedDict.fromkeys(signature(self.process).parameters.keys())
-        # print("initial state", self.state)
+    def __init__(self, node_id=None):
+        """ Initialize Node """
+        self.node_id = node_id  # identifier for the node
+        self.ready = {}         # Flags for each argument, all true indicates the node should run
+        self.state = {}         # Variables local to the node, set internally by itself. Persits
+        self.args = {}          # Variables local to the node, set externally by it's parents
+        self.global_vars = {}   # Variables global to the entire pipeline.
+        self.done = True        # Flag indicating if this node requires multple passes
 
     ################################################################################################
+    # Node.start: Pipeline runs this when the pipeline starts
     ################################################################################################
     def start(self):
+        """ Default start hook ran by the pipeline before all processing begins """
         return None
         
     ################################################################################################
+    # Node.start: Pipeline runs this when the node is ready
     ################################################################################################
-    def process(self, *args, **kwargs):
+    def process(self):
+        """ Default process hook ran by the pipeline when this node is ready """
         return {}
 
     ################################################################################################
+    # Node.reset: Pipeline runs this to reset this nodes state variables
     ################################################################################################    
     def reset(self):
+        """ Default process hook ran by the pipeline to reset this node's state variables """
         return None
         
     ################################################################################################
+    # Node.end: Pipeline runs this when the pipeline ends
     ################################################################################################    
     def end(self):
+        """ Default end hook ran by the pipeline once the pipeline has finished """
         return None
 
     ################################################################################################
@@ -49,161 +62,79 @@ class Node():
         print(self, self.state, self.ready, ready)
         return ready
 
-class TestImportNode(Node):
+class CSVInputNodeGUI(Node):
+    pass
+
+class CSVOutputNodeGUI(Node):
+    pass
+
+class FileInputNode(Node):
+    def __init__(self, name):
+        super().__init__(name)
+        self.done = False
+        self.state['batch'] = [] 
+        self.state['run'] = [] 
+        self.state['row'] = []
 
     def start(self):
-        self.data = [0,1,2,3,4,5,6,7,8,9]
-        self.done = False
+        app = QApplication(sys.argv)
+        ex = FileWidget()
+        self.state['files'] = ex.openFileNamesDialog()
+        self.state['batch'] = []
+        for file_path in self.state['files']:
+            with open(file_path) as csv_file:
+                reader = csv.reader(csv_file)
+                data = []
+                for row in reader:
+                    data.append(row)
+                self.state['batch'].append(data)
 
-    def process(self, *args, **kwargs):
-        if len(self.data) == 0:
+    def process(self):
+        print("##### Process #####")
+        item = None
+        if len(self.state['row']) > 0:
+            item = self.state['row'].pop()
+        elif len(self.state['run']) > 0:
+            self.state['row'] = self.state['run'].pop()
+            item = self.state['row'].pop()
+        elif len(self.state['batch']) > 0:
+            self.state['run'] = self.state['batch'].pop()
+            self.state['row'] = self.state['run'].pop()
+            item = self.state['row'].pop()
+
+        if len(self.state["batch"]) == 0 and len(self.state["run"]) == 0 and len(self.state["row"]) == 0:
             self.done = True
-            return { 'out': None}
 
         return {
-            'out': self.data.pop()
-        }
-
-class TestAddNode(Node):
-    def process(self, A, B):
-        print(A, B)
-        return {
-            'out': A + B
+            "OUT": item
         }
 
 class TestNode(Node):
     def process(self):
-        return {
-            'A': 0, 'B': 1
-        }
+        print(self.args['IN'])
+        return {}
 
-###################################################################################################
-#
-###################################################################################################
-
-# class InputNode(Node):
-#     """ Node that returns part of its data each time it's run """
-
-#     batch = []  # The complete set of data for a process to run. A directory of one or more files.
-#     run = [] # A subset of a batch, a set of rows in a file for example
-#     row = [] # A subset of a run, an single row in a file for example
-#     value = None
-
-#     batch_finished = False
-#     run_finished = False
-#     row_finished = False
-#     ready = False
-
-#     def load_batch(self):
-#         return [[[]]]
-
-#     # this is part of the running code, it consumes the next piece of data, then pushes it onwards
-#     def process(self, *args, **kwargs):
-#         self.value = None
-
-#         # This is the process of iterating through and processing the batch, run, and row data
-#         if len(self.row) == 0: # this is the last one in the row
-#             self.row_finished = True
-#             if len(self.run) == 0: # this is the last one in the run
-#                 self.run_finished = True
-#                 if len(self.batch) == 0: # this is the last one in the batch
-#                     self.batch_finished = True
-#                 else: # there is still some left in the batch
-#                     self.run = self.batch.pop()
-#                     self.row = self.run.pop()
-#                     self.value = self.row.pop()
-#                     self.run_finished = False
-#                     self.row_finished = False
-#             else: # there is still som left in the run
-#                 self.row = self.run.pop()
-#                 self.value = self.row.pop()
-#                 self.row_finished = False
-#         else:
-#             self.value = self.row.pop() # we wouldnt be running this if there was nothing in the row
-
-#         # print(self.row)
-
-#         return {
-#             "out": self.value
-#         }
-
-# ###################################################################################################
-# #
-# ###################################################################################################
-
-# class OutputNode(Node):
-#     """ abstract node with no children, this is used to output the results of the entire process """
+class FileWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.title = 'Select Some Files'
+        self.left = 10
+        self.top = 10
+        self.width = 640
+        self.height = 480
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
     
-#     def finish_batch(self, batch):
-#         """ concludes the running of a batch of runs """
+    def openFileNamesDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
+        self.show()
+        return files
     
-#     def finish_run(self, run, batch):
-#         """ concludes the running of a run """
-
-#     def output_after_batch(self, batch):
-#         return batch
-
-#     def output_after_run(self, run):
-#         return run
-
-# ###################################################################################################
-# #
-# ###################################################################################################
-
-# class FileInputNode(InputNode):
-#     """ This is an input node where each item is a row of a file or each row in a set of files. """ 
-
-#     def load_batch(self, batch=[]):
-#         """ load the data for the whole batch, in this case, a set of files """ 
-
-#         file_locations = self.prompt_file_locations()
-#         for location in file_locations:
-#             batch.append(self.read_file(location))
-
-#         return batch
-
-#     def prompt_file_locations(self):
-#         """ prompt the user with a graphical file selector """
-        
-#         file_locations = ["./test1.csv", "test2.csv"]
-
-#         return file_locations
-
-#     def read_file(self, file_location):
-#         """ reads all of the data from a set of file locations. returns the raw data """
-
-#         data = []
-
-#         with open(file_location) as f:
-#             data = list(csv.reader(f))
-
-#         return data
-
-# ###################################################################################################
-# #
-# ###################################################################################################
-
-# class RandomInputNode(InputNode):
-#     """ fills a set of columns and rows with random numbers and pushes them as a batch and runs """
-
-#     def __init__(self, n_rows=0, n_columns=0, rand_min=0, rand_max=1, precision=3):
-#         self.n_rows = n_rows
-#         self.n_columns = n_columns
-#         self.rand_min = rand_min
-#         self.rand_max = rand_max
-#         self.precision = precision
-
-#     def load_batch(self, batch=[]):
-#         batch = [[random.randrange(self.rand_min, self.rand_max) for i in range(self.n_columns)] for j in range(self.n_rows)]
-#         return batch
-
-# ###################################################################################################
-# #
-# ###################################################################################################
-# class PrintNode(Node):
-
-#     def process(self, value):
-#         print("PRINTNODE: ", value)
-#         return {
-#             'out': value
-#         }
+    def saveFileDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()","","All Files (*);;Text Files (*.txt)", options=options)
+        if fileName:
+            print(fileName)

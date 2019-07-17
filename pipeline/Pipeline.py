@@ -1,4 +1,4 @@
-import json
+from pipeline.Node import Node
 
 ###################################################################################################
 # Pipeline:
@@ -14,8 +14,15 @@ import json
 class Pipeline():
     """  Proccess flow pipeline. Oversees/orchestrates the running of a directed graph of arbitrary tasks  """
 
-    nodes = {}          # tree of nodes, each node stores its return attributes which in turn stores its children
-    roots = {}          # Nodes with no parents. Updated as needed when new tasks are added, reduces need to search the whole graph
+    # TODO: Validation step for initialization arguments
+    def __init__(self, nodes=None, global_vars=None, roots=None):
+        """ Pipeline initialization. Optionally can initialize with nodes, global_vars, roots """
+        # tree of nodes, each node stores its return attributes which in turn stores its children
+        self.nodes = nodes if nodes is not None else {}
+        # Nodes with no parents. Updated as needed when new tasks are added, reduces need to search the whole graph
+        self.roots = roots if roots is not None else {}
+        # Variables that are optionally shared accross nodes and batches/runs/passes
+        self.global_vars = global_vars if global_vars is not None else {}
 
     ################################################################################################
     # Pipeline: Add
@@ -23,8 +30,9 @@ class Pipeline():
     ################################################################################################
     def add(self, node):
         """ Add a new node to the pipeline """
-        self.roots[node] = node
+
         self.nodes[node] = {}
+        self.roots[node] = node
 
     ################################################################################################
     # Pipeline: Connect
@@ -33,18 +41,18 @@ class Pipeline():
     # + parent_terminal: On what outgoing parameter is the parent node connecting
     # + child_terminal: On what incoming parameter is the child node connecting
     ################################################################################################
-    def connect(self, parent, child, parent_terminal, child_terminal):
+    def connect(self, parent=None, child=None):
         """ Form a relationship between two nodes, from the parent data will be passed to child """
-
-        print("CONNECT", parent, child, parent_terminal, child_terminal)
-
-        if parent_terminal not in self.nodes[parent]:
-            self.nodes[parent][parent_terminal] = []
-        
-        self.nodes[parent][parent_terminal].append([child, child_terminal])
+ 
+        parent_node, parent_terminal = parent
+        child_node, child_terminal = child
+        child_node.ready[child_terminal] = False
+        if parent_terminal not in self.nodes[parent_node]:
+            self.nodes[parent_node][parent_terminal] = []
+        self.nodes[parent_node][parent_terminal].append([child_node, child_terminal])
 
     ###############################################################################################
-    # Pipeline.Start: Initiates the pipeline
+    # Pipeline: Start:
     ###############################################################################################
     def start(self):
         """ Initializes all the nodes and starts the first pass """
@@ -60,16 +68,17 @@ class Pipeline():
             self.run_pass(True)
 
     ###############################################################################################
-    # Pipeline.run_pass: Recursively run passes of the pipeline until all data is processed
-    # + done: indicates if more passes over the data need to be done
-    ### Since a pipeline can have input nodes that iteratively return parts of their data, multiple
-    ### runnings of these nodes must be performed. Each pass over the data runs all of the nodes
-    ### from the start until they all report that they have processed all of their available data
+    # Pipeline: Run_Pass
+    # + done: Indicates if more passes over the data need to be done
+    #
+    ### Recursively run passes over the pipeline until each node has processed all of its data.
+    ### Since a pipeline can have input nodes that iteratively return parts of their data (batches)
+    ### multiple runnings of these nodes must be performed (a pass). Each pass over the data runs
+    ### all of the nodes from the start until they all report that they are done.
     ###############################################################################################
 
     def run_pass(self, done):
         """ Recursively runs all of the roots nodes until they report they are done """
-        print("Pass ###")
 
         for root in self.roots:
             done = done and self.run_node(root, {})
@@ -89,21 +98,21 @@ class Pipeline():
     ################################################################################################
 
     def run_node(self, node, visited):
-        """ called on each node, and recursively on each child node """
-        print(node.state)
-        if node.is_ready():
-            visited[node] = True
+        """ Called on each node, and recursively on each child node """
 
-            # results = node.process(*node.state.values()) # processes the node and retrieves the results
+        print("Node", node, "State", node.state, "Ready", node.ready, all(node.ready.values()))
+        if all(node.ready.values()):
+
+            node.global_vars = self.global_vars
             results = node.process()
-            # print(node, 'results', results)
+            self.global_vars = node.global_vars
+            print(node.done)
             for terminal in self.nodes[node]:
                 for child, child_terminal in self.nodes[node][terminal]:
-                    print(child_terminal, results[terminal])
-                    child.state[child_terminal] = results[terminal]
+
+                    child.args[child_terminal] = results[terminal]
                     child.ready[child_terminal] = True
                     if child not in visited:
-                        # print("child", child)
                         self.run_node(child, visited)
 
         return node.done
