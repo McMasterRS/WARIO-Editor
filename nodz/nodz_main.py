@@ -13,6 +13,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 import nodz.nodz_utils as utils
+from nodz.customWidgets import *
 
 defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..\\toolkits\default\config.json')
 
@@ -70,6 +71,9 @@ class Nodz(QtWidgets.QGraphicsView):
         self.drawingConnection = False
         self.currentHoveredNode = None
         self.sourceSlot = None
+        
+        # Global variables
+        self.globalUI = GlobalUI(self)
 
         # Display options.
         self.currentState = 'DEFAULT'
@@ -144,7 +148,7 @@ class Nodz(QtWidgets.QGraphicsView):
                     name = nt
                 else:
                     name = nt[len(nodeTb[nt]):]
-                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction('Create ' + name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),settings=self.config['node_types'][nt]["settings"], type=name, toolkit=nodeTb[nt]))
+                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction('Create ' + name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),settings=self.config['node_types'][nt]["settings"], type=nt, toolkit=nodeTb[nt]))
                 
             menu.addAction('Custom', functools.partial(self.newNode,name='Custom',attrs=self.config['node_types']['Custom'],position=self.mapToScene(event.pos()),settings=self.config['node_types']['Custom']["settings"], type='Custom', toolkit='custom'))
 
@@ -511,10 +515,23 @@ class Nodz(QtWidgets.QGraphicsView):
                 return
             
         sys.exit()
-            
+        
+    def openGlobals(self):
+        self.globalUI.show()
+        self.globalUI.activateWindow()
+        
+    def updateGlobals(self, globals):
+        for node in self.scene().nodes:
+            n = self.scene().nodes[node]    
+            if n.type == "Set Global" or n.type == "Get Global":
+                for i in range(0, n.settingsWindow.layout.rowCount()):
+                    widget = n.settingsWindow.layout.itemAt(i, 1).widget()
+                    if isinstance(widget, GlobalNodeComboBox):
+                        widget.updateGlobals(globals)
+    
 
     ##################################################################
-    # API
+    # API   
     ##################################################################
 
     def loadConfig(self, filePath):
@@ -656,6 +673,10 @@ class Nodz(QtWidgets.QGraphicsView):
 
             # Emit signal.
             self.signal_NodeCreated.emit(nodeId)
+            
+            # Update the global listbox if the node is of that type
+            if type == "Get Global" or type == "Set Global":
+                self.globalUI.genGlobals()
 
             return nodeItem
 
@@ -905,15 +926,18 @@ class Nodz(QtWidgets.QGraphicsView):
             nodeInst = self.scene().nodes[node]
             
             # Make sure settings are up to date before saving
-            nodeInst.settings.genSettings()
+            nodeInst.settingsWindow.genSettings()
             
             name = nodeInst.name
             preset = nodeInst.nodePreset
             nodeAlternate = nodeInst.alternate
-            nodeType = nodeInst.type
+            if nodeInst.toolkit == 'default' or nodeInst.toolkit == 'custom':
+                nodeType = nodeInst.type 
+            else: 
+                nodeType[len(toolkit):]
             toolkit = nodeInst.toolkit
-            variables = nodeInst.variables
-            file = self.config['node_types'][nodeType]['file']
+            variables = nodeInst.variables         
+            file = self.config['node_types'][nodeInst.type]['file']
             data['NODES'][node] = { 'name': name,
                                     'type': nodeType,
                                     'file': file,
@@ -938,6 +962,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Store connections data.
         data['CONNECTIONS'] = self.evaluateGraph()
+        data['GLOBALS'] = self.globalUI.genGlobals()
 
 
         # Save data.
@@ -988,6 +1013,14 @@ class Nodz(QtWidgets.QGraphicsView):
             print('Invalid path : {0}'.format(filePath))
             print('Load aborted !')
             return False
+           
+        # Load global variables
+        if "GLOBALS" in data: 
+            self.globalUI.loadGlobals(data["GLOBALS"])
+        else:
+            self.globalUI.clearTable()
+            
+        self.globalUI.genGlobals()
 
         # Apply nodes data.
         nodesData = data['NODES']
@@ -1043,7 +1076,6 @@ class Nodz(QtWidgets.QGraphicsView):
         if nodeType == "Custom":
            node.settings.initCustom()
 
-        
         # Apply connections data.
         connectionsData = data['CONNECTIONS']
 
@@ -1057,8 +1089,8 @@ class Nodz(QtWidgets.QGraphicsView):
             targetAttr = target.split('.')[1]
 
             self.createConnection(sourceNode, sourceAttr,
-                                  targetNode, targetAttr)
-
+                                  targetNode, targetAttr)          
+        
         self.scene().update()
 
         # Emit signal.
@@ -1317,7 +1349,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         # Methods.
         self._createStyle(config)
         
-        self.settings = settingsItem(self, settings)
+        self.settingsWindow = settingsItem(self, settings)
 
     @property
     def height(self):
@@ -1472,7 +1504,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
     def _deleteAttribute(self, index):
         """
         Remove an attribute by reducing the node, removing the label
-        and the connection items.
+        and the connection items.       
 
         :type  index: int.
         :param index: The index of the attribute in the node.
@@ -1623,11 +1655,14 @@ class NodeItem(QtWidgets.QGraphicsItem):
             # Search non-connectable attributes.
             if nodzInst.drawingConnection:
                 if self == nodzInst.currentHoveredNode:
-                    if (attrData['dataType'] != nodzInst.sourceSlot.dataType or
-                        (nodzInst.sourceSlot.slotType == 'plug' and attrData['socket'] == False or
-                         nodzInst.sourceSlot.slotType == 'socket' and attrData['plug'] == False)):
+                    if ((attrData['dataType'].casefold() != nodzInst.sourceSlot.dataType.casefold() or    
+                        (nodzInst.sourceSlot.slotType == 'plug' and attrData['socket'] == False) or
+                         (nodzInst.sourceSlot.slotType == 'socket' and attrData['plug'] == False)) and 
+                         (attrData['dataType'] != 'file') and (nodzInst.sourceSlot.dataType != "file")):
+
                         # Set non-connectable attributes color.
                         painter.setPen(utils._convertDataToColor(config['non_connectable_color']))
+                        
 
             textRect = QtCore.QRect(rect.left() + self.radius,
                                      rect.top(),
@@ -1705,8 +1740,8 @@ class NodeItem(QtWidgets.QGraphicsItem):
         super(NodeItem, self).hoverLeaveEvent(event)
         
     def mouseDoubleClickEvent(self, event):
-        self.settings.show()
-        self.settings.activateWindow()
+        self.settingsWindow.show()
+        self.settingsWindow.activateWindow()
 
 
 class SlotItem(QtWidgets.QGraphicsItem):
@@ -1747,6 +1782,7 @@ class SlotItem(QtWidgets.QGraphicsItem):
         self.preset = preset
         self.index = index
         self.dataType = dataType
+        self.setToolTip(dataType)
 
         # Style.
         self.brush = QtGui.QBrush()
@@ -1867,7 +1903,8 @@ class SlotItem(QtWidgets.QGraphicsItem):
         if nodzInst.drawingConnection:
             if self.parentItem() == nodzInst.currentHoveredNode:
                 painter.setBrush(utils._convertDataToColor(config['non_connectable_color']))
-                if (self.slotType == nodzInst.sourceSlot.slotType or (self.slotType != nodzInst.sourceSlot.slotType and self.dataType != nodzInst.sourceSlot.dataType)):
+                if ((self.slotType == nodzInst.sourceSlot.slotType or self.dataType.lower() != nodzInst.sourceSlot.dataType.lower())
+                    and (self.dataType.lower() != "file") and (nodzInst.sourceSlot.dataType.lower() != "file")):
                     painter.setBrush(utils._convertDataToColor(config['non_connectable_color']))
                 else:
                     _penValid = QtGui.QPen()
@@ -1963,7 +2000,7 @@ class PlugItem(SlotItem):
         """
         if isinstance(socket_item, SocketItem):
             if self.parentItem() != socket_item.parentItem():
-                if socket_item.dataType == self.dataType:
+                if socket_item.dataType.casefold() == self.dataType.casefold() or socket_item.dataType == "file":
                     if socket_item in self.connected_slots:
                         return False
                     else:
@@ -2085,7 +2122,7 @@ class SocketItem(SlotItem):
         if isinstance(plug_item, PlugItem):
             if (self.parentItem() != plug_item.parentItem() and
                 len(self.connected_slots) <= 1):
-                if plug_item.dataType == self.dataType:
+                if plug_item.dataType.casefold() == self.dataType.casefold() or plug_item.dataType == "file":
                     if plug_item in self.connected_slots:
                         return False
                     else:
@@ -2343,105 +2380,136 @@ class ConnectionItem(QtWidgets.QGraphicsPathItem):
 
         self.setPath(path)
 
-# Loadbox widget with file dialog
-class loadWidget(QtWidgets.QHBoxLayout):
+
+# Global variable UI
+class GlobalUI(QtWidgets.QWidget):
     def __init__(self, parent):
-        super(loadWidget, self).__init__()
+        super(GlobalUI, self).__init__()        
+        self.layout = QtWidgets.QVBoxLayout()
+        self.vars = []
         self.parent = parent
-        self.textbox = QtWidgets.QLineEdit()
-        self.button = QtWidgets.QPushButton("Load")
-        self.button.clicked.connect(self.loadFile)
-        self.addWidget(self.textbox)
-        self.addWidget(self.button)
         
-    def loadFile(self):
-        f = QtWidgets.QFileDialog.getOpenFileName()[0]
-        if f is not "":
-            self.textbox.setText(f)
-        self.parent.genSettings
+        self.buildUI()
+        self.setLayout(self.layout)
+        self.resize(700, 300)
+        self.setWindowIcon(self.style().standardIcon(getattr(QtWidgets.QStyle,"SP_TitleBarMenuButton")))
+        self.setWindowTitle("Global Settings")
         
-# Loadbox exclusively for loading custom widget code
-class customWidget(loadWidget):
-    def __init__(self, parent):
-        super(customWidget, self).__init__(parent)
-        self.tempSettings = {}
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.installEventFilter(self)
         
-    def loadFile(self):
-        f = QtWidgets.QFileDialog.getOpenFileName(directory='.', filter="Python source files (*.py)")[0]
-        if f is not "":
-            self.textbox.setText(f)
-            self.buildCustomUI()
-        else:
-            return
-
-    # Turns file selected in textbox into a setting UI
-    def buildCustomUI(self):
-        f = self.textbox.text()
-        
-        try:
-            # Load in setting JSON
-            spec = importlib.util.spec_from_file_location("getSettings", f)
-            obj = importlib.util.module_from_spec(spec)
-   
-            spec.loader.exec_module(obj)
-            self.parent.resetUI(custom = True)
-            self.parent.buildUI(json.loads(obj.getSettings()), custom = True)
-        except:
-            QtWidgets.QMessageBox.critical(self.parent, "ERROR", "Unable to import settings")
-            return
-        
-        i = 2
-        # Fill in the values for the custom genned settings
-        # Used when duplicating or loading
-        for p in self.tempSettings:
-            setting = self.tempSettings[p]
-            if setting["type"] == "custombox":
-                continue
-            w = self.parent.layout.itemAt(i, 1)
-            if setting["type"] == "textbox":
-                if "text" in setting["params"]: w.widget().setText(setting["params"]["text"])
-            elif setting["type"] == "spinbox":
-                if "value" in setting["params"]: w.widget().setValue(setting["params"]["value"]) 
-            elif setting["type"] == "checkbox":
-                if "checked" in setting["params"]: w.widget().setChecked(setting["params"]["checked"]) 
-            elif setting["type"] == "loadbox":
-                if "text" in setting["params"]: w.textbox.setText(setting["params"]["text"])
-            i += 1
-            
-        self.tempSettings = {}
-        
-        try:
-            # Load in the attribute json
-            spec = importlib.util.spec_from_file_location("getAttribs", f)
-            obj = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(obj)
-            attribs = json.loads(obj.getAttribs())
-            
-            # Delete existing attributes and their connections
-            while len(self.parent.parent.attrs) > 0:
-                self.parent.parent._deleteAttribute(0)
-        except:
-            QtWidgets.QMessageBox.critical(self.parent, "ERROR", "Unable to import attributes: ")
-            return    
-
-        # Create attributes
-        for attrib in attribs:
-            index = attribs[attrib]['index']
-            name = attrib
-            plug = attribs[attrib]['plug']
-            socket = attribs[attrib]['socket']
-            preset = attribs[attrib]['preset']
-            dataType = attribs[attrib]['type']
-            self.parent.parent._createAttribute(name=name,
-                                            index=index,
-                                            preset=preset,
-                                            plug=plug,
-                                            socket=socket,
-                                            dataType=dataType)
-        
-        # Initialize the settings for saving/duplicating
-        self.parent.genSettings()
+    def buildUI(self):
     
+        self.table = QtWidgets.QTableWidget()
+        self.table.setColumnCount(4)
+        
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        self.table.setHorizontalHeaderLabels(['Variable Name', 'Type', 'Value', 'Constant'])
+        self.table.verticalHeader().setVisible(False)
+        self.layout.addWidget(self.table)
+        
+        buttonLayout = QtWidgets.QHBoxLayout()
+        self.btAdd = QtWidgets.QPushButton(text = "Add")
+        self.btAdd.clicked.connect(self.addRow)
+        buttonLayout.addWidget(self.btAdd)
+        
+        self.btRemove = QtWidgets.QPushButton(text = "Remove")
+        self.btRemove.clicked.connect(self.removeRow)
+        buttonLayout.addWidget(self.btRemove)
+        
+        spacer = QtWidgets.QSpacerItem(100, 10, QtWidgets.QSizePolicy.Expanding)
+        buttonLayout.addItem(spacer)
+        
+        self.layout.addLayout(buttonLayout)
+        
+    def eventFilter(self, object, event):
+        if event.type() == QtCore.QEvent.Close:
+            self.genGlobals()
+            event.accept()
+        elif event.type() == QtCore.QEvent.WindowDeactivate:
+            self.genGlobals()
+            event.accept()
+           
+        return False
+        
+    def genGlobals(self):
+        globals = {}
+        self.vars = {}
+        
+        for row in range(0, self.table.rowCount()):
+            gb = {}
+        
+            name = self.table.item(row, 0).text()
+            type = self.table.cellWidget(row, 1).currentText()
+            value = self.table.item(row, 2). text()
+            const = True if self.table.item(row, 3).checkState() == QtCore.Qt.Checked else False
+            
+            gb["type"] = type
+            gb["value"] = value
+            gb["const"] = const
+            globals[name] = gb
+            
+            self.vars[name] = type
+            
+        self.parent.updateGlobals(self.vars)
+            
+        return globals
+        
+    def loadGlobals(self, globals):
+        self.clearTable()
+        for g in globals:
+            self.addRow()
+            row = self.table.rowCount() - 1
+            
+            self.table.item(row, 0).setText(g)
+            
+            # Use the type of the global to work out which index to load
+            id = self.table.cellWidget(row, 1).findText(globals[g]["type"])
+            if id == -1:
+                self.table.cellWidget(row, 1).setCurrentIndex(len(self.table.cellWidget(row, 1).items) - 1)
+                self.table.cellWidget(row, 1).setCurrentText(globals[g]["type"])
+            else:
+                self.table.cellWidget(row, 1).setCurrentIndex(id)
+                
+            self.table.item(row, 2).setText(globals[g]["value"])    
+            
+            if globals[g]["const"]:
+                self.table.item(row, 3).setCheckState(QtCore.Qt.Checked)
+            else:
+                self.table.item(row, 3).setCheckState(QtCore.Qt.Unchecked)
+        
+    def addRow(self):
+    
+        row = self.table.rowCount()
+        self.table.insertRow(row)
+        
+        text = QtWidgets.QTableWidgetItem("Var{0}".format(row))
+        value = QtWidgets.QTableWidgetItem("0")
+        
+        # Defined in nodz/customWidgets.py
+        combobox = TypeComboBox()
+        
+        checkbox = QtWidgets.QTableWidgetItem()
+        checkbox.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+        checkbox.setCheckState(QtCore.Qt.Unchecked)
+        
+        self.table.setItem(row, 0, text)    
+        self.table.setCellWidget(row, 1, combobox)
+        self.table.setItem(row, 2, value)
+        self.table.setItem(row, 3, checkbox)
+        
+
+    def removeRow(self):
+        if self.table.currentRow() != -1:
+            self.table.removeRow(self.table.currentRow())
+            
+    def clearTable(self):
+        while self.table.rowCount() > 0:
+            self.table.removeRow(0)
+            
+ 
 # Window that displays node settings
 class settingsItem(QtWidgets.QWidget):
 
@@ -2561,8 +2629,12 @@ class settingsItem(QtWidgets.QWidget):
         elif widget == "combobox":
             w = QtWidgets.QComboBox()
             
+        elif widget == "globalbox":
+            w = GlobalNodeComboBox(self.parent, params["loaded"])
+            if "value" in params: w.setCurrentText(params["value"])
+            
         else:
-            QtWidgets.QMessageBox.critical(self, "ERROR", "Unrecognised setting type for node {0}".format(self.parent.name))
+            QtWidgets.QMessageBox.critical(self, "ERROR", "Unrecognised setting type '{0}' for node {1}".format(widget, self.parent.name))
             return None
             
         return w
@@ -2610,6 +2682,9 @@ class settingsItem(QtWidgets.QWidget):
                 setting['type'] = "loadbox"
                 setting['params'] = {'text' : w.textbox.text()}
                 var = w.textbox.text()
+            elif isinstance(w.widget(), GlobalNodeComboBox):
+                setting['type']  = "globalbox"
+                setting['params'] = {'value' : w.widget().currentText(), 'loaded' : True}
 
             data[self.nameList[i-1]] = setting
             vars[self.nameList[i-1]] = var

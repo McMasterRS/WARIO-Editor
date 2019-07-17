@@ -86,7 +86,7 @@ def startNodz():
                 tk.setChecked(False)
 
     loadAct = QtWidgets.QAction(getIcon('SP_DialogOpenButton'), "&Load", window)
-    loadAct.setShortcut("Ctrl+O")
+    loadAct.setShortcut("Ctrl+L")
     loadAct.setStatusTip("Load Flowchart")
     loadAct.triggered.connect(loadFile)
 
@@ -101,6 +101,11 @@ def startNodz():
     
     ### EDIT MENU
     
+    globalAct = QtWidgets.QAction(getIcon('SP_ComputerIcon'), "&Global Settings", window)
+    globalAct.setShortcut("Ctrl+G")
+    globalAct.setStatusTip("Open global settings window")   
+    globalAct.triggered.connect(nodz.openGlobals)
+    
     duplicateAct = QtWidgets.QAction(getIcon('SP_TitleBarNormalButton'), "&Duplicate Nodes", window)
     duplicateAct.setShortcut("Ctrl+D")
     duplicateAct.setStatusTip("Duplicate selected nodes")
@@ -110,6 +115,7 @@ def startNodz():
     clearAct.setStatusTip("Clear flowchart of all nodes")
     clearAct.triggered.connect(nodz.clearGraph)
 
+    editMenu.addAction(globalAct)
     editMenu.addAction(duplicateAct)
     editMenu.addAction(clearAct)
 

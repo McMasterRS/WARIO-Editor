@@ -73,13 +73,46 @@
         "plug": [255, 155, 0, 255],
         "socket": [255, 155, 0, 255]
     },
+    
+    "attr_preset_optional":{
+        "bg": [60, 60, 60, 255],
+        "text": [220, 220, 220, 255],
+        "plug": [0, 120, 255, 255],
+        "socket": [0, 120, 255, 255]
+    },
 
     "node_types":{
+        "Get Global": {
+            "preset": "node_default",
+            "file": "getGlobal.py",
+            "category": "Input",
+            "toolkit" : "default",
+            "attributes": {},
+            "settings": {
+                "global" : {
+                    "text" : "Global Variable",
+                    "type" : "globalbox",
+                    "params" : {"loaded" : false}
+                }
+            }
+        },
+        "Set Global": {
+            "preset": "node_default",
+            "file": "setGlobal.py",
+            "category": "Input",
+            "toolkit" : "default",
+            "attributes": {},
+            "settings": {
+                "global" : {
+                    "text" : "Global Variable",
+                    "type" : "globalbox",
+                    "params" :{"loaded" : false}
+                }
+            }
+        },
         "Import CSV": {
             "preset": "node_default",
             "file": "importCSV.py",
-            "alternate": true,
-            "position": "none",
             "category": "Input",
             "toolkit" : "default",
             "attributes": {

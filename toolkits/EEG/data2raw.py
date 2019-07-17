@@ -2,7 +2,11 @@ from pipeline.Task import Task
 import mne
 
 class data2raw(Task):
-    def run(self, data, badchans, lowPass, highPass):
+
+    def __init__(self, name, params):
+        super(data2raw, self).__init__(name, params)
+    
+    def process(self, data, badchans, lowPass, highPass):
         Raw = mne.io.RawArray(data,info,first_samp=0)
         Raw.set_montage(montage, set_dig=True)
         Raw.info['bads'] = badchans

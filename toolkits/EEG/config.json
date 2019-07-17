@@ -2,10 +2,10 @@
     "node_types": {
         "Import Data": {
             "preset": "node_default",
-            "file": "importData.py",
+            "file": "importEEGData.py",
             "alternate": true,
             "position": "none",
-            "category": "Preprocessing",
+            "category": "Input",
             "toolkit" : "EEG",
             "attributes": {
                 "Data": {
@@ -13,10 +13,10 @@
                     "preset": "attr_preset_1",
                     "plug": true,
                     "socket": false,
-                    "type": "int"
+                    "type": "EEGdata"
                 }
             },
-            "parameters" : {}
+            "settings" : {}
         },
             
         "Data to Raw": {
@@ -32,17 +32,17 @@
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": "int"
+                    "type": "EEGdata"
                 },
                 "Raw": {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": true,
                     "socket": false,
-                    "type": "int"
+                    "type": "rawEEG"
                 }
             },
-            "parameters" : {
+            "settings" : {
                 "filter1" : {
                     "text"   : "Low-pass filter cutoff",
                     "type"   : "spinbox",
@@ -62,6 +62,160 @@
                     }
                 }
             }
+        },
+        "Raw to epoch" : {
+            "preset" : "node_default",
+            "file" : "raw2epoch.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Preprocessing",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Raw": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "rawEEG"
+                },
+                "Trigger Times": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "trigTimes"
+                },
+                "Trigger Values": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "trigVals"
+                },
+                "Subject IDs": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Epoch Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "epoch"
+                },
+                "Evoked Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "evoked"
+                },
+                "Trigger Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "trigData"
+                }
+            },
+            "settings" : {}
+        },
+        "Fit ICA" : {
+            "preset" : "node_default",
+            "file" : "fitICA.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "ICA",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Raw": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "rawEEG"
+                },
+                "ICA Solution": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "ICA"   
+                }
+            },
+            "settings" : {}
+        },
+        "Apply ICA" : {
+            "preset" : "node_default",
+            "file" : "applyICA.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "ICA",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "ICA Solution": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,  
+                    "socket": true,
+                    "type": "ICA"   
+                },
+                "Epoch Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "epoch"   
+                },
+                "Epochs ICA": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "epochICA"   
+                }
+            },
+            "settings" : {}
+        },
+        
+        "Save Epochs" : {
+            "preset" : "node_default",
+            "file" : "saveEpochs.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Output",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Epochs": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "epoch"   
+                }
+            },
+            "settings" : {}
+        },
+        "Save Epochs ICA" : {
+            "preset" : "node_default",
+            "file" : "saveEpochsICA.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Output",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Epochs ICA": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "epochICA"   
+                }
+            },
+            "settings" : {}
         }
     }
 }
