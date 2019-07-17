@@ -1,5 +1,5 @@
 import json
-from pipeline.TaskFactory import NodeFactory
+from pipeline.NodeFactory import NodeFactory
 
 NODZ_SAVE_LOCATION = "./pipeline/saves/sample.json"
 

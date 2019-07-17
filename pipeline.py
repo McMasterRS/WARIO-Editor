@@ -1,24 +1,34 @@
-from pipeline.Node import Node, TestNode
-from pipeline.Toolkit import Toolkit
-from pipeline.TaskFactory import NodeFactory
+from pipeline.Node import FileInputNode, TestNode
 from pipeline.NodzInterface import NodzInterface
 from pipeline.Pipeline import Pipeline
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
+from PyQt5.QtGui import QIcon
 
-nodes, connections, global_vars = NodzInterface.load("./pipeline/saves/sample.json")
+
+# nodes, connections, global_vars = NodzInterface.load("./pipeline/saves/sample.json")
+# pipeline = Pipeline()
+
+# for node_id, node in nodes:
+#     pipeline.add(node)
+
+# print("connections")
+# for connection in connections:
+#     parent, child = connection
+#     pipeline.connect(parent, child)
+#     # print("connect", parent, child)
+#     # pipeline.connect(parent, child)
+
 pipeline = Pipeline()
-
-for node_id, node in nodes:
-    pipeline.add(node)
-
-print("connections")
-for connection in connections:
-    parent, child = connection
-    pipeline.connect(parent, child)
-    # print("connect", parent, child)
-    # pipeline.connect(parent, child)
-
-
+fin = FileInputNode('a')
+test = TestNode('b')
+pipeline.add(fin)
+pipeline.add(test)
+pipeline.connect(parent=(fin, 'OUT'), child=(test, 'IN'))
 pipeline.start()
+
+
+
 
 # from pipeline.TaskFactory import TaskFactory
 # from pipeline.ImportLayer import NodzImporter

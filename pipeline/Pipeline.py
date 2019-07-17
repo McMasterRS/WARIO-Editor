@@ -106,7 +106,7 @@ class Pipeline():
             node.global_vars = self.global_vars
             results = node.process()
             self.global_vars = node.global_vars
-
+            print(node.done)
             for terminal in self.nodes[node]:
                 for child, child_terminal in self.nodes[node][terminal]:
 

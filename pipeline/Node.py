@@ -1,7 +1,8 @@
-from inspect import signature, Parameter
-from collections import OrderedDict
-from pipeline.TaskFactory import NodeFactory
-
+from pipeline.NodeFactory import NodeFactory
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
+from PyQt5.QtGui import QIcon
+import csv
 ###################################################################################################
 # Node/Task
 # + Abstract node for handling the running of a discrete task in a workflow
@@ -60,3 +61,80 @@ class Node():
             ready = ready and param in self.state
         print(self, self.state, self.ready, ready)
         return ready
+
+class CSVInputNodeGUI(Node):
+    pass
+
+class CSVOutputNodeGUI(Node):
+    pass
+
+class FileInputNode(Node):
+    def __init__(self, name):
+        super().__init__(name)
+        self.done = False
+        self.state['batch'] = [] 
+        self.state['run'] = [] 
+        self.state['row'] = []
+
+    def start(self):
+        app = QApplication(sys.argv)
+        ex = FileWidget()
+        self.state['files'] = ex.openFileNamesDialog()
+        self.state['batch'] = []
+        for file_path in self.state['files']:
+            with open(file_path) as csv_file:
+                reader = csv.reader(csv_file)
+                data = []
+                for row in reader:
+                    data.append(row)
+                self.state['batch'].append(data)
+
+    def process(self):
+        print("##### Process #####")
+        item = None
+        if len(self.state['row']) > 0:
+            item = self.state['row'].pop()
+        elif len(self.state['run']) > 0:
+            self.state['row'] = self.state['run'].pop()
+            item = self.state['row'].pop()
+        elif len(self.state['batch']) > 0:
+            self.state['run'] = self.state['batch'].pop()
+            self.state['row'] = self.state['run'].pop()
+            item = self.state['row'].pop()
+
+        if len(self.state["batch"]) == 0 and len(self.state["run"]) == 0 and len(self.state["row"]) == 0:
+            self.done = True
+
+        return {
+            "OUT": item
+        }
+
+class TestNode(Node):
+    def process(self):
+        print(self.args['IN'])
+        return {}
+
+class FileWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.title = 'Select Some Files'
+        self.left = 10
+        self.top = 10
+        self.width = 640
+        self.height = 480
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+    
+    def openFileNamesDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
+        self.show()
+        return files
+    
+    def saveFileDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()","","All Files (*);;Text Files (*.txt)", options=options)
+        if fileName:
+            print(fileName)
