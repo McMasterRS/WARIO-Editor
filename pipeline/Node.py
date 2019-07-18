@@ -23,6 +23,8 @@ class Node():
         self.args = {}          # Variables local to the node, set externally by it's parents
         self.global_vars = {}   # Variables global to the entire pipeline.
         self.done = True        # Flag indicating if this node requires multple passes
+        self.event_callbacks = {}
+        self.events_fired = {}
 
     ################################################################################################
     # Node.start: Pipeline runs this when the pipeline starts
@@ -62,13 +64,39 @@ class Node():
         print(self, self.state, self.ready, ready)
         return ready
 
-class CSVInputNodeGUI(Node):
-    pass
+class CSVOutputGUINode(Node):
+    def __init__(self, name):
+        super().__init__(name)
+        self.state['csv_out'] = [[]]
+        self.state['current_row'] = self.state['csv_out'][0]
+        self.event_callbacks = {
+            "Row End": self.on_row_end
+        }
 
-class CSVOutputNodeGUI(Node):
-    pass
+    def process(self):
+        self.state['current_row'].append(self.args['IN'])
 
-class FileInputNode(Node):
+    def end(self):
+        app = QApplication(sys.argv)
+        ex = FileWidget()
+        print(self.state['csv_out'])
+        file = ex.saveFileDialog()
+        if file != '':
+            with open(file, 'w') as f:
+                writer = csv.writer(f)
+                while len(self.state['csv_out']) > 0:
+                    row = self.state['csv_out'].pop()
+                # for row in self.state['csv_out']:
+                    writer.writerow(row)
+
+
+    def on_row_end(self, event_id, event_data):
+        print("####################################### Row End Heared")
+        current_row = []
+        self.state['csv_out'].append(current_row) # create a new row for the output
+        self.state['current_row'] = current_row
+
+class CSVInputGUINode(Node):
     def __init__(self, name):
         super().__init__(name)
         self.done = False
@@ -92,18 +120,24 @@ class FileInputNode(Node):
     def process(self):
         print("##### Process #####")
         item = None
+
         if len(self.state['row']) > 0:
             item = self.state['row'].pop()
+
         elif len(self.state['run']) > 0:
             self.state['row'] = self.state['run'].pop()
             item = self.state['row'].pop()
+            self.events_fired["Row End"] = None
+
         elif len(self.state['batch']) > 0:
             self.state['run'] = self.state['batch'].pop()
             self.state['row'] = self.state['run'].pop()
             item = self.state['row'].pop()
+            self.events_fired["Run End"] = ("Run End", None)
 
         if len(self.state["batch"]) == 0 and len(self.state["run"]) == 0 and len(self.state["row"]) == 0:
             self.done = True
+            self.events_fired["Batch End"] = ("Batch End", None)
 
         return {
             "OUT": item
@@ -136,5 +170,5 @@ class FileWidget(QWidget):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()","","All Files (*);;Text Files (*.txt)", options=options)
-        if fileName:
-            print(fileName)
+        self.show()
+        return fileName

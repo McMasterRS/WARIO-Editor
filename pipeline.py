@@ -1,4 +1,4 @@
-from pipeline.Node import FileInputNode, TestNode
+from pipeline.Node import CSVInputGUINode, CSVOutputGUINode
 from pipeline.NodzInterface import NodzInterface
 from pipeline.Pipeline import Pipeline
 import sys
@@ -20,11 +20,11 @@ from PyQt5.QtGui import QIcon
 #     # pipeline.connect(parent, child)
 
 pipeline = Pipeline()
-fin = FileInputNode('a')
-test = TestNode('b')
-pipeline.add(fin)
-pipeline.add(test)
-pipeline.connect(parent=(fin, 'OUT'), child=(test, 'IN'))
+csv_in = CSVInputGUINode('a')
+csv_out = CSVOutputGUINode('b')
+pipeline.add(csv_in)
+pipeline.add(csv_out)
+pipeline.connect(parent=(csv_in, 'OUT'), child=(csv_out, 'IN'))
 pipeline.start()
 
 
