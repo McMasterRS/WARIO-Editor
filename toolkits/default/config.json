@@ -86,7 +86,10 @@
                 "global" : {
                     "text" : "Global Variable",
                     "type" : "globalbox",
-                    "params" : {"loaded" : false}
+                    "params" : {
+                        "value" : "",
+                        "loaded" : false
+                    }
                 }
             }
         },
@@ -100,7 +103,10 @@
                 "global" : {
                     "text" : "Global Variable",
                     "type" : "globalbox",
-                    "params" :{"loaded" : false}
+                    "params" : {
+                        "value" : "",
+                        "loaded" : false
+                    }
                 }
             }
         },

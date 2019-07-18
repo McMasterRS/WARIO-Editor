@@ -148,7 +148,7 @@ class Nodz(QtWidgets.QGraphicsView):
                     name = nt
                 else:
                     name = nt[len(nodeTb[nt]):]
-                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction('Create ' + name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),settings=self.config['node_types'][nt]["settings"], type=nt, toolkit=nodeTb[nt]))
+                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction(name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),settings=self.config['node_types'][nt]["settings"], type=nt, toolkit=nodeTb[nt]))
                 
             menu.addAction('Custom', functools.partial(self.newNode,name='Custom',attrs=self.config['node_types']['Custom'],position=self.mapToScene(event.pos()),settings=self.config['node_types']['Custom']["settings"], type='Custom', toolkit='custom'))
 
@@ -931,13 +931,13 @@ class Nodz(QtWidgets.QGraphicsView):
             name = nodeInst.name
             preset = nodeInst.nodePreset
             nodeAlternate = nodeInst.alternate
-            if nodeInst.toolkit == 'default' or nodeInst.toolkit == 'custom':
-                nodeType = nodeInst.type 
-            else: 
-                nodeType[len(toolkit):]
             toolkit = nodeInst.toolkit
             variables = nodeInst.variables         
             file = self.config['node_types'][nodeInst.type]['file']
+            if nodeInst.toolkit == 'default' or nodeInst.toolkit == 'custom':
+                nodeType = nodeInst.type 
+            else: 
+                nodeType = nodeInst.type[len(toolkit):]
             data['NODES'][node] = { 'name': name,
                                     'type': nodeType,
                                     'file': file,
@@ -1658,7 +1658,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
                     if ((attrData['dataType'].casefold() != nodzInst.sourceSlot.dataType.casefold() or    
                         (nodzInst.sourceSlot.slotType == 'plug' and attrData['socket'] == False) or
                          (nodzInst.sourceSlot.slotType == 'socket' and attrData['plug'] == False)) and 
-                         (attrData['dataType'] != 'file') and (nodzInst.sourceSlot.dataType != "file")):
+                         (attrData['dataType'].casefold() != 'file') and (nodzInst.sourceSlot.dataType.casefold() != "file")):
 
                         # Set non-connectable attributes color.
                         painter.setPen(utils._convertDataToColor(config['non_connectable_color']))
@@ -1904,7 +1904,7 @@ class SlotItem(QtWidgets.QGraphicsItem):
             if self.parentItem() == nodzInst.currentHoveredNode:
                 painter.setBrush(utils._convertDataToColor(config['non_connectable_color']))
                 if ((self.slotType == nodzInst.sourceSlot.slotType or self.dataType.lower() != nodzInst.sourceSlot.dataType.lower())
-                    and (self.dataType.lower() != "file") and (nodzInst.sourceSlot.dataType.lower() != "file")):
+                    and (self.dataType.casefold() != "file") and (nodzInst.sourceSlot.dataType.casefold() != "file")):
                     painter.setBrush(utils._convertDataToColor(config['non_connectable_color']))
                 else:
                     _penValid = QtGui.QPen()
@@ -2000,7 +2000,7 @@ class PlugItem(SlotItem):
         """
         if isinstance(socket_item, SocketItem):
             if self.parentItem() != socket_item.parentItem():
-                if socket_item.dataType.casefold() == self.dataType.casefold() or socket_item.dataType == "file":
+                if socket_item.dataType.casefold() == self.dataType.casefold() or socket_item.dataType.casefold() == "file" or self.dataType.casefold() == "file":
                     if socket_item in self.connected_slots:
                         return False
                     else:
@@ -2122,7 +2122,7 @@ class SocketItem(SlotItem):
         if isinstance(plug_item, PlugItem):
             if (self.parentItem() != plug_item.parentItem() and
                 len(self.connected_slots) <= 1):
-                if plug_item.dataType.casefold() == self.dataType.casefold() or plug_item.dataType == "file":
+                if plug_item.dataType.casefold() == self.dataType.casefold() or plug_item.dataType.casefold() == "file" or self.dataType.casefold() == "file":
                     if plug_item in self.connected_slots:
                         return False
                     else:
@@ -2400,7 +2400,7 @@ class GlobalUI(QtWidgets.QWidget):
         
     def buildUI(self):
     
-        self.table = QtWidgets.QTableWidget()
+        self.table = UniqueNameTable()
         self.table.setColumnCount(4)
         
         header = self.table.horizontalHeader()
@@ -2431,6 +2431,8 @@ class GlobalUI(QtWidgets.QWidget):
         elif event.type() == QtCore.QEvent.WindowDeactivate:
             self.genGlobals()
             event.accept()
+            
+            
            
         return False
         
@@ -2485,7 +2487,8 @@ class GlobalUI(QtWidgets.QWidget):
         row = self.table.rowCount()
         self.table.insertRow(row)
         
-        text = QtWidgets.QTableWidgetItem("Var{0}".format(row))
+        text = QtWidgets.QTableWidgetItem("Var{0}".format(self.table.varNameCounter))
+        self.table.varNameCounter += 1
         value = QtWidgets.QTableWidgetItem("0")
         
         # Defined in nodz/customWidgets.py
@@ -2630,8 +2633,7 @@ class settingsItem(QtWidgets.QWidget):
             w = QtWidgets.QComboBox()
             
         elif widget == "globalbox":
-            w = GlobalNodeComboBox(self.parent, params["loaded"])
-            if "value" in params: w.setCurrentText(params["value"])
+            w = GlobalNodeComboBox(self.parent, params["loaded"], params["value"])
             
         else:
             QtWidgets.QMessageBox.critical(self, "ERROR", "Unrecognised setting type '{0}' for node {1}".format(widget, self.parent.name))
