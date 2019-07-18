@@ -23,6 +23,8 @@ class Pipeline():
         self.roots = roots if roots is not None else {}
         # Variables that are optionally shared accross nodes and batches/runs/passes
         self.global_vars = global_vars if global_vars is not None else {}
+        # 
+        self.event_callbacks = {}
 
     ################################################################################################
     # Pipeline: Add
@@ -33,6 +35,13 @@ class Pipeline():
 
         self.nodes[node] = {}
         self.roots[node] = node
+        if len(node.event_callbacks) > 0:
+            print(node.event_callbacks)
+            for event_id in node.event_callbacks:
+                event_callback = node.event_callbacks[event_id]
+                if event_id not in self.event_callbacks:
+                    self.event_callbacks[event_id] = []
+                self.event_callbacks[event_id].append(event_callback)
 
     ################################################################################################
     # Pipeline: Connect
@@ -47,6 +56,8 @@ class Pipeline():
         parent_node, parent_terminal = parent
         child_node, child_terminal = child
         child_node.ready[child_terminal] = False
+        child_node.default_ready[child_terminal] = False
+
         if parent_terminal not in self.nodes[parent_node]:
             self.nodes[parent_node][parent_terminal] = []
         self.nodes[parent_node][parent_terminal].append([child_node, child_terminal])
@@ -66,6 +77,9 @@ class Pipeline():
 
         if len(self.roots) > 0:
             self.run_pass(True)
+
+        for node in self.nodes:
+            node.end()
 
     ###############################################################################################
     # Pipeline: Run_Pass
@@ -100,19 +114,28 @@ class Pipeline():
     def run_node(self, node, visited):
         """ Called on each node, and recursively on each child node """
 
-        print("Node", node, "State", node.state, "Ready", node.ready, all(node.ready.values()))
         if all(node.ready.values()):
-
+            
             node.global_vars = self.global_vars
             results = node.process()
             self.global_vars = node.global_vars
-            print(node.done)
+
+            if len(node.events_fired) > 0:
+                for event_id in node.events_fired:
+                    event_data = node.events_fired[event_id]
+                    self.resolve_event(event_id, event_data)
+                node.events_fired = {}
+
             for terminal in self.nodes[node]:
                 for child, child_terminal in self.nodes[node][terminal]:
-
                     child.args[child_terminal] = results[terminal]
                     child.ready[child_terminal] = True
                     if child not in visited:
                         self.run_node(child, visited)
-
+            node.reset()
         return node.done
+    
+    def resolve_event(self, event_id, event_data):
+        if event_id in self.event_callbacks:
+            for callback in self.event_callbacks[event_id]:
+                callback(event_id, event_data)
