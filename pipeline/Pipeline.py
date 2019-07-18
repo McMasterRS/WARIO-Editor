@@ -56,6 +56,8 @@ class Pipeline():
         parent_node, parent_terminal = parent
         child_node, child_terminal = child
         child_node.ready[child_terminal] = False
+        child_node.default_ready[child_terminal] = False
+
         if parent_terminal not in self.nodes[parent_node]:
             self.nodes[parent_node][parent_terminal] = []
         self.nodes[parent_node][parent_terminal].append([child_node, child_terminal])
@@ -112,9 +114,8 @@ class Pipeline():
     def run_node(self, node, visited):
         """ Called on each node, and recursively on each child node """
 
-        print("Node", node, "State", node.state, "Ready", node.ready, all(node.ready.values()))
         if all(node.ready.values()):
-
+            
             node.global_vars = self.global_vars
             results = node.process()
             self.global_vars = node.global_vars
@@ -122,7 +123,6 @@ class Pipeline():
             if len(node.events_fired) > 0:
                 for event_id in node.events_fired:
                     event_data = node.events_fired[event_id]
-                    print(event_id, event_data)
                     self.resolve_event(event_id, event_data)
                 node.events_fired = {}
 
@@ -132,12 +132,10 @@ class Pipeline():
                     child.ready[child_terminal] = True
                     if child not in visited:
                         self.run_node(child, visited)
-
+            node.reset()
         return node.done
     
     def resolve_event(self, event_id, event_data):
         if event_id in self.event_callbacks:
             for callback in self.event_callbacks[event_id]:
                 callback(event_id, event_data)
-
-    # event fire

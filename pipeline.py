@@ -1,9 +1,7 @@
-from pipeline.Node import CSVInputGUINode, CSVOutputGUINode
+from pipeline.NodeFactory import NodeFactory
 from pipeline.NodzInterface import NodzInterface
 from pipeline.Pipeline import Pipeline
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
-from PyQt5.QtGui import QIcon
+import matplotlib.pyplot as plt
 
 
 # nodes, connections, global_vars = NodzInterface.load("./pipeline/saves/sample.json")
@@ -20,17 +18,24 @@ from PyQt5.QtGui import QIcon
 #     # pipeline.connect(parent, child)
 
 pipeline = Pipeline()
-csv_in = CSVInputGUINode('a')
-csv_out = CSVOutputGUINode('b')
-pipeline.add(csv_in)
-pipeline.add(csv_out)
-pipeline.connect(parent=(csv_in, 'OUT'), child=(csv_out, 'IN'))
+
+NodeFactory.import_node('CSVInputGUINode', 'default', 'CSVInputGUINode')
+input_gui_node = NodeFactory.create_node("INPUT GUI", 'CSVInputGUINode')
+
+NodeFactory.import_node('BasicMatplotOutputNode', 'default', 'BasicMatplotOutputNode')
+plot_node = NodeFactory.create_node("PLOT GUI", 'BasicMatplotOutputNode')
+
+pipeline.add(input_gui_node)
+pipeline.add(plot_node)
+
+pipeline.connect(parent=(input_gui_node, 'OUT'), child=(plot_node, 'X'))
+pipeline.connect(parent=(input_gui_node, 'OUT'), child=(plot_node, 'Y'))
+
 pipeline.start()
 
 
 
 
-# from pipeline.TaskFactory import TaskFactory
 # from pipeline.ImportLayer import NodzImporter
 # from pipeline.Pipeline import Pipeline
 # from pipeline.Node import TestImportNode, TestAddNode, TestNode
