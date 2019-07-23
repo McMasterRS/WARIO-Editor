@@ -4,15 +4,40 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 
+# QTableWidget that forces the first column to be unique
+# Attempts to use the same value twice reverts it to its previous value
+class UniqueNameTable(QtWidgets.QTableWidget):
+    def __init__(self):
+        super(UniqueNameTable, self).__init__()
+        self.cellChanged.connect(self.checkUniqueNames)
+        self.prevNames = {}
+        self.varNameCounter = 0
+        
+    def checkUniqueNames(self, row, column):
+        # if the name row
+        if column == 0: 
+            item = self.item(row, column)
+            # if row already exists
+            if row in self.prevNames:
+                # If the name is already in use or is empty
+                if item.text() in self.prevNames.values() or item.text() == "":
+                    item.setText(self.prevNames[row])
+                    QtWidgets.QMessageBox.critical(self, "ERROR", "Global variables must have unique names")
+                            
+            self.prevNames[row] = item.text()
+
+# Combobox that lists the types of global variables
 class TypeComboBox(QtWidgets.QComboBox):
     def __init__(self):
         super(TypeComboBox, self).__init__()
+        # Custom option must remain last for setEditState to work properly
         self.types = ["Int", "Float", "String", "File", "Custom"]
         self.addItems(self.types)
         self.setCurrentIndex(0)
         self.setEditable(False)
         self.currentIndexChanged.connect(self.setEditState)
         
+    # Enables editing if custom box selected
     def setEditState(self, index):
         if index == len(self.types) - 1:
             self.setEditable(True)
@@ -21,22 +46,23 @@ class TypeComboBox(QtWidgets.QComboBox):
         
         
 class GlobalNodeComboBox(QtWidgets.QComboBox):
-    def __init__(self, parentNode, loaded):
+    def __init__(self, parentNode, loaded, text):
         super(GlobalNodeComboBox, self).__init__()
+        self.loaded = loaded
+        self.loadText = text
         self.globalsList = []
         self.parentNode = parentNode
-        self.currentIndexChanged.connect(self.updateParent)    
-        self.manual = not loaded
+        self.currentIndexChanged.connect(self.updateParent) 
+        self.manual = True
         
     # Update attribute of parent
     def updateParent(self):
-    
-        if self.manual == False:
-            self.manual = True
+        # Only run if the selected variable is changed
+        if self.manual == False or self.loaded == True:
             return
     
         if self.parentNode.type == "Get Global":
-            plug = True
+            plug = True     
         else:
             plug = False
         
@@ -47,26 +73,42 @@ class GlobalNodeComboBox(QtWidgets.QComboBox):
                                              index = -1,
                                              plug = plug,
                                              socket = not plug,
-                                             preset = "attr_preset_1",
+                                             preset  = "attr_preset_1",
                                              dataType = self.globalsList[self.currentText()])
         self.parentNode.update()
         
     def updateGlobals(self, globals):
+        # If no change was made exit
         if globals == self.globalsList:
             return  
         
-        #self.manual = False
+        # Sets the selected text to the loaded value if the 
+        # box was just loaded
+        if self.loaded == True:
+            selected = self.loadText
+        else:
+            selected = self.currentText()
+        
+        # Checks if the currently selected variable was changed
+        #if selected in globals and selected in self.globalsList:
+        #    if globals[selected] == self.globalsList[selected]:
+        #        return
+        
         self.globalsList = globals
-        selected = self.currentText()
+
+        self.manual = False
         self.clear()
         self.addItems(self.globalsList)
-        if self.findText(selected) == -1:
-            self.manual = True
-            self.setCurrentIndex(0)
-        else:
-            self.manual = False
-            self.setCurrentIndex(self.findText(selected))
         self.manual = True
+        
+        if self.findText(selected) == -1:
+            self.setCurrentIndex(0)
+            self.updateParent()
+        else:
+            self.setCurrentIndex(self.findText(selected))
+            
+        self.loaded = False
+        
 
 # Loadbox widget with file dialog
 class loadWidget(QtWidgets.QHBoxLayout):
