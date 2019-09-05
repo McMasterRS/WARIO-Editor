@@ -35,7 +35,7 @@ class Pipeline():
     def add(self, node):
         """ Add a new node to the pipeline """
 
-        self.nodes[node] = {}
+        self.nodes[node] = []
         self.roots[node] = node
         if len(node.event_callbacks) > 0:
             print(node.event_callbacks)
@@ -68,7 +68,10 @@ class Pipeline():
 
         # self.nodes[parent_node][parent_terminal].append([child_node, child_terminal])
         self.nodes[parent_node].append((parent_terminal, child_terminal, child_node))
-        
+
+        if child_node in self.roots:
+            self.roots.pop(child_node)
+
         return self.nodes[parent_node][-1]
 
     ###############################################################################################
@@ -85,10 +88,12 @@ class Pipeline():
             node.start()
 
         if len(self.roots) > 0:
-            self.run_pass(True)
+            results = self.run_pass(True)
 
         for node in self.nodes:
             node.end()
+
+        return results
 
     ###############################################################################################
     # Pipeline: Run_Pass
@@ -110,6 +115,7 @@ class Pipeline():
         if not done:
             self.run_pass(True)
 
+        return results
 
     ################################################################################################
     # Pipeline: Process Node
