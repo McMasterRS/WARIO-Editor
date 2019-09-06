@@ -111,6 +111,7 @@ class MeasureVoicePitch(Node):
         print(mean_f0, stdev_f0, min_f0, max_f0)
 
         return {
+            'pitch': pitch,
             'mean_f0': mean_f0,
             'stdev_f0': stdev_f0,
             'min_f0': min_f0,
@@ -339,7 +340,7 @@ class MeasureVoiceFormant(Node):
 
         sound = self.args['voice']
 
-        pitch = call(voice, "To Pitch", 0.0, 50, 500)  # check pitch to set formant settings
+        pitch = call(sound, "To Pitch", 0.0, 50, 500)  # check pitch to set formant settings
         mean_f0 = call(pitch, "Get mean", 0, 0, "Hertz")
         if 170 <= mean_f0 <= 300:
             max_formant = 5500
@@ -376,6 +377,7 @@ class MeasureVoiceFormant(Node):
         f4_median = call(formant_object, "Get quantile", 4, 0, 0, "Hertz", 0.5)
 
         return {
+            'formants': formant_object,
             'formant_medians': [f1_median, f2_median, f3_median, f4_median],
             'formant_means': [f1_mean, f2_mean, f3_mean, f4_mean],
             'formant_settings': self.formant_settings
@@ -502,4 +504,12 @@ class MeasureFormantPCA(Node):
 
         return {
             'principal_components': principal_components
+        }
+
+class MeasureIntensity(Node):
+    def process(self):
+        voice = self.args['voice']
+        intensity = voice.to_intensity()
+        return {
+            'intensity': intensity
         }

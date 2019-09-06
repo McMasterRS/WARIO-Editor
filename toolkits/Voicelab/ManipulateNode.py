@@ -26,11 +26,12 @@ def pitch_bounds(sound):
 
 class ManipulatePitchNode(Node):
 
-    def process(self):    
-        sound = self.args['sound']
-        unit=self.args['unit']
-        factor=self.args['factor']
-        sound_name = self.args['sound_name']
+    def process(self):
+        
+        sound = self.args['voice']
+        unit = self.args['unit']
+        factor = self.args['factor']
+        # sound_name = self.args['sound_name']
 
         f0min, f0max = pitch_bounds(sound)
 
@@ -40,8 +41,8 @@ class ManipulatePitchNode(Node):
         call([pitch_tier, manipulation], "Replace pitch tier")
         manipulated_sound = call(manipulation, "Get resynthesis (overlap-add)")
         manipulated_sound.scale_intensity(70)
-        manipulated_pitch_name = sound_name + "_pitch_manipulated_{}_{}.wav".format(factor, unit)
-        manipulated_sound.save(manipulated_pitch_name, "WAV")
+        # manipulated_pitch_name = sound_name + "_pitch_manipulated_{}_{}.wav".format(factor, unit)
+        # manipulated_sound.save(manipulated_pitch_name, "WAV")
 
         return {
             'manipulated_sound': manipulated_sound
@@ -50,10 +51,10 @@ class ManipulatePitchNode(Node):
 class ManipulateFormantsNode(Node):
 
     def process(self):
-        sound = self.args['sound']
+        sound = self.args['voice']
         unit = self.args['unit']
         factor = self.args['factor']
-        sound_name = self.args['sound_name']
+        # sound_name = self.args['sound_name']
 
         factor_percent = round(factor*100)
         f0min, f0max = pitch_bounds(sound)
@@ -69,11 +70,11 @@ class ManipulatePitchAndFormants(Node):
 
     def process(self):
 
-        sound = self.args['sound']
+        sound = self.args['voice']
         unit = self.args['unit']
         formant_factor = self.args['formant_factor']
         pitch_factor = self.args['pitch_factor']
-        sound_name = self.args['sound_name']
+        # sound_name = self.args['sound_name']
         duration = self.args['duration']
 
         f0min, f0max = pitch_bounds(sound)
@@ -86,7 +87,9 @@ class ManipulatePitchAndFormants(Node):
         sampling_rate = call(sound, "Get sample rate")
 
         # create Pitch & Manipulation objects
-        pitch = sound.to_pitch(0.001, f0min, f0max)
+        pitch = call(sound, "To Pitch", 0.001, f0min, f0max)
+
+        # pitch = sound.to_pitch(0.001, f0min, f0max)
         manipulation = call([pitch, sound], "To Manipulation")
 
         # apply the appropriate transformation to the Pitch object
@@ -119,7 +122,7 @@ class ManipulateGenderAge(Node):
 
     def process(self):
 
-        sound = self.args['sound']
+        sound = self.args['voice']
         call(sound, "Scale intensity", 70)
         pitch = call(sound, "To Pitch", 0.0, 60, 500)
         meanF0 = call(pitch, "Get mean", 0, 0, "Hertz")

@@ -4,11 +4,13 @@ from pipeline.Pipeline import Pipeline
 from pipeline.Node import Node
 from toolkits.Voicelab.MeasureNode import *
 from toolkits.Voicelab.ManipulateNode import *
+from toolkits.Voicelab.VisualizeNode import *
 
 load_voice = LoadVoiceNode('load_voice')
 
 measure_duration = MeasureVoiceDuration('measure_duration')
 measure_pitch = MeasureVoicePitch('measure_pitch')
+measure_intensity = MeasureIntensity('measure_intensity')
 measure_hnr = MeasureHNR('measure_hnr')
 measure_jitter = MeasureJitter('meaure_jitter')
 measure_shimmer = MeasureShimmer('measure_shimmer')
@@ -17,6 +19,17 @@ measure_vocal_tract = MeasureVocalTractEstimates('measure_vocal_tract')
 measure_jitter_pca = MeasureJitterPCA('measure_jitter_pca')
 measure_shimmer_pca = MeasureShimmerPCA('measure_shimmer_pca')
 measure_formant_pca = MeasureFormantPCA('measure_formant_pca')
+
+manipulate_pitch = ManipulatePitchNode('manipulate_pitch')
+manipulate_formants = ManipulateFormantsNode('manipulate_formants')
+manipulate_gender_age = ManipulateGenderAge('maniplate_gender_age')
+# manipulate_formants_pitch = ManipulatePitchAndFormants('manipulate_formants_pitch')
+
+plot_spectrogram = PlotSpectrogram('plot_spectrogram')
+plot_pitch = PlotPitch('plot_pitch')
+plot_intensity = PlotIntensity('plot_intensity')
+plot_formants = PlotFormants('plot_formants')
+show_plot = ShowVoicePlot('show_plot')
 
 pipeline = Pipeline()
 
@@ -33,6 +46,18 @@ pipeline.add(measure_vocal_tract)
 pipeline.add(measure_jitter_pca)
 pipeline.add(measure_shimmer_pca)
 pipeline.add(measure_formant_pca)
+pipeline.add(measure_intensity)
+
+pipeline.add(manipulate_pitch)
+pipeline.add(manipulate_formants)
+# pipeline.add(manipulate_formants_pitch)
+pipeline.add(manipulate_gender_age)
+
+pipeline.add(plot_spectrogram)
+pipeline.add(plot_pitch)
+pipeline.add(plot_intensity)
+# pipeline.add(plot_formants)
+pipeline.add(show_plot)
 
 pipeline.connect((load_voice, "voice"), (measure_pitch, "voice"))
 pipeline.connect((load_voice, "voice"), (measure_duration, "voice"))
@@ -40,6 +65,24 @@ pipeline.connect((load_voice, "voice"), (measure_hnr, "voice"))
 pipeline.connect((load_voice, "voice"), (measure_jitter, "voice"))
 pipeline.connect((load_voice, "voice"), (measure_shimmer, "voice"))
 pipeline.connect((load_voice, "voice"), (measure_formants, "voice"))
+pipeline.connect((load_voice, "voice"), (measure_intensity, "voice"))
+
+pipeline.connect((load_voice, "voice"), (manipulate_pitch, "voice"))
+manipulate_pitch.args['unit'] = "ERB"
+manipulate_pitch.args['factor'] = -0.5
+
+pipeline.connect((load_voice, "voice"), (manipulate_formants, "voice"))
+manipulate_formants.args['factor'] = .85
+manipulate_formants.args['unit'] = "percent"
+
+# pipeline.connect((load_voice, "voice"), (manipulate_formants_pitch, "voice"))
+# pipeline.connect((measure_duration, "duration"), (manipulate_formants_pitch, "duration"))
+# manipulate_formants_pitch.args['unit'] = "ERB"
+# manipulate_formants_pitch.args['pitch_factor'] = -0.5
+# manipulate_formants_pitch.args['formant_factor'] = .25
+
+pipeline.connect((load_voice, "voice"), (manipulate_gender_age, "voice"))
+pipeline.connect((load_voice, "voice"), (plot_spectrogram, "voice"))
 
 pipeline.connect((measure_formants, "formant_means"), (measure_vocal_tract, "formants"))
 
@@ -57,6 +100,22 @@ pipeline.connect((measure_shimmer, "apq11_shimmer"), (measure_shimmer_pca, "apq1
 pipeline.connect((measure_shimmer, "dda_shimmer"), (measure_shimmer_pca, "dda_shimmer"))
 
 pipeline.connect((measure_formants, "formant_means"), (measure_formant_pca, "formant_means"))
+
+pipeline.connect((measure_pitch, "pitch"), (plot_pitch, "pitch"))
+pipeline.connect((measure_intensity, "intensity"), (plot_pitch, "intensity"))
+pipeline.connect((plot_spectrogram, "figure"), (plot_pitch, "figure"))
+pipeline.connect((plot_spectrogram, "host"), (plot_pitch, "host"))
+
+pipeline.connect((measure_intensity, "intensity"), (plot_intensity, "intensity"))
+pipeline.connect((plot_pitch, "figure"), (plot_intensity, "figure"))
+pipeline.connect((plot_pitch, "host"), (plot_intensity, "host"))
+
+pipeline.connect((measure_formants, "formants"), (plot_formants, "formants"))
+pipeline.connect((measure_intensity, "intensity"), (plot_formants, "intensity"))
+pipeline.connect((plot_intensity, "figure"), (plot_formants, "figure"))
+pipeline.connect((plot_intensity, "host"), (plot_formants, "host"))
+
+pipeline.connect((plot_formants, "axis"), (show_plot, "axis"))
 
 results = pipeline.start()
 print(results)
