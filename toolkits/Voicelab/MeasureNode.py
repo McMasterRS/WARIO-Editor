@@ -325,7 +325,7 @@ class MeasureShimmer(Node):
 class MeasureVoiceFormant(Node):
 
     formant_settings = {
-        'time_step': 0, # a zero value is equal to 25% of the window length
+        'time_step': 0.0025, # a zero value is equal to 25% of the window length
         'max_number_of_formants': 5,  # always one more than you are looking for
         'maximum_formant': 5500,
         'window_length(s)': 0.025,

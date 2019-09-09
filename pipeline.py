@@ -50,13 +50,12 @@ pipeline.add(measure_intensity)
 
 pipeline.add(manipulate_pitch)
 pipeline.add(manipulate_formants)
-# pipeline.add(manipulate_formants_pitch)
 pipeline.add(manipulate_gender_age)
 
 pipeline.add(plot_spectrogram)
 pipeline.add(plot_pitch)
 pipeline.add(plot_intensity)
-# pipeline.add(plot_formants)
+pipeline.add(plot_formants)
 pipeline.add(show_plot)
 
 pipeline.connect((load_voice, "voice"), (measure_pitch, "voice"))
@@ -75,6 +74,10 @@ pipeline.connect((load_voice, "voice"), (manipulate_formants, "voice"))
 manipulate_formants.args['factor'] = .85
 manipulate_formants.args['unit'] = "percent"
 
+
+
+## Manipulate Pitch and Formants
+# pipeline.add(manipulate_formants_pitch)
 # pipeline.connect((load_voice, "voice"), (manipulate_formants_pitch, "voice"))
 # pipeline.connect((measure_duration, "duration"), (manipulate_formants_pitch, "duration"))
 # manipulate_formants_pitch.args['unit'] = "ERB"
@@ -112,10 +115,10 @@ pipeline.connect((plot_pitch, "host"), (plot_intensity, "host"))
 
 pipeline.connect((measure_formants, "formants"), (plot_formants, "formants"))
 pipeline.connect((measure_intensity, "intensity"), (plot_formants, "intensity"))
-pipeline.connect((plot_intensity, "figure"), (plot_formants, "figure"))
-pipeline.connect((plot_intensity, "host"), (plot_formants, "host"))
+pipeline.connect((plot_spectrogram, "figure"), (plot_formants, "figure"))
+pipeline.connect((plot_spectrogram, "host"), (plot_formants, "host"))
 
-pipeline.connect((plot_formants, "axis"), (show_plot, "axis"))
+pipeline.connect((plot_formants, "formants"), (show_plot, "axis"))
 
 results = pipeline.start()
 print(results)

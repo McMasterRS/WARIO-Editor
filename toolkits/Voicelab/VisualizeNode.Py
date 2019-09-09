@@ -101,11 +101,11 @@ class PlotFormants(Node):
 
         formants = self.args['formants']
         intensity = self.args['intensity']
-        figure, host = self.args['figure'], self.args['host'] if ('figure' in self.args and 'host' in self.args) else plt.subplots()
-        axis = host.twinx()
+        figure, host = (self.args['figure'], self.args['host']) if ('figure' in self.args and 'host' in self.args) else plt.subplots()
+        # axis = host.twinx()
         sample_times = formants.xs()
 
-        for i in range(4):  # How many formants do you want?
+        for i in range(0, 4):  # How many formants do you want?
             formant_values = call(formants, "To Matrix", i + 1).values[0, :]
             for j, time in enumerate(sample_times):
                 intensity_value = call(intensity, "Get value at time", time, "cubic")
@@ -113,15 +113,15 @@ class PlotFormants(Node):
                     formant_values[j] = 0
 
             formant_values[formant_values == 0] = np.nan
-            axis.scatter(sample_times, formant_values, c='w', linewidth=3, marker='o', s=1)
-            axis.scatter(sample_times, formant_values, c='r', linewidth=1, s=1)
-            axis.grid(False)
-            return {
-                'figure': figure,
-                'host': host,
-                'axis': axis,
-                'formants': formants
-            }
+            host.scatter(sample_times, formant_values, c='w', linewidth=3, marker='o', s=1)
+            host.scatter(sample_times, formant_values, c='r', linewidth=1, s=1)
+            host.grid(False)
+        return {
+            'figure': figure,
+            'host': host,
+            # 'axis': axis,
+            'formants': formants
+        }
 
 class PlotSpectrogram(Node):
     def process(self):
@@ -131,7 +131,10 @@ class PlotSpectrogram(Node):
         colour_map = self.args['colour'] if 'colour' in self.args else 'binary'
         figure, host = (self.args['figure'], self.args['host']) if ('figure' in self.args and 'host' in self.args) else plt.subplots()
 
-        spectrogram = voice.to_spectrogram(window_length=window_length, maximum_frequency=8000)
+        pre_emphasized_voice = voice.copy()
+        pre_emphasized_voice.pre_emphasize()
+
+        spectrogram = pre_emphasized_voice.to_spectrogram(window_length=window_length, maximum_frequency=8000)
         x, y = spectrogram.x_grid(), spectrogram.y_grid()
 
         sg_db = 10 * np.log10(spectrogram.values)
