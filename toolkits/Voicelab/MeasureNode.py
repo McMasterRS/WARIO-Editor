@@ -27,30 +27,10 @@ def pitch_bounds(sound):
 
     return pitch_floor, pitch_ceiling
 
-class LoadVoiceNode(Node):
-    def process(self):
-        voice_file = self.args['voice_file']
-        voice = parselmouth.Sound(voice_file)
-
-        print('voice')
-        print(voice)
-        
-        return {'voice': voice}
-
-class LoadVoicesNode(Node):
-    def process(self):
-        voices = {}
-        for voice_file in self.args['voice_files']:
-            voices[voice_file] = parselmouth.Sound(voice_file)
-
-        print('voice')
-        print(voices)
-
-        return {'voices': voices}
-
 class MeasureVoiceDuration(Node):
     def process(self):
         sound = self.args['voice']
+        print(type(sound))
         duration = call(sound, "Get total duration") 
 
         print('duration')
