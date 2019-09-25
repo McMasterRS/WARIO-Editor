@@ -5,8 +5,8 @@ from pipeline.Node import Node
 from toolkits.Voicelab.MeasureNode import *
 from toolkits.Voicelab.ManipulateNode import *
 from toolkits.Voicelab.VisualizeNode import *
-
-load_voice = LoadVoiceNode('load_voice')
+from toolkits.Voicelab.IONodes import *
+load_voice = LoadVoicesNode('load_voice')
 
 measure_duration = MeasureVoiceDuration('measure_duration')
 measure_pitch = MeasureVoicePitch('measure_pitch')
@@ -33,7 +33,7 @@ show_plot = ShowVoicePlot('show_plot')
 
 pipeline = Pipeline()
 
-load_voice.args['voice_file'] = './test_voices/f4047_ah.wav'
+load_voice.args['file_locations'] = ['./test_voices/f4047_ah.wav', './test_voices/f4047_ee.wav']
 
 pipeline.add(load_voice)
 pipeline.add(measure_pitch)

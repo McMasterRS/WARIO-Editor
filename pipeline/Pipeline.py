@@ -82,13 +82,14 @@ class Pipeline():
         print(self.nodes)
 
         print("############################ Starting ############################")
+        results = [{}]
 
         # runs each node's start function once at the beginning
         for node in self.nodes:
             node.start()
 
         if len(self.roots) > 0:
-            results = self.run_pass(True)
+            results = self.run_pass(True, results=results)
 
         for node in self.nodes:
             node.end()
@@ -105,15 +106,16 @@ class Pipeline():
     ### all of the nodes from the start until they all report that they are done.
     ###############################################################################################
 
-    def run_pass(self, done):
+    def run_pass(self, done, results=None, i_pass=0):
         """ Recursively runs all of the roots nodes until they report they are done """
-
+        
         for root in self.roots:
-            results, _done = self.run_node(root, {})
+            _done = self.run_node(root, results, i_pass)
             done = done and _done
 
         if not done:
-            self.run_pass(True)
+            i_pass = i_pass + 1
+            self.run_pass(True, results, i_pass)
 
         return results
 
@@ -125,15 +127,17 @@ class Pipeline():
     ### running it's accompanied process function.
     ################################################################################################
 
-    def run_node(self, node, results=None):
+    def run_node(self, node, results=None, i_pass=0):
         """ Called on each node, and recursively on each child node """
         if results is None:
-            results = {}
+            results = [{}]
+        if len(results) <= i_pass:
+            results.append({})
 
         if all(node.ready.values()):
             
             node.global_vars = self.global_vars
-            results[node] = node.process()
+            results[i_pass][node] = node.process()
             self.global_vars = node.global_vars
 
             if len(node.events_fired) > 0:
@@ -144,13 +148,13 @@ class Pipeline():
 
             if node in self.nodes: # if this is a parent of another node
                 for parent_terminal, child_terminal, child in self.nodes[node]:
-                    if parent_terminal in results[node]:
-                        child.args[child_terminal] = results[node][parent_terminal]
+                    if parent_terminal in results[i_pass][node]:
+                        child.args[child_terminal] = results[i_pass][node][parent_terminal]
                         child.ready[child_terminal] = True
-                        self.run_node(child, results)
+                        self.run_node(child, results, i_pass)
             node.reset()
 
-        return results, node.done
+        return node.done
     
     def resolve_event(self, event_id, event_data):
         if event_id in self.event_callbacks:
