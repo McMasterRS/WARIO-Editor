@@ -19,9 +19,49 @@ else:
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
+import numpy as np
+import seaborn as sns
+
 
 ###################################################################################################
 ###################################################################################################
+
+class SpectrogramDisplay(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+
+        # Create a figure for the spectrogram
+        self.figure_canvas = FigureCanvas(Figure())
+        self.layout.addWidget(self.figure_canvas)
+        self.fig, self.axis = self.figure_canvas.figure, self.figure_canvas.figure.subplots()
+
+    def draw_spectrogram(self, voice, pitch=None, intensity=None, formants=None):
+
+        self.axis.clear()
+
+        voice = parselmouth.Sound(voice)
+        intensity = voice.to_intensity()
+        pre_emphasized_voice = voice.copy()
+        pre_emphasized_voice.pre_emphasize()
+        length_of_window = 0.005
+        dynamic_range = 70  # todo put this value in defaults and allow user to specify this value in advanced mode
+        spectrogram = pre_emphasized_voice.to_spectrogram(window_length=length_of_window, maximum_frequency=8000)
+        x, y = spectrogram.x_grid(), spectrogram.y_grid()
+
+
+def create_spectrogram(voice, pitch=None, intensity=None, formants=None, settings=None):
+    
+    fig, axis = plt.subplots()
+    voice.pre_emphasize()
+    spectrogram = voice.to_spectrogram(window_length=0.005, maximum_frequency=8000)
+    x, y = spectrogram.x_grid(), spectrogram.y_grid()
+
+    x_label, y_label = None, None
+    colour = None
+    return fig, axis
 
 value_accessor = QWidgetValueAccesser()
 
@@ -100,8 +140,6 @@ class FilesTab(QWidget):
 
     def onclick_start(self):
 
-        # print(self.feature_settings)
-        self.file_locations = [str(self.list_widget.item(i).text()) for i in range(self.list_widget.count())]
         pipeline = measure(self.feature_settings, self.file_locations)
         self.results['values'] = pipeline.start()
         self.results['changed'] = True
@@ -111,9 +149,9 @@ class FilesTab(QWidget):
         options = QFileDialog.Options()
         temp_loaded = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","Sound Files (*.wav *.mp3)", options=options)[0]
         for loaded in temp_loaded:
-            self.file_locations.append(loaded)
-        for i, self.file_location in enumerate(self.file_locations):
-            QListWidgetItem(parent=self.list_widget).setText(self.file_location)
+            if loaded not in self.file_locations:
+                self.file_locations[loaded] = loaded
+                QListWidgetItem(parent=self.list_widget).setText(loaded)
 
     def onclick_remove(self):
         for item in self.list_widget.selectedItems():
@@ -237,6 +275,9 @@ class OutputTab(QWidget):
         self.list_stacks = {}
         self.stack_layouts = {}
         self.stack_textareas = {}
+        self.spectrogram_displays = {}
+        self.spectrogram_figures = {}
+        self.spectrogram_axis = {}
 
         self.leftlist = QListWidget()
         self.stack = QStackedWidget(self)
@@ -247,23 +288,20 @@ class OutputTab(QWidget):
         self.layout.addWidget(self.stack)
         self.setLayout(self.layout)
 
-        # self.spectrogram_display = FigureCanvas(Figure(figsize=(5, 3)))
-        # self._static_ax = self.spectrogram_display.figure.subplots()
-        # t = np.linspace(0, 10, 501)
-        # self._static_ax.plot(t, np.tan(t), ".")
+        SpectrogramDisplay().draw_spectrogram('./test_voices/f4047_ah.wav')
 
-        # self.display_area = QPlainTextEdit()
-        # self.display_area.setReadOnly(True)
 
-        # self.layout.addWidget(self.spectrogram_display)
         # self.layout.addWidget(self.display_area)
 
     def display(self,i):
         self.stack.setCurrentIndex(i)
 
     def update_results_view(self):
+        
+        file_locations = [location for location in self.file_locations]
 
         print('Check', self.results['changed'])
+
         # We only want to update if there are results and those results have changed
         if self.results['changed']:
             print('changed', self.results['values'])
@@ -274,24 +312,23 @@ class OutputTab(QWidget):
             # For each file get its results
             for i, pass_result in enumerate(self.results['values']):
                 
-
                 # Create a new layout for this stack
                 self.stack_layouts[i] = QVBoxLayout()
                 self.list_stacks[i] = QWidget()
                 self.list_stacks[i].setLayout(self.stack_layouts[i])
 
-                # Create a new list item for this file location
+                # Create a new list item for each loaded file
                 self.list_items[i] = QListWidgetItem(parent=self.leftlist)
-                self.list_items[i].setText(self.file_locations[i])
+                self.list_items[i].setText(file_locations[i])
 
-                # create a text area for this file location
+                # Create figure canvases for each file
+                # create a text area for each loaded file
                 self.stack_textareas[i] = QPlainTextEdit()
                 self.stack_textareas[i].setReadOnly(True)
+                self.stack_layouts[i].addWidget(self.stack_textareas[i])
 
-                self.stack_layouts[i].addWidget(self.stack_textareas[i])
-                
+                # add the stacks to the container stack
                 self.stack.addWidget(self.list_stacks[i])
-                self.stack_layouts[i].addWidget(self.stack_textareas[i])
 
                 # For each node get its results
                 for run_result_name in pass_result:
@@ -300,16 +337,19 @@ class OutputTab(QWidget):
 
                     # For each attribute on this node get its result
                     for attribute_result_name in run_result:
-                        attribute_result = run_result[attribute_result_name]
-                        self.stack_textareas[i].insertPlainText("\n@@@@@  "+attribute_result_name+"  @@@@@\n\n")
-                        self.stack_textareas[i].insertPlainText(str(attribute_result))
+                        if attribute_result_name == 'voice':
+                            voice = parselmouth.Sound(file_locations[i])
+                        else:
+                            attribute_result = run_result[attribute_result_name]
+                            self.stack_textareas[i].insertPlainText("\n@@@@@  "+attribute_result_name+"  @@@@@\n\n")
+                            self.stack_textareas[i].insertPlainText(str(attribute_result))
 
 class VoicelabWizard(QWidget):
 
     def __init__(self):
 
         super().__init__()
-        self.file_locations = []
+        self.file_locations = {}
         pitch_combo = QComboBox()
         hnr_combo = QComboBox()
 
@@ -700,6 +740,14 @@ class DisplayShimmerWidget(QWidget):
 class DisplayFormantsWidget(QWidget):
     def __init__(self):
         super().__init__()
+
+    def initUI(self):
+        pass
+
+class ResultsView(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
 
     def initUI(self):
         pass
