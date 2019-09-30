@@ -1,5 +1,39 @@
 {   
+    "global_variables":{
+        "test2" : {
+            "type"  : "Int",
+            "value" : "0",
+            "const" : false
+        }
+    },
+
     "node_types": {
+        "Import Raw": {
+            "preset": "node_default",
+            "file": "importRawData.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Input",
+            "toolkit" : "EEG",
+            "attributes": {
+                "Raw": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "rawEEG"
+                }
+            },
+            "settings" : {
+                "file" : {
+                    "text" : "File",
+                    "type" : "loadbox",
+                    "params" : {
+                        "text" : ""
+                    }
+                }
+            }
+        },
         "Import Data": {
             "preset": "node_default",
             "file": "importEEGData.py",
@@ -8,17 +42,47 @@
             "category": "Input",
             "toolkit" : "EEG",
             "attributes": {
-                "Data": {
+                "Raw": {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": true,
                     "socket": false,
-                    "type": "EEGdata"
+                    "type": "rawEEG"
                 }
             },
-            "settings" : {}
+            "settings" : {
+                "file" : {
+                    "text" : "File",
+                    "type" : "loadbox",
+                    "params" : {
+                        "text" : ""
+                    }
+                },
+                "montageData" : {
+                    "text" : "Montage File",
+                    "type" : "loadbox",
+                    "params" : {
+                        "text" : ""
+                    }
+                },
+                "channelTypes" : {
+                    "text" : "Channel Type File",
+                    "type" : "loadbox",
+                    "params" : {
+                        "text" : ""
+                    }
+                },
+                "sfreq" : {
+                    "text" : "Sampling Frequency",
+                    "type" : "spinbox",
+                    "params" : {
+                        "minimum" : 0,
+                        "maximum" : 2147483647,
+                        "value" : 100
+                    }
+                }
+            }
         },
-            
         "Data to Raw": {
             "preset": "node_default",
             "file": "data2raw.py",
@@ -33,6 +97,20 @@
                     "plug": false,
                     "socket": true,
                     "type": "EEGdata"
+                },
+                "Bad Channels" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "badChans"
+                },
+                "Montage" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "montageData"                
                 },
                 "Raw": {
                     "index": -1,
@@ -197,7 +275,15 @@
                     "type": "epoch"   
                 }
             },
-            "settings" : {}
+            "settings" : {
+                "folder" : {
+                    "text" : "Save Location",
+                    "type" : "loadbox",
+                    "params" : {
+                        "text" : ""
+                    }
+                }
+            }
         },
         "Save Epochs ICA" : {
             "preset" : "node_default",

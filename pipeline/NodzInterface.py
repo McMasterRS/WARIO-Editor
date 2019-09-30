@@ -1,5 +1,6 @@
 import json
 from pipeline.NodeFactory import NodeFactory
+from pipeline.GlobalVar import GlobalVar
 
 NODZ_SAVE_LOCATION = "./pipeline/saves/sample.json"
 
@@ -28,7 +29,7 @@ class NodzInterface():
                     node = data["NODES"][node_id]
                     class_name = node["file"].split('.')[0] # extract the name of the class stored here as XXXX.py
                     NodeFactory.import_node(node["type"], node["toolkit"], class_name) # uses the Nodefactory to do the import logic, this also registers it with the factory for creating new versions
-                    node_instance = NodeFactory.create_node(node_id, node["type"]) # Create a new instance of this node
+                    node_instance = NodeFactory.create_node(node_id, node["type"], node["variables"]) # Create a new instance of this node
                     node_instance.args = {**node['variables']} # Copies the variables into the node as default arguments/configurations
                     nodes.append([node_id, node_instance]) # Compact the id and instance for access later
                     nodes_mapping[node_id] = node_instance # we use a mapping of id to instance for use parsing connections later
@@ -41,9 +42,10 @@ class NodzInterface():
                     child = nodes_mapping[child_id]
                     connections.append([(parent, parent_terminal), (child, child_terminal)]) # stores the nodes and terminals all together
 
-            # TODO: parse the global variables contained in nodz
+            # Parse the global variables contained in the file
             if "GLOBALS" in data:
-                for global_var in data["GLOBALS"]:
-                    print(global_var)
+                for global_var in data["GLOBALS"]:   
+                    gv = data["GLOBALS"][global_var]
+                    global_vars[global_var] = GlobalVar(gv["type"], gv["value"], gv["const"])
 
             return nodes, connections, global_vars

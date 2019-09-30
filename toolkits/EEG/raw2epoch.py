@@ -1,18 +1,21 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 import mne
 
-class raw2epoch(Task):
+class raw2epoch(Node):
 
     def __init__(self, name, params):
         super(raw2epoch, self).__init__(name, params)
         
         
-    def process(self, Raw, T, Y, sID):
+    def process(self):
         '''
         Takes an MNE Raw object and trigger data and creates anan Epochs object 
         and Evoked object.
         '''
+        Raw = self.args["Raw"]
         sfreq = Raw.info['sfreq']
+        
+        # NEED TO IMPORT T AND Y
      
         ###################
     #    Y[Y==3] = 1
@@ -32,4 +35,4 @@ class raw2epoch(Task):
         # create Evoked object
         Evoked = [Epochs[name].average() for name in ('NMW', 'MW')]
       
-        return Epochs, Evoked, trigger_data
+        return {"Epoch Data" : Epochs, "Evoked Data" : Evoked, "Trigger Data" :trigger_data}

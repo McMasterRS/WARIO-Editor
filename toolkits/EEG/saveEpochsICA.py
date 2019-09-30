@@ -1,7 +1,7 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 import mne
 
-class saveEpochsICA(Task):
+class saveEpochsICA(Node):
 
     def __init__(self, name, params):
         super(saveEpochsICA, self).__init__(name, params)

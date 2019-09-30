@@ -1,13 +1,15 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 import mne
 
-class fitICA(Task):
+class fitICA(Node):
 
     def __init__(self, name, params):
         super(fitICA, self).__init__(name, params)
         
         
-    def process(self, data):
-        // do magic ICA stuff
+    def process(self):
+        # do magic ICA stuff
         
-        return icaSolution
+        data = self.parameters["Raw"]    
+        
+        return {"ICA Solution" : icaSolution}

@@ -19,19 +19,27 @@ class UniqueNameTable(QtWidgets.QTableWidget):
             item = self.item(row, column)
             # if row already exists
             if row in self.prevNames:
+                # if no change to text then exit
+                if self.prevNames[row] == item.text():
+                    return
                 # If the name is already in use or is empty
                 if item.text() in self.prevNames.values() or item.text() == "":
                     item.setText(self.prevNames[row])
                     QtWidgets.QMessageBox.critical(self, "ERROR", "Global variables must have unique names")
-                            
+  
             self.prevNames[row] = item.text()
+            
+    def updateNames(self):
+        self.prevNames = {}
+        for row in range(0, self.rowCount()):
+            self.prevNames[row] = self.item(row, 0).text()
 
 # Combobox that lists the types of global variables
 class TypeComboBox(QtWidgets.QComboBox):
     def __init__(self):
         super(TypeComboBox, self).__init__()
         # Custom option must remain last for setEditState to work properly
-        self.types = ["Int", "Float", "String", "File", "Custom"]
+        self.types = ["Int", "Float", "String", "Bool", "File", "Custom"]
         self.addItems(self.types)
         self.setCurrentIndex(0)
         self.setEditable(False)

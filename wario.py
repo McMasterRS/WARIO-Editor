@@ -1,6 +1,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
-import sys, os
+import sys, os, textwrap
+
+version = "0.0.1"
 
 class NodzWindow(QtWidgets.QMainWindow):
     def __init__(self, nodz):
@@ -143,11 +145,7 @@ def startNodz():
                     dirMenu.triggered.connect(makeToolkitCall(dir))
                     toolkitMenu.addAction(dirMenu)
             break
-            
-        reloadAct = QtWidgets.QAction(getIcon('SP_BrowserReload'), "Reload", window)
-        reloadAct.triggered.connect(buildToolkitMenu)
-        toolkitMenu.addAction(reloadAct)
-        
+    
         # Check the toolkits that are currently loaded in nodz
         toolkitList = nodz.toolkits
         for tk in toolkitMenu.actions():
@@ -160,6 +158,18 @@ def startNodz():
     
     ### ABOUT MENU
     
+    def showAbout():
+        abt = QtWidgets.QMessageBox.about(nodz, "About", 
+        textwrap.dedent('''\
+            WARIO - Workplace Automation and Research IO
+        
+            Version {0}
+                    
+            Data pipeline with integrated flowchart-based interface allowing for the quick and effective development of complex data analysis flows.
+
+            Developed by Ron Harwood, Thomas Mudway and Oliver Cook at the McMaster University CANARIE research software development group  
+            '''.format(version)))
+    
     def openRepo():
         url = QtCore.QUrl("https://gits.mcmaster.ca/harwood/nodz")
         if not QtGui.QDesktopServices.openUrl(url):
@@ -171,6 +181,7 @@ def startNodz():
             QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
     
     aboutAct = QtWidgets.QAction(getIcon('SP_MessageBoxQuestion'), "&About", window)
+    aboutAct.triggered.connect(showAbout)   
     repoAct = QtWidgets.QAction(QtGui.QIcon('repo.png'), "&Repository", window)
     repoAct.triggered.connect(openRepo)
     wikiAct = QtWidgets.QAction(QtGui.QIcon('wiki.png'), "&Wiki", window)

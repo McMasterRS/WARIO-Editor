@@ -1,13 +1,16 @@
-from pipeline.Task import Task
+from pipeline.Node import Node
 import mne
 
-class applyICA(Task):
+class applyICA(Node):
 
     def __init__(self, name, params):
         super(applyICA, self).__init__(name, params)
     
     def process(self, solution, epochs):
     
-        EpochsICA = solution.apply(epochs.copy())
+        solution = self.args["ICA Solution"]
+        epochs = self.args["Epoch Data"]
+    
+        EpochsICA = solution.apply(epochs)
         
         return EpochsICA

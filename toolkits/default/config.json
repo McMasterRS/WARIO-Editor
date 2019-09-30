@@ -74,6 +74,14 @@
         "plug": [0, 120, 255, 255],
         "socket": [0, 120, 255, 255]
     },
+    
+"global_variables":{
+    "example" : {
+        "type"  : "Int",
+        "value" : "0",
+        "const" : false
+    }
+},
 
     "node_types":{
         "Get Global": {
@@ -96,7 +104,7 @@
         "Set Global": {
             "preset": "node_default",
             "file": "setGlobal.py",
-            "category": "Input",
+            "category": "Output",
             "toolkit" : "default",
             "attributes": {},
             "settings": {
@@ -454,6 +462,17 @@
                 }
             },
             "settings": {}
+        },
+        "Test Settings": {
+            "preset": "node_default",
+            "file": "getGlobal.py",
+            "category": "Test Settings",
+            "toolkit" : "default",
+            "attributes": {},
+            "settings": {
+                "settingsFile" : "testSettings",
+                "settingsClass" : "TestSettings"
+            }
         }
     }
 }
