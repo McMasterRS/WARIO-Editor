@@ -17,7 +17,7 @@ class Pipeline():
     # TODO: Validation step for initialization arguments
     def __init__(self, nodes=None, global_vars=None, roots=None):
         """ Pipeline initialization. Optionally can initialize with nodes, global_vars, roots """
-        # tree of nodes, each node stores its return attributes which in turn stores its children
+        # tree of nodes, storing return value names and its subsequent children
         self.nodes = nodes if nodes is not None else {}
         # Nodes with no parents. Updated as needed when new tasks are added, reduces need to search the whole graph
         self.roots = roots if roots is not None else {}
@@ -25,6 +25,8 @@ class Pipeline():
         self.global_vars = global_vars if global_vars is not None else {}
         # 
         self.event_callbacks = {}
+        #
+        self.results = {}
 
     ################################################################################################
     # Pipeline: Add
@@ -58,9 +60,19 @@ class Pipeline():
         child_node.ready[child_terminal] = False
         child_node.default_ready[child_terminal] = False
 
-        if parent_terminal not in self.nodes[parent_node]:
-            self.nodes[parent_node][parent_terminal] = []
-        self.nodes[parent_node][parent_terminal].append([child_node, child_terminal])
+        if parent_node not in self.nodes:
+            self.nodes[parent_node] = []
+
+        # if parent_terminal not in self.nodes[parent_node]:
+        #     self.nodes[parent_node][parent_terminal] = []
+
+        # self.nodes[parent_node][parent_terminal].append([child_node, child_terminal])
+        self.nodes[parent_node].append((parent_terminal, child_terminal, child_node))
+
+        if child_node in self.roots:
+            self.roots.pop(child_node)
+
+        return self.nodes[parent_node][-1]
 
     ###############################################################################################
     # Pipeline: Start:
@@ -76,10 +88,12 @@ class Pipeline():
             node.start()
 
         if len(self.roots) > 0:
-            self.run_pass(True)
+            results = self.run_pass(True)
 
         for node in self.nodes:
             node.end()
+
+        return results
 
     ###############################################################################################
     # Pipeline: Run_Pass
@@ -95,29 +109,31 @@ class Pipeline():
         """ Recursively runs all of the roots nodes until they report they are done """
 
         for root in self.roots:
-            done = done and self.run_node(root, {})
+            results, _done = self.run_node(root, {})
+            done = done and _done
 
         if not done:
             self.run_pass(True)
 
+        return results
 
     ################################################################################################
     # Pipeline: Process Node
     # + node_id: Unique identifier for retrieving the node to be processed
-    # + visited: Dictionary of already visited nodes, recursively filled as the graph is traversed
     #
     ### Recursive function to traverse the sequence of nodes (the graph) visiting each node once and
-    ### running it's accompanied process function. Data for running each node is retrieved from that
-    ### node's upstream buffer and passed in as simple arguments.
+    ### running it's accompanied process function.
     ################################################################################################
 
-    def run_node(self, node, visited):
+    def run_node(self, node, results=None):
         """ Called on each node, and recursively on each child node """
+        if results is None:
+            results = {}
 
         if all(node.ready.values()):
             
             node.global_vars = self.global_vars
-            results = node.process()
+            results[node] = node.process()
             self.global_vars = node.global_vars
 
             if len(node.events_fired) > 0:
@@ -126,16 +142,21 @@ class Pipeline():
                     self.resolve_event(event_id, event_data)
                 node.events_fired = {}
 
-            for terminal in self.nodes[node]:
-                for child, child_terminal in self.nodes[node][terminal]:
-                    child.args[child_terminal] = results[terminal]
-                    child.ready[child_terminal] = True
-                    if child not in visited:
-                        self.run_node(child, visited)
+            if node in self.nodes: # if this is a parent of another node
+                for parent_terminal, child_terminal, child in self.nodes[node]:
+                    if parent_terminal in results[node]:
+                        child.args[child_terminal] = results[node][parent_terminal]
+                        child.ready[child_terminal] = True
+                        self.run_node(child, results)
             node.reset()
-        return node.done
+
+        return results, node.done
     
     def resolve_event(self, event_id, event_data):
         if event_id in self.event_callbacks:
             for callback in self.event_callbacks[event_id]:
                 callback(event_id, event_data)
+
+
+# result = pipeline.run(node)
+# pipeline.run(node.child[0])

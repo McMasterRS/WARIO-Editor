@@ -1,10 +1,7 @@
 import parselmouth
 from parselmouth.praat import call
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 from pipeline.Node import Node
-import numpy as np
-import pandas as pd
 
 def pitch_bounds(sound):
     "measures the ceiling and floor for a given voice"
@@ -31,32 +28,27 @@ class LoadVoiceNode(Node):
     def process(self):
         voice_file = self.args['voice_file']
         voice = parselmouth.Sound(voice_file)
-
-        print('voice')
-        print(voice)
-        
         return {'voice': voice}
+
+load_voice = LoadVoiceNode()
+load_voice.args['voice_file'] = './test_voices/f4047_ah.wav'
+res = load_voice.process()
+voice = res['voice']
+print(res)
+
 
 class LoadVoicesNode(Node):
     def process(self):
         voices = {}
         for voice_file in self.args['voice_files']:
             voices[voice_file] = parselmouth.Sound(voice_file)
-
-        print('voice')
-        print(voices)
-
         return {'voices': voices}
 
 class MeasureVoiceDuration(Node):
     def process(self):
         sound = self.args['voice']
         duration = call(sound, "Get total duration") 
-
-        print('duration')
-        print(duration)
-
-        return {'duration': duration}
+        return { 'duration': duration}
 
 class MeasureVoicePitch(Node):
 
@@ -75,8 +67,8 @@ class MeasureVoicePitch(Node):
         'measure pitch for incoming sound'
 
         sound = self.args['voice']
+        # unit = self.args['unit']
         unit = "Hertz"
-
         file_duration: float = call(sound, "Get total duration")
 
         # use auto-correlation for longer sounds & cross-correlation for shorter sounds
@@ -107,11 +99,7 @@ class MeasureVoicePitch(Node):
         min_f0: float = call(pitch, "Get minimum", 0, 0, "hertz", "Parabolic")
         max_f0: float = call(pitch, "Get maximum", 0, 0, "hertz", "Parabolic")
 
-        print('mean_f0', 'stdev_f0', 'min_f0', 'max_f0')
-        print(mean_f0, stdev_f0, min_f0, max_f0)
-
         return {
-            'pitch': pitch,
             'mean_f0': mean_f0,
             'stdev_f0': stdev_f0,
             'min_f0': min_f0,
@@ -133,7 +121,7 @@ class MeasureHNR(Node):
     def process(self):
         'hnr'
 
-        sound = self.args['voice']
+        sound = self.args['sound']
 
         # measure pitch ceiling and floor
         broad_pitch = call(sound, "To Pitch (cc)", 0, 50, 15, "yes", 0.03, 0.45, 0.01, 0.35, 0.14, 800)
@@ -160,12 +148,9 @@ class MeasureHNR(Node):
 
         hnr: float = call(harmonicity, "Get mean", 0, 0)
 
-        print('hnr')
-        print(hnr)
-
         return {
             "hnr": hnr,
-            "hnr_settings": self.hnr_settings
+            "hnr_settings": hnr_settings
         }
 
 
@@ -185,7 +170,7 @@ class MeasureJitter(Node):
 
         'measure jitter'
 
-        sound = self.args['voice']
+        sound = self.args['sound']
         pitch_floor, pitch_ceiling = pitch_bounds(sound)
 
         point_process: object = call(sound, "To PointProcess (periodic, cc)",
@@ -228,16 +213,13 @@ class MeasureJitter(Node):
             self.jitter_settings['longest_period'],
             self.jitter_settings['maximum_period_factor'])
 
-        print('local_jitter', 'localabsolute_jitter', 'rap_jitter', 'ppq5_jitter', 'ddp_jitter')
-        print(local_jitter, localabsolute_jitter, rap_jitter, ppq5_jitter, ddp_jitter)
-
         return {
             'local_jitter': local_jitter,
             'localabsolute_jitter': localabsolute_jitter,
             'rap_jitter': rap_jitter,
             'ppq5_jitter': ppq5_jitter,
             'ddp_jitter': ddp_jitter,
-            'jitter_settings': self.jitter_settings
+            'jitter_settings': jitter_settings
         }
 
 class MeasureShimmer(Node):
@@ -255,8 +237,6 @@ class MeasureShimmer(Node):
 
     def process(self):
         'shimmer'
-
-        sound = self.args['voice']
 
         floor, ceiling = pitch_bounds(sound)
 
@@ -319,40 +299,30 @@ class MeasureShimmer(Node):
             'aqpq5_shimmer': aqpq5_shimmer,
             'apq11_shimmer': apq11_shimmer,
             'dda_shimmer': dda_shimmer,
-            'shimmer_settings': self.shimmer_settings
+            'shimmer_settings': shimmer_settings
         }
 
 class MeasureVoiceFormant(Node):
 
     formant_settings = {
-        'time_step': 0.0025, # a zero value is equal to 25% of the window length
+        'time_step': 0, # a zero value is equal to 25% of the window length
         'max_number_of_formants': 5,  # always one more than you are looking for
         'maximum_formant': 5500,
         'window_length(s)': 0.025,
         'pre_emphasis_from': 50,
         'pitch_floor': 50,
-        'pitch_ceiling': 500,
-        'method': 'formants_praat_manual'
+        'pitch_ceiling': 500
     }
 
     def process(self):
         'formants'
 
-        sound = self.args['voice']
+        sound = self.args['sound']
 
-        pitch = call(sound, "To Pitch", 0.0, 50, 500)  # check pitch to set formant settings
-        mean_f0 = call(pitch, "Get mean", 0, 0, "Hertz")
-        if 170 <= mean_f0 <= 300:
-            max_formant = 5500
-        elif mean_f0 < 170:
-            max_formant = 5000
-        else:
-            max_formant = 8000
+        if method == "formants_praat_manual":
+            self.formant_settings['max_formant'] = automatic_parameters.formants_praat_manual(sound)
 
-        if self.formant_settings['method'] == "formants_praat_manual":
-            self.formant_settings['max_formant'] = max_formant
-
-        elif self.formant_settings['method'] == "sweep":
+        elif method == "sweep":
             self.formant_settings['max_formant'] = automatic_parameters.calculate_best_ceiling()
             # todo warn user this takes a long time
             # todo find a way for user to get from user the speaker identity and vowels from file names so we can process
@@ -377,19 +347,34 @@ class MeasureVoiceFormant(Node):
         f4_median = call(formant_object, "Get quantile", 4, 0, 0, "Hertz", 0.5)
 
         return {
-            'formants': formant_object,
-            'formant_medians': [f1_median, f2_median, f3_median, f4_median],
-            'formant_means': [f1_mean, f2_mean, f3_mean, f4_mean],
-            'formant_settings': self.formant_settings
+            'f1': {
+                'mean': f1_mean,
+                'median': f1_median
+            },
+            'f2': {
+                'mean': f2_mean,
+                'median': f2_median
+            },
+            'f3': {
+                'mean': f3_mean,
+                'median': f3_median
+            },
+            'f4': {
+                'mean': f4_mean,
+                'median': f4_median
+            },
+            'formant_settings':formant_settings
         }
 
 class MeasureVocalTractEstimates(Node):
     def process(self):
         'vocal_tract_estimates_mean'
 
-        formants = self.args['formants']
+        f1 = self.args['f1']
+        f2 = self.args['f2']
+        f3 = self.args['f3']
+        f4 = self.args['f4']
 
-        f1, f2, f3, f4 = formants
         formant_dispersion = (f4 - f1) / 3
         average_formant = (f1 + f2 + f3 + f4) / 4
         geometric_mean = (f1 * f2 * f3 * f4) ** 0.25
@@ -418,21 +403,11 @@ class MeasureVocalTractEstimates(Node):
 class MeasureJitterPCA(Node):
     def process(self):
 
-        jitter_values = {
-            'local_jitter': self.args['local_jitter'],
-            'local_abs_jitter': self.args['localabsolute_jitter'],
-            'rap_jitter': self.args['rap_jitter'],
-            'ppq5_jitter': self.args['ppq5_jitter'],
-            'ddp_jitter': self.args['ddp_jitter']
-        }
-        jitter_df = pd.DataFrame(data=jitter_values, index=[0])
-
-        # df = self.args['df'] # dataframe
+        df = self.args['df']
         try:
             # z-score the Jitter measurements
             measures = ['localJitter', 'localabsoluteJitter', 'rapJitter', 'ppq5Jitter', 'ddpJitter']
-            # x = df.loc[:, measures].values
-            x = jitter_df
+            x = df.loc[:, measures].values
             x = StandardScaler().fit_transform(x)
 
             # Run the PCA
@@ -450,24 +425,16 @@ class MeasureJitterPCA(Node):
                 'jitter_pca_df': None
             }
 
-class MeasureShimmerPCA(Node):
+class MeasureShimmerPca(Node):
     
     def process(self):
 
-        shimmer_values = {
-            'local_shimmer': self.args['local_shimmer'],
-            'localdb_shimmer': self.args['localdb_shimmer'],
-            'apq3_shimmer': self.args['apq3_shimmer'],
-            'aqpq5_shimmer': self.args['aqpq5_shimmer'],
-            'apq11_shimmer': self.args['apq11_shimmer'],
-            'dda_shimmer': self.args['dda_shimmer'],
-        }
-
-        shimmer_values = pd.DataFrame(data=shimmer_values, index=[0])
+        df = self.args['df']
 
         try:
             # z-score the Shimmer measurements
-            x = shimmer_values
+            measures = ['localShimmer', 'localdbShimmer', 'apq3Shimmer', 'apq5Shimmer', 'apq11Shimmer', 'ddaShimmer']
+            x = df.loc[:, measures].values
             x = StandardScaler().fit_transform(x)
             # Run the PCA
             pca = PCA(n_components=1)
@@ -483,19 +450,11 @@ class MeasureFormantPCA(Node):
     def process(self):
         ""
 
-        f1, f2, f3, f4 = self.args['formant_means']
-        formant_values = pd.DataFrame(data={
-            'f1': f1,
-            'f2': f2,
-            'f3': f3,
-            'f4': f4
-        }, index=[0])
-
-        # df = self.args['df']
-        # measures = self.args['measures']
+        df = self.args['df']
+        measures = self.args['measures']
 
         # PCA of the formants
-        x = formant_values
+        x = df.loc[:, measures].values
         x = StandardScaler().fit_transform(x)
         
         # Run the PCA
@@ -504,12 +463,4 @@ class MeasureFormantPCA(Node):
 
         return {
             'principal_components': principal_components
-        }
-
-class MeasureIntensity(Node):
-    def process(self):
-        voice = self.args['voice']
-        intensity = voice.to_intensity()
-        return {
-            'intensity': intensity
         }
