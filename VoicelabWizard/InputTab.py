@@ -47,24 +47,62 @@ class InputTab(QWidget):
         options = QFileDialog.Options()
         temp_loaded = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","Sound Files (*.wav *.mp3)", options=options)[0]
         for loaded in temp_loaded:
-            if loaded not in self.model['loaded files']:
-                self.model['loaded files'].append(loaded)
+            if loaded not in self.model['files']:
+                self.model['files'].append(loaded)
                 QListWidgetItem(parent=self.list_loaded_voices).setText(loaded)
 
     def onclick_remove(self):
         for item in self.list_loaded_voices.selectedItems():
-            self.model['loaded files'].pop(self.model['loaded files'].index(item.text()))
+            self.model['files'].pop(self.model['files'].index(item.text()))
             self.list_loaded_voices.takeItem(self.list_loaded_voices.row(item))
 
     def onclick_start(self):
         pipeline = self.create_pipeline()
-        self.results['values'] = pipeline.start()
-        self.results['changed'] = True
+        pipeline_results = pipeline.start()
+
+        # Turn the pipeline results into a more convenient format
+        for i, run in enumerate(pipeline_results):
+            voice_file = self.model['files'][i]
+            self.model['results'][voice_file] = {}
+
+            for node in run:
+                node_name = node.node_id
+                if node_name != 'Load Voice':
+                    self.model['results'][voice_file][node_name] = {}
+
+                    for result in run[node]:
+                        self.model['results'][voice_file][node_name][result] = run[node][result]
+
+        self.model['update results'](self.model['results'])
 
     def create_pipeline(self):
+        functions = self.model['functions']
+        file_locations = self.model['files']
         pipeline = Pipeline()
 
-        # Create a node to load voices into
+        # Create a node that will load all of the voices
         load_voices = LoadVoicesNode('Load Voice')
+        # Set up the load node with the appropriate file locations
         load_voices.args['file_locations'] = file_locations
+        # add the node to the pipeline
         pipeline.add(load_voices)
+
+        # Create a node that will draw the default spectrogram for the loaded voices, we always want to plot the spectrogram
+        visualize_voices = VisualizeVoiceNode('Visualize Voice')
+        # Connect the loaded voice to the visualize node
+        pipeline.connect((load_voices, 'voice'), (visualize_voices, 'voice'))
+        # Add the node to the pipeline
+        pipeline.add(visualize_voices)
+
+        # for each checked operation we create the appropriate node, assign its
+        # associated parameters, and add it to the pipeline connecting it either 
+        # directly to the load node or to its specified parent node
+        for fn in functions:
+            if self.model['functions'][fn]['checked']:
+                pipeline.add(self.model['functions'][fn]['node'])
+                parameters = self.model['functions'][fn]['parameters']
+                for parameter in parameters:
+                    self.model['functions'][fn]['node'].args[parameter.lower()] = parameters[parameter]
+                pipeline.connect((load_voices, 'voice'), (self.model['functions'][fn]['node'], 'voice'))
+
+        return pipeline

@@ -31,7 +31,6 @@ class ManipulatePitchNode(Node):
         sound = self.args['voice']
         unit = self.args['unit']
         factor = self.args['factor']
-        # sound_name = self.args['sound_name']
 
         f0min, f0max = pitch_bounds(sound)
 
@@ -41,11 +40,9 @@ class ManipulatePitchNode(Node):
         call([pitch_tier, manipulation], "Replace pitch tier")
         manipulated_sound = call(manipulation, "Get resynthesis (overlap-add)")
         manipulated_sound.scale_intensity(70)
-        # manipulated_pitch_name = sound_name + "_pitch_manipulated_{}_{}.wav".format(factor, unit)
-        # manipulated_sound.save(manipulated_pitch_name, "WAV")
 
         return {
-            'manipulated_sound': manipulated_sound
+            'voice': manipulated_sound
         }
 
 class ManipulateFormantsNode(Node):
@@ -54,7 +51,6 @@ class ManipulateFormantsNode(Node):
         sound = self.args['voice']
         unit = self.args['unit']
         factor = self.args['factor']
-        # sound_name = self.args['sound_name']
 
         factor_percent = round(factor*100)
         f0min, f0max = pitch_bounds(sound)
@@ -63,10 +59,10 @@ class ManipulateFormantsNode(Node):
         manipulated_sound.scale_intensity(70)
 
         return {
-            'manipulated_sound': manipulated_sound
+            'voice': manipulated_sound
         }
 
-class ManipulatePitchAndFormants(Node):
+class ManipulatePitchAndFormantsNode(Node):
 
     def process(self):
 
@@ -74,7 +70,6 @@ class ManipulatePitchAndFormants(Node):
         unit = self.args['unit']
         formant_factor = self.args['formant_factor']
         pitch_factor = self.args['pitch_factor']
-        # sound_name = self.args['sound_name']
         duration = self.args['duration']
 
         f0min, f0max = pitch_bounds(sound)
@@ -118,11 +113,12 @@ class ManipulatePitchAndFormants(Node):
             'manipulated_sound': manipulated_sound
         }
 
-class ManipulateGenderAge(Node):
+class ManipulateGenderAgeNode(Node):
 
     def process(self):
 
         sound = self.args['voice']
+
         call(sound, "Scale intensity", 70)
         pitch = call(sound, "To Pitch", 0.0, 60, 500)
         meanF0 = call(pitch, "Get mean", 0, 0, "Hertz")

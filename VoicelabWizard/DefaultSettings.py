@@ -1,7 +1,13 @@
 from parselmouth.praat import call
 from VoicelabWizard.AutomaticParams import *
 
+from toolkits.Voicelab.MeasureNode import *
+from toolkits.Voicelab.ManipulateNode import *
+from toolkits.Voicelab.VisualizeNode import *
+
+# List of default settings matching at least one of the available functions
 default_settings = {
+
     'Measure Pitch': {
         'Algorithm': ('To Pitch (ac)', ['To Pitch (cc)']),
         'Time Step': 0,
@@ -53,24 +59,44 @@ default_settings = {
         'Means': formant_means,
         'Max': formant_max
     },
-}
-
-# All of the operations the user can do on a voice
-available_operations = {
-
-    'Measure Pitch': MeasurePitchNode(),
-    'Measure Intensity': MeasureIntensityNode(),
-    'Measure Harmonicity': MeasureHarmonicityNode(),
-    'Measure Jitter': MeasureJitterNode(),
-    'Measure Shimmer': MeasureShimmerNode(),
-    'Measure Formants': MeasureFormantsNode(),
-
-    'Manipulate Pitch': ManipulatePitchNode(),
-    'Manipulate Gender': ManipulateGenderNode(),
-    'Manipulate Age': ManipulateAgeNode(),
-
-    'Visualize Pitch': VisualizePitchNode(),
-    'Visualize Intensity': VisualizeIntensityNode(),
-    'Visualize Formants': VisualizeFormantsNode(),
+    'Manipulate Pitch': {
+        'Unit': 'ERB',
+        'Factor': -0.5
+    }
 
 }
+
+# List of all available operations the user can perform as well as their associated function node
+avialable_functions = {
+
+    'Measure Pitch': MeasurePitchNode('Measure Pitch'),
+    'Measure Intensity': MeasureIntensityNode('Measure Intensity'),
+    'Measure Harmonicity': MeasureHarmonicityNode('Measure Harmonicity'),
+    'Measure Jitter': MeasureJitterNode('Measure Jitter'),
+    'Measure Shimmer': MeasureShimmerNode('Measure Shimmer'),
+    'Measure Formants': MeasureFormantNode('Measure Formants'),
+    'Measure Jitter PCA': MeasureJitterPCANode('Measure Jitter PCA'),
+    'Measure Shimmer PCA': MeasureShimmerPCANode('Measure Shimmer PCA'),
+    'Measure Formant PCA' : MeasureFormantPCANode('Measure Formant PCA'),
+    'Measure Vocal Tract Estimates': MeasureVocalTractEstimatesNode('Measure Vocal Tract Estimates'),
+
+    'Manipulate Pitch': ManipulatePitchNode('Manipulate Pitch'),
+    'Manipulate Formants': ManipulateFormantsNode('Manipulate Formants'),
+    'Manipulate Gender and Age': ManipulateGenderAgeNode('Manipulate Gender and Age'),
+
+    # 'Visualize Pitch': VisualizePitchNode(),
+    # 'Visualize Intensity': VisualizeIntensityNode(),
+    # 'Visualize Formants': VisualizeFormantNode(),
+
+}
+
+# List of default operations that will be performed when there is no custom configuration
+default_functions = [
+
+    'Measure Pitch',
+    'Measure Shimmer',
+    'Measure Jitter',
+    'Manipulate Pitch',
+    'Visualize Pitch',
+
+]

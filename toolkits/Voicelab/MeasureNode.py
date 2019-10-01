@@ -27,7 +27,7 @@ def pitch_bounds(sound):
 
     return pitch_floor, pitch_ceiling
 
-class MeasureVoiceDuration(Node):
+class MeasureDurationNode(Node):
     def process(self):
         sound = self.args['voice']
         print(type(sound))
@@ -38,7 +38,7 @@ class MeasureVoiceDuration(Node):
 
         return {'duration': duration}
 
-class MeasureVoicePitch(Node):
+class MeasurePitchNode(Node):
 
     pitch_settings = {
         'pitch_method': 'To Pitch (ac)',
@@ -91,15 +91,15 @@ class MeasureVoicePitch(Node):
         print(mean_f0, stdev_f0, min_f0, max_f0)
 
         return {
-            'pitch': pitch,
+            # 'pitch': pitch,
             'mean_f0': mean_f0,
             'stdev_f0': stdev_f0,
             'min_f0': min_f0,
             'max_f0': max_f0,
-            'pitch_settings': self.pitch_settings
+            # 'pitch_settings': self.pitch_settings
         }
 
-class MeasureHNR(Node):
+class MeasureHarmonicityNode(Node):
 
     hnr_settings = {
         'hnr_floor': 50,
@@ -149,7 +149,7 @@ class MeasureHNR(Node):
         }
 
 
-class MeasureJitter(Node):
+class MeasureJitterNode(Node):
 
     jitter_settings = {
         'floor': 50,
@@ -220,7 +220,7 @@ class MeasureJitter(Node):
             'jitter_settings': self.jitter_settings
         }
 
-class MeasureShimmer(Node):
+class MeasureShimmerNode(Node):
         
     shimmer_settings = {
         'floor': 50,
@@ -302,7 +302,7 @@ class MeasureShimmer(Node):
             'shimmer_settings': self.shimmer_settings
         }
 
-class MeasureVoiceFormant(Node):
+class MeasureFormantNode(Node):
 
     formant_settings = {
         'time_step': 0.0025, # a zero value is equal to 25% of the window length
@@ -363,7 +363,7 @@ class MeasureVoiceFormant(Node):
             'formant_settings': self.formant_settings
         }
 
-class MeasureVocalTractEstimates(Node):
+class MeasureVocalTractEstimatesNode(Node):
     def process(self):
         'vocal_tract_estimates_mean'
 
@@ -395,7 +395,7 @@ class MeasureVocalTractEstimates(Node):
             'vtl_delta_f': vtl_delta_f
         }
 
-class MeasureJitterPCA(Node):
+class MeasureJitterPCANode(Node):
     def process(self):
 
         jitter_values = {
@@ -430,7 +430,7 @@ class MeasureJitterPCA(Node):
                 'jitter_pca_df': None
             }
 
-class MeasureShimmerPCA(Node):
+class MeasureShimmerPCANode(Node):
     
     def process(self):
 
@@ -457,7 +457,7 @@ class MeasureShimmerPCA(Node):
         except:
             print('Shimmer PCA failed.  Please check your data') # todo make this an error message
 
-class MeasureFormantPCA(Node):
+class MeasureFormantPCANode(Node):
 
     # Takes a dataframe with f1-4
     def process(self):
@@ -486,7 +486,7 @@ class MeasureFormantPCA(Node):
             'principal_components': principal_components
         }
 
-class MeasureIntensity(Node):
+class MeasureIntensityNode(Node):
     def process(self):
         voice = self.args['voice']
         intensity = voice.to_intensity()

@@ -43,7 +43,7 @@ class SaveVoiceSpectrogram(Node):
             "plot": plt
         }
 
-class PlotPitch(Node):
+class VisualizePitchNode(Node):
     def process(self):
         # use the provided plot if one is provided, otherwise create a new one
         pitch = self.args['pitch']
@@ -75,7 +75,7 @@ class PlotPitch(Node):
             'axis': axis,
         }
 
-class PlotIntensity(Node):
+class VisualizeIntensityNode(Node):
     def process(self):
         intensity = self.args['intensity']
         figure, host = self.args['figure'], self.args['host'] if ('figure' in self.args and 'host' in self.args) else plt.subplots()
@@ -95,7 +95,7 @@ class PlotIntensity(Node):
             'intensity': intensity
         }
 
-class PlotFormants(Node):
+class VisualizeFormantNode(Node):
     def process(self):
         'generate a new axis for these formants and plot them to a new or provided grid'
 
@@ -123,7 +123,7 @@ class PlotFormants(Node):
             'formants': formants
         }
 
-class PlotSpectrogram(Node):
+class VisualizeVoiceNode(Node):
     def process(self):
 
         voice = self.args['voice']
@@ -146,8 +146,8 @@ class PlotSpectrogram(Node):
         host.yaxis.label.set_color('w')
         host.set_xlim([self.args['voice'].xmin, self.args['voice'].xmax])
         sns.set()
-        figure.set_dpi(250)
-        figure.set_size_inches(9, 4)
+        # figure.set_dpi(250)
+        # figure.set_size_inches(9, 4)
 
         return {
             'figure': figure,

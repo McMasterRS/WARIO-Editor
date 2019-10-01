@@ -7,7 +7,7 @@ from VoicelabWizard.InputTab import InputTab
 from VoicelabWizard.OutputTab import OutputTab
 from VoicelabWizard.SettingsTab import SettingsTab
 
-from VoicelabWizard.DefaultSettings import feature_defaults
+from VoicelabWizard.DefaultSettings import default_settings, avialable_functions, default_functions
 
 class VoicelabWizard(QMainWindow):
     def __init__(self):
@@ -26,14 +26,17 @@ class VoicelabWizard(QMainWindow):
 
         self.model = {
             'files': [],    # loaded voice files
-            'results': [],  # ordered list of results corresponding with each loaded file
-            'features': {}, # settings for each feature, keyed by feature name
+            'results': {},  # ordered list of results corresponding with each loaded file
+            'functions': {}, # list of all available operations the user can perform.
         }
 
-        for feature in feature_defaults:
-            self.model['features'][feature] = {
-                'checked': False,
-                'parameters': feature_defaults[feature]
+        # Set up the internal state
+        for fn in avialable_functions:
+            self.model['functions'][fn] = {
+                'checked': True if fn in default_functions else False,
+                'parameters': default_settings[fn] if fn in default_settings else {},
+                'node': avialable_functions[fn],
+                'name': avialable_functions[fn].node_id
             }
 
         tabs.addTab(InputTab(parent=self), "Input")
