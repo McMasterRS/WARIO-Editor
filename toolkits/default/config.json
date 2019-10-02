@@ -76,11 +76,6 @@
     },
     
 "global_variables":{
-    "example" : {
-        "type"  : "Int",
-        "value" : "0",
-        "const" : false
-    }
 },
 
     "node_types":{

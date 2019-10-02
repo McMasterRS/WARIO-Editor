@@ -1,21 +1,30 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
-class TestSettings(QtWidgets.QWidget):
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import random
+
+class CustomSettings(QtWidgets.QWidget):
     
     def __init__(self, parent, settings):
-        super(TestSettings, self).__init__(None)
+        super(CustomSettings, self).__init__(None)
         self.parent = parent
+        self.settings = settings
         
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
         self.setWindowIcon(self.style().standardIcon(getattr(QtWidgets.QStyle,"SP_TitleBarMenuButton")))
         self.setWindowTitle("Settings")
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
         
         # Build the UI
         self.buildUI(settings)
         
 		# Event filter to make sure the main window gets updated settings/
         self.installEventFilter(self)
+        
+        # Generate starting values for the settings
+        self.genSettings()
         
     # Catches window close/loss of focus events
     def eventFilter(self, object, event):
@@ -31,18 +40,20 @@ class TestSettings(QtWidgets.QWidget):
         
     # Build the settings UI
     def buildUI(self, settings):
-    
+        return
+        
+    def updateGlobals(self, globals):
         return
         
     # Return the values from each setting type
     def genSettings(self):
         
         # Value of each of the variables for the node. stored as a dict
-        varList = []
+        varList = {}
 
         # Information on each settings item to allow for them to be
         # recreated when the file is loaded. Stored as a dict of dicts.
-        settingList = []
+        settingList = {}
     
-        self.parent.settings = settingList
         self.parent.variables = varList
+        self.parent.settings = settingList

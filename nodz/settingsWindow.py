@@ -1,5 +1,6 @@
 import nodz.nodz_utils as utils
 from nodz.customWidgets import *
+from nodz.customSettings import *
 
 import json
 import collections
@@ -11,35 +12,12 @@ from PyQt5 import QtGui
 from PyQt5 import uic
 
 # Window that displays node settings
-class settingsItem(QtWidgets.QWidget):
+class SettingsItem(CustomSettings):
 
     def __init__(self, parent, widgets):
-        super(settingsItem, self).__init__(None)
-        self.parent = parent
         self.nameList = []
+        super(SettingsItem, self).__init__(parent, widgets)
         
-        self.layout = QtWidgets.QFormLayout()
-        self.buildUI(widgets)
-        self.setLayout(self.layout)
-        
-        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
-        self.setWindowIcon(self.style().standardIcon(getattr(QtWidgets.QStyle,"SP_TitleBarMenuButton")))
-        self.setWindowTitle("Settings")
-        self.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.installEventFilter(self)
-
-        self.genSettings()
-        
-    # Catches window close/loss of focus events
-    def eventFilter(self, object, event):
-        if event.type() == QtCore.QEvent.Close:
-            self.genSettings()
-            event.accept()
-        elif event.type() == QtCore.QEvent.WindowDeactivate:
-            self.genSettings()
-            event.accept()
-            
-        return False
         
     # Initialise the custom UI elements 
     def initCustom(self):
@@ -49,11 +27,10 @@ class settingsItem(QtWidgets.QWidget):
             if isinstance(w, customWidget):
                 if w.textbox.text() != "":
                     w.buildCustomUI()
-                
-                
         
     # Populate the settings window    
     def buildUI(self, widgets, custom = False):
+        self.layout = QtWidgets.QFormLayout()
         # If not building the custom node UI add the rename textbox
         # to the top of the settings menu
         if custom == False:
@@ -65,7 +42,7 @@ class settingsItem(QtWidgets.QWidget):
         # add them to the settings menu
         for i in widgets:
             # Give error message if any essential info is missing
-            errors = []
+            errors = [] 
             if "text" not in widgets[i]: errors.append("text")
             if "type" not in widgets[i]: errors.append("type")
             if "params" not in widgets[i]: errors.append("params")
@@ -85,6 +62,8 @@ class settingsItem(QtWidgets.QWidget):
             if widgets[i]["type"] == "custombox":
                 widget.tempSettings = widgets
                 break
+                
+        self.setLayout(self.layout)
                 
            
     # Reset the settings window to basic version

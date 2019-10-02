@@ -4,6 +4,124 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 
+
+class ExpandingTable(QtWidgets.QTableWidget):
+    def __init__(self, name, settings):
+        super(ExpandingTable, self).__init__(1, 1)
+        
+        self.cellChanged.connect(self.checkRowCount)
+        
+        self.setHorizontalHeaderLabels(["Name"])
+        header = self.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        
+        if name + "Values" in settings.keys():
+            print(settings[name + "Values"])
+            for i in range(len(settings[name + "Values"])):
+                self.insertRow(self.rowCount())
+                self.setItem(i, 0, QtWidgets.QTableWidgetItem(settings[name + "Values"][str(i)]))
+
+        
+    def checkRowCount(self, i, j):
+        if self.item(self.rowCount() - 1, 0) != None:
+            if self.item(self.rowCount() - 1, 0).text() != "":
+                self.insertRow(self.rowCount())
+            
+        if self.item(self.rowCount() - 2, 0).text() == "":
+            self.removeRow(self.rowCount() - 1)
+            
+            
+    def getSettings(self, name, var, settings):
+    
+        varDict = {}
+        settingsDict = {}
+    
+        for i in range(self.rowCount() - 1):
+            settingsDict[i] = self.item(i, 0).text()
+            varDict[self.item(i, 0).text()] = i
+            
+        var[name] = varDict
+        settings[name + "Values"] = settingsDict
+        
+        
+
+# Spinbox linked to another spinbox so they cant be higher/lower
+class LinkedSpinbox(QtWidgets.QSpinBox):
+    def __init__(self):
+        super(LinkedSpinbox, self).__init__()
+        self.linkedWidget = None
+        self.linkType = None
+        self.valueChanged.connect(self.updateLink)
+        
+    def linkWidgets(self, widget, type):
+        self.linkedWidget = widget
+        self.linkedType = type
+        self.updateLink(self.value())
+    
+    def updateLink(self, value):
+        if self.linkedWidget == None:
+            return
+            
+        # Linked widget is always lower
+        if self.linkedType == "Lower":
+            self.linkedWidget.setMaximum(value - 1)
+            
+        # Linked widget is always higher
+        elif self.linkedType == "Higher":
+            self.linkedWidget.setMinimum(value + 1)
+    
+
+# Checkbox that is linked to another widget and enables/disables it
+class LinkedCheckbox(QtWidgets.QCheckBox):
+    def __init__(self, text, widget):
+        super(LinkedCheckbox, self).__init__(text)
+        self.linkedWidget = widget
+        self.stateChanged.connect(self.updateLink)
+        self.setChecked(False)
+        self.updateLink(0)
+        
+    def updateLink(self, state):
+        if state == 0:
+            self.linkedWidget.setEnabled(False)
+        else:
+            self.linkedWidget.setEnabled(True)
+            
+    def buildLinkedCheckbox(self, name, settings):
+        if name + "Checked" in settings.keys():
+            self.setChecked(settings[name + "Checked"])
+            
+            if isinstance(self.linkedWidget, QtWidgets.QSpinBox):
+                self.linkedWidget.setMaximum(settings[name + "Max"])
+                self.linkedWidget.setMinimum(settings[name + "Min"])
+                self.linkedWidget.setValue(settings[name + "Value"])
+                
+            if isinstance(self.linkedWidget, QtWidgets.QComboBox):
+                self.linkedWidget.setCurrentIndex(settings[name + "Index"])
+        
+    def getSettings(self, name, varList, settingList):
+
+        settingList[name + "Checked"] = self.isChecked()
+        
+        # Spinbox results
+        if isinstance(self.linkedWidget, QtWidgets.QSpinBox):
+            if self.isChecked():
+                varList[name] = self.linkedWidget.value()
+            else:
+                varList[name] = None
+
+            settingList[name + "Max"] = self.linkedWidget.maximum()
+            settingList[name + "Min"] = self.linkedWidget.minimum()
+            settingList[name + "Value"] = self.linkedWidget.value()
+            
+        if isinstance(self.linkedWidget, QtWidgets.QComboBox):
+            if self.isChecked():
+                varList[name] = self.linkedWidget.currentIndex()
+            else:
+                varList[name] = None
+                
+            settingList[name + "Index"] = self.linkedWidget.currentIndex() 
+            
+
 # QTableWidget that forces the first column to be unique
 # Attempts to use the same value twice reverts it to its previous value
 class UniqueNameTable(QtWidgets.QTableWidget):
@@ -82,7 +200,7 @@ class GlobalNodeComboBox(QtWidgets.QComboBox):
                                              plug = plug,
                                              socket = not plug,
                                              preset  = "attr_preset_1",
-                                             dataType = self.globalsList[self.currentText()])
+                                             dataType = self.globalsList[self.currentText()]["type"])
         self.parentNode.update()
         
     def updateGlobals(self, globals):

@@ -15,6 +15,7 @@ from PyQt5 import uic
 import nodz.nodz_utils as utils
 from nodz.customWidgets import *
 from nodz.settingsWindow import *
+from nodz.customSettings import CustomSettings
 
 defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..\\toolkits\default\config.json')
 
@@ -61,6 +62,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Global variables
         self.globalUI = GlobalUI(self)
+        self.globals = []
         
         # Load nodz configuration.
         self.loadConfig(configPath)
@@ -523,8 +525,10 @@ class Nodz(QtWidgets.QGraphicsView):
         self.globalUI.activateWindow()
         
     def updateGlobals(self, globals):
+        self.globals = globals
         for node in self.scene().nodes:
-            n = self.scene().nodes[node]    
+            n = self.scene().nodes[node]
+            n.settingsWindow.updateGlobals(globals)
             if n.type == "Set Global" or n.type == "Get Global":
                 for i in range(0, n.settingsWindow.layout.rowCount()):
                     widget = n.settingsWindow.layout.itemAt(i, 1).widget()
@@ -669,7 +673,7 @@ class Nodz(QtWidgets.QGraphicsView):
         else:
             nodeItem = NodeItem(nodeId=nodeId, name=name, alternate=alternate, preset=preset,
                                 config=self.config, extended_attributes=extended_attributes,
-                                settings=settings, type=type, toolkit=toolkit)
+                                settings=settings, type=type, toolkit=toolkit, globals = self.globals)
 
             # Store node in scene.
             self.scene().nodes[nodeId] = nodeItem
@@ -1311,7 +1315,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
     """
 
-    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, settings=None, type=None, toolkit=None):
+    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, settings=None, type=None, toolkit=None, globals=None):
         """
         Initialize the class.
 
@@ -1363,13 +1367,15 @@ class NodeItem(QtWidgets.QGraphicsItem):
         
         # Load custom settings window
         if "settingsFile" in settings.keys():  
-            module = importlib.import_module(settings["settingsFile"])
+            module = importlib.import_module("toolkits." + toolkit + "." + settings["settingsFile"])
             cls = getattr(module, settings["settingsClass"])
             self.settingsWindow = cls(self, settings)
             
         # Load default settings window based on JSON
         else:
-            self.settingsWindow = settingsItem(self, settings)
+            self.settingsWindow = SettingsItem(self, settings)
+            
+        self.settingsWindow.updateGlobals(globals)
 
     @property
     def height(self):
@@ -2463,7 +2469,7 @@ class GlobalUI(QtWidgets.QWidget):
         
             name = self.table.item(row, 0).text()
             type = self.table.cellWidget(row, 1).currentText()
-            value = self.table.item(row, 2). text()
+            value = self.table.item(row, 2).text()
             const = True if self.table.item(row, 3).checkState() == QtCore.Qt.Checked else False
             
             gb["type"] = type
@@ -2473,7 +2479,7 @@ class GlobalUI(QtWidgets.QWidget):
             
             self.vars[name] = type
             
-        self.parent.updateGlobals(self.vars)
+        self.parent.updateGlobals(globals)
             
         return globals
         
@@ -2558,6 +2564,8 @@ class GlobalUI(QtWidgets.QWidget):
         self.table.setCellWidget(row, 1, combobox)
         self.table.setItem(row, 2, value)
         self.table.setItem(row, 3, checkbox)
+        
+        self.genGlobals()
 
     def removeRow(self):
         if self.table.currentRow() != -1:

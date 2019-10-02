@@ -1,8 +1,13 @@
 {   
     "global_variables":{
-        "test2" : {
+        "Channel Count" : {
             "type"  : "Int",
-            "value" : "0",
+            "value" : "32",
+            "const" : false
+        },
+        "Data Length" : {
+            "type"  : "Int",
+            "value" : "100",
             "const" : false
         }
     },
@@ -199,7 +204,10 @@
                     "type": "trigData"
                 }
             },
-            "settings" : {}
+            "settings" : {
+                "settingsFile" : "raw2epoch",
+                "settingsClass" : "Raw2EpochSettings"
+            }
         },
         "Fit ICA" : {
             "preset" : "node_default",
@@ -224,7 +232,10 @@
                     "type": "ICA"   
                 }
             },
-            "settings" : {}
+            "settings" : {
+                "settingsFile" : "fitICA",
+                "settingsClass" : "FitICASettings"
+            }
         },
         "Apply ICA" : {
             "preset" : "node_default",
