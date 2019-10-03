@@ -2,6 +2,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
+import matplotlib.pyplot as plt
+
 from pipeline.Pipeline import Pipeline
 # from toolkits.Voicelab.MeasureNode import *
 # from toolkits.Voicelab.ManipulateNode import *
@@ -40,11 +42,14 @@ class InputTab(QWidget):
         btn_start = QPushButton("Start")
         btn_start.clicked.connect(self.onclick_start)
 
+        # self.progress = QProgressBar()
+
         # Display the widgets in the correct order
         self.layout.addWidget(btn_add_voices)
         self.layout.addWidget(btn_remove_voices)
         self.layout.addWidget(self.list_loaded_voices)
         self.layout.addWidget(btn_start)
+        # self.layout.addWidget(self.progress)
 
         # Loaded Voice List
         self.setLayout(self.layout)
@@ -66,7 +71,7 @@ class InputTab(QWidget):
     ###############################################################################################
     def onclick_remove(self):
         for item in self.list_loaded_voices.selectedItems():
-            self.model['files'].pop(item.text())
+            self.model['files'].pop(self.model['files'].index(item.text()))
             self.list_loaded_voices.takeItem(self.list_loaded_voices.row(item))
 
     ###############################################################################################
@@ -74,6 +79,9 @@ class InputTab(QWidget):
     # Constructs and starts a WARIO pipeline to process loaded voices according to the settings
     ###############################################################################################
     def onclick_start(self):
+
+        self.model['results'] = {}
+
         # Create a pipeline reflecting the user's settings
         pipeline = self.create_pipeline(self.model['files'], self.model['functions'])
         pipeline_results = pipeline.start()
@@ -131,5 +139,6 @@ class InputTab(QWidget):
                 
                 pipeline.add(self.model['functions'][fn]['node'])
                 pipeline.connect((load_voices, 'voice'), (self.model['functions'][fn]['node'], 'voice'))
+                pipeline.connect((visualize_voices, 'figure'), (self.model['functions'][fn]['node'], 'figure'))
 
         return pipeline

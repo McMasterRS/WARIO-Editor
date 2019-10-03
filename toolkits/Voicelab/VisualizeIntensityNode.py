@@ -6,6 +6,7 @@ from parselmouth.praat import call
 import matplotlib.pyplot as plt
 
 from toolkits.Voicelab.VoicelabNode import VoicelabNode
+from toolkits.Voicelab.MeasureIntensityNode import MeasureIntensityNode
 
 
 ###################################################################################################
@@ -20,11 +21,15 @@ from toolkits.Voicelab.VoicelabNode import VoicelabNode
 
 
 class VisualizeIntensityNode(VoicelabNode):
+
     def process(self):
-        intensity = self.args['intensity']
-        figure, host = self.args['figure'], self.args['host'] if ('figure' in self.args and 'host' in self.args) else plt.subplots()
+
+        figure = self.args['figure']
+        voice = self.args['voice']
+        host = figure.axes[0]
         axis = host.twinx()
 
+        intensity = voice.to_intensity()
         intensity.values.T[intensity.values.T < 50] = np.nan
         axis.plot(intensity.xs(), intensity.values.T, linewidth=3, color='k')
         axis.plot(intensity.xs(), intensity.values.T, linewidth=2, color='w')

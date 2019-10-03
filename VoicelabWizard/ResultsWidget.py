@@ -7,6 +7,8 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
 import seaborn as sns
+
+import parselmouth
 ###################################################################################################
 # ResultsWidget :
 # Wraps the widgets and functionality for displaying results from a single analyzed voice file.
@@ -24,6 +26,7 @@ class ResultsWidget(QWidget):
         self.setLayout(self.layout)
 
     def load_results(self, results):
+        self.cache = {}
         self.results = results
 
         # Generate the stack of results presentation widgets
@@ -49,7 +52,7 @@ class ResultsWidget(QWidget):
             stack_widget.setLayout(stack_layout)
 
             figure = self.results['files'][voice_file]['Visualize Voice']['figure']
-
+            
             spectrogram = FigureCanvas(figure)
 
             tabs = QTabWidget()
@@ -78,6 +81,8 @@ class ResultsWidget(QWidget):
                 table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
                 for j, fn_result in enumerate(self.results['files'][voice_file][fn_name]):
+                    if isinstance(self.results['files'][voice_file][fn_name][fn_result], parselmouth.Sound):
+                        pass
                     table.setItem(j,0, QTableWidgetItem(str(self.results['files'][voice_file][fn_name][fn_result])))
 
             stack_layout.addWidget(spectrogram)

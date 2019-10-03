@@ -5,6 +5,7 @@ from .LoadVoicesNode import LoadVoicesNode
 
 # Measure Nodes
 from .MeasureDurationNode import MeasureDurationNode
+from .MeasureIntensityNode import MeasureIntensityNode
 from .MeasureFormantNode import MeasureFormantNode
 from .MeasureFormantPCANode import MeasureFormantPCANode
 from .MeasureHarmonicityNode import MeasureHarmonicityNode

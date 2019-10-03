@@ -25,27 +25,34 @@ class OutputTab(QWidget):
 
         # Model contains the state of data within the program
         self.model = self.parent().model
-        # results = self.model['results']
+        # create the callback for updating the list with new results
+        self.model['update results'] = self.update_results
 
         # Create a column layout
-        layout = QHBoxLayout()
+
+        layout = QVBoxLayout()
         self.setLayout(layout)
+
+        results_container = QWidget()
+        results_layout = QHBoxLayout()
 
         # list of voice files that were processed
         self.file_list = QListWidget()
         self.file_list.itemSelectionChanged.connect(self.on_list_change)
-        layout.addWidget(self.file_list)
 
         # presentation widget for the results of processing the voices
-        self.results_widget = ResultsWidget()
-        layout.addWidget(self.results_widget)
 
-        self.save_button = QPushButton()
+        results_container.setLayout(results_layout)
+        self.results_widget = ResultsWidget()
+        self.save_button = QPushButton("Save Results")
         self.save_button.clicked.connect(self.on_save)
+
+        layout.addWidget(results_container)
         layout.addWidget(self.save_button)
 
-        # create the callback for updating the list with new results
-        self.model['update results'] = self.update_results
+        results_layout.addWidget(self.file_list)
+        results_layout.addWidget(self.results_widget)
+
 
     def update_results(self, results):
 
@@ -64,7 +71,9 @@ class OutputTab(QWidget):
             list_item = QListWidgetItem(parent=self.file_list)
             list_item.setText(voice_file)
             self.results_widget.load_results(results)
-                
+
+        self.results_widget.show_result(voice_files[0])
+
     def on_list_change(self):
         selected = self.file_list.selectedItems()
 
@@ -75,57 +84,57 @@ class OutputTab(QWidget):
     def on_save(self):
         print('saved')
 
-        sheets = {}
-        results = self.model['results']
+        options = QFileDialog.Options()
+        temp_loaded = QFileDialog.getExistingDirectory (self)
 
-        sheets = {}
+        if temp_loaded != '':
 
-        for i, fn in enumerate(results['functions']):
-            sheets[fn] = {
-                'file name': []
-            }
-            for j, file_name in enumerate(results['functions'][fn]):
-                sheets[fn]['file name'].append(file_name)
+            sheets = {}
+            results = self.model['results']
 
-                for j, result in enumerate(results['functions'][fn][file_name]):
-                    if result not in sheets[fn]:
-                        sheets[fn][result] = []
-                    sheets[fn][result].append(str(results['functions'][fn][file_name][result]))
+            sheets = {}
 
-        print(sheets)
+            for i, fn in enumerate(results['functions']):
+                sheets[fn] = {
+                    'file name': []
+                }
+                for j, file_path in enumerate(results['functions'][fn]):
+                    sheets[fn]['file name'].append(file_path)
+                    file_name = file_path.split('/')[-1].split('.wav')[0]
 
-        # n_rows = len(files)
+                    for j, result in enumerate(results['functions'][fn][file_path]):
+                        result_value = results['functions'][fn][file_path][result]
 
-        # for i, run in enumerate(results):
-        #     file_name = files[i].split('/')[-1].split('.wav')[0]
+                        if isinstance(result_value, parselmouth.Sound):
+                            modified_path = temp_loaded + '/' + file_name + '_' + fn.lower().replace(' ', '_') + '.wav'
+                            self.save_voice(result_value, modified_path)
 
-        #     for j, fn in enumerate(results[run]):
+                        elif isinstance(result_value, Figure):
+                            modified_path = temp_loaded + '/' + file_name + '.png'
+                            self.save_spectrogram(result_value, modified_path)
 
-        #         if fn not in sheets:
+                        else:
+                            if result not in sheets[fn]:
+                                sheets[fn][result] = []
+                            sheets[fn][result].append(str(results['functions'][fn][file_path][result]))
 
-        #             sheets[fn] = {}
-        #             sheets[fn]['file name'] = [None] * n_rows
+                print(sheets)
 
-        #         sheets[fn]['file name'][i] = files[i]
+            writer = ExcelWriter('voicelab_results.xlsx')
 
-        #         for k, result in enumerate(results[run][fn]):
+            for sheet_data in sheets:
+                sheet = pd.DataFrame(sheets[sheet_data])
+                sheet.to_excel(writer, sheet_data, index=False)
 
-        #             result_value = results[run][fn][result]
+            writer.save()
 
-        #             if result not in sheets[fn]:
-        #                 sheets[fn][result] = [None] * n_rows
 
-        #             if isinstance(result_value, parselmouth.Sound): # if the result is a sound file, that is probably a manipulate node, save a seperate wav file
-        #                 save_file_name = file_name + '_' + fn.lower() + '.wav'
-        #                 print(save_file_name)
-        #                 result_value.save(save_file_name, 'WAV')
-                    
-        #             sheets[fn][result][i] = result_value
+    def save_voice(self, voice, file_name):
+        
+        voice.save(file_name, 'WAV')
+        return file_name
+    
+    def save_spectrogram(self, spectrogram, file_name):
 
-        writer = ExcelWriter('voicelab_results.xlsx')
-
-        for sheet_data in sheets:
-            sheet = pd.DataFrame(sheets[sheet_data])
-            sheet.to_excel(writer, sheet_data, index=False)
-
-        writer.save()
+        spectrogram.savefig(file_name)
+        return file_name

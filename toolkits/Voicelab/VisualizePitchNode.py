@@ -6,6 +6,8 @@ from parselmouth.praat import call
 import matplotlib.pyplot as plt
 
 from toolkits.Voicelab.VoicelabNode import VoicelabNode
+from toolkits.Voicelab.MeasurePitchNode import MeasurePitchNode
+from toolkits.Voicelab.MeasureIntensityNode import MeasureIntensityNode
 
 
 ###################################################################################################
@@ -22,15 +24,22 @@ class VisualizePitchNode(VoicelabNode):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.args = {}
+        self.args = {
+            'pitch': lambda voice: self.measure_pitch(voice)['pitch'],
+            'intensity': lambda voice: self.measure_intensity(voice)['intensity'],
+        }
 
     def process(self):
 
-        pitch = self.args['pitch']
-        intensity = self.args['intensity']
+        voice = self.args['voice']
+        figure = self.args['figure']
+        pitch = self.args['pitch'](voice)
+        intensity = self.args['intensity'](voice)
 
         # use the provided plot if one is provided, otherwise create a new one
-        figure, host = self.args['figure'], self.args['host'] if ('figure' in self.args and 'host' in self.args) else plt.subplots()
+        # figure, host = self.args['figure'], self.args['host'] if ('figure' in self.args and 'host' in self.args) else plt.subplots()
+
+        host = figure.axes[0]
 
         axis = host.twinx()
         pitch_values = pitch.selected_array['frequency']
@@ -55,5 +64,19 @@ class VisualizePitchNode(VoicelabNode):
         return {
             'figure': figure,
             'host': host,
-            'axis': axis,
+            # 'axis': axis,
         }
+    
+    def measure_pitch(self, voice):
+        measure_pitch = MeasurePitchNode('Measure Pitch')
+        measure_pitch.args['voice'] = voice
+        results = measure_pitch.process()
+        self.cached = { voice: results }
+        return results
+
+    def measure_intensity(self, voice):
+        measure_intensity = MeasureIntensityNode('Measure Intensity')
+        measure_intensity.args['voice'] = voice
+        results = measure_intensity.process()
+        self.cached = { voice: results }
+        return results

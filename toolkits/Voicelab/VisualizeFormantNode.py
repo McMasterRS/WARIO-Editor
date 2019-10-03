@@ -6,6 +6,8 @@ from parselmouth.praat import call
 import matplotlib.pyplot as plt
 
 from toolkits.Voicelab.VoicelabNode import VoicelabNode
+from toolkits.Voicelab.MeasureIntensityNode import MeasureIntensityNode
+from toolkits.Voicelab.MeasureFormantNode import MeasureFormantNode
 
 
 ###################################################################################################
@@ -19,29 +21,54 @@ from toolkits.Voicelab.VoicelabNode import VoicelabNode
 ###################################################################################################
 
 class VisualizeFormantNode(VoicelabNode):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.args = {}
+
     def process(self):
-        'generate a new axis for these formants and plot them to a new or provided grid'
+        ''
 
-        formants = self.args['formants']
-        intensity = self.args['intensity']
-        figure, host = (self.args['figure'], self.args['host']) if ('figure' in self.args and 'host' in self.args) else plt.subplots()
-        # axis = host.twinx()
+        figure = self.args['figure']
+        voice = self.args['voice']
+
+        host = figure.axes[0]
+        axis = host.twinx()
+
+        max_formant = self.formants_praat_manual(voice)
+        number_of_formants = 5
+        time_step = 0.0025
+        window_length = 0.025
+        pre_emphasis_dB = 50
+        formants = call(voice, "To Formant (burg)", time_step, number_of_formants, max_formant, window_length,
+                        pre_emphasis_dB)
         sample_times = formants.xs()
-
-        for i in range(0, 4):  # How many formants do you want?
-            formant_values = call(formants, "To Matrix", i + 1).values[0, :]
-            for j, time in enumerate(sample_times):
-                intensity_value = call(intensity, "Get value at time", time, "cubic")
+        intensity = voice.to_intensity()
+        for i in range(4):  # How many formants do you want?
+            formant_values = parselmouth.praat.call(formants, "To Matrix", i + 1).values[0, :]
+            j = 0
+            for time in sample_times:
+                j += 1
+                intensity_value = parselmouth.praat.call(intensity, "Get value at time", time, "cubic")
                 if intensity_value < 50:
                     formant_values[j] = 0
-
             formant_values[formant_values == 0] = np.nan
-            host.scatter(sample_times, formant_values, c='w', linewidth=3, marker='o', s=1)
-            host.scatter(sample_times, formant_values, c='r', linewidth=1, s=1)
-            host.grid(False)
+            axis.scatter(sample_times, formant_values, c='w', linewidth=3, marker='o', s=1)
+            axis.scatter(sample_times, formant_values, c='r', linewidth=1, s=1)
+            axis.grid(False)
+
         return {
-            'figure': figure,
-            'host': host,
-            # 'axis': axis,
-            'formants': formants
+            'axis': axis
         }
+
+    def formants_praat_manual(self, voice):
+        pitch = call(voice, "To Pitch", 0.0, 50, 500)  # check pitch to set formant settings
+        mean_f0 = call(pitch, "Get mean", 0, 0, "Hertz")
+        if 170 <= mean_f0 <= 300:
+            max_formant = 5500
+        elif mean_f0 < 170:
+            max_formant = 5000
+        else:
+            max_formant = 8000
+        return max_formant

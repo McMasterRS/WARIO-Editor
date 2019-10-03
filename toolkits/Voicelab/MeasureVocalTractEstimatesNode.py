@@ -1,6 +1,7 @@
 from pipeline.Node import Node
 from parselmouth.praat import call
 from toolkits.Voicelab.VoicelabNode import VoicelabNode
+from toolkits.Voicelab.MeasureFormantNode import MeasureFormantNode
 
 ###################################################################################################
 # MEASURE VOCAL TRACT ESTIMATES NODE
@@ -13,10 +14,19 @@ from toolkits.Voicelab.VoicelabNode import VoicelabNode
 ###################################################################################################
 
 class MeasureVocalTractEstimatesNode(VoicelabNode):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.args = {
+            'formants': lambda voice: self.measure_formants(voice)['formant_means']
+        }
+
     def process(self):
         'vocal_tract_estimates_mean'
 
-        formants = self.args['formants']
+        voice = self.args['voice']
+        formants = self.args['formants'](voice)
 
         f1, f2, f3, f4 = formants
         formant_dispersion = (f4 - f1) / 3
@@ -43,3 +53,10 @@ class MeasureVocalTractEstimatesNode(VoicelabNode):
             'delta_f': delta_f,
             'vtl_delta_f': vtl_delta_f
         }
+
+    def measure_formants(self, voice):
+        measure_formants = MeasureFormantNode('Measure Formants')
+        measure_formants.args['voice'] = voice
+        results = measure_formants.process()
+        self.cached = { voice: results }
+        return results

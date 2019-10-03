@@ -68,25 +68,6 @@ default_settings = {
 
 }
 
-# These are the names inputs that shimmer pca needs
-shimmer_pca_requirements = [
-    'local_shimmer',
-    'localdb_shimmer',
-    'apq3_shimmer',
-    'aqpq5_shimmer',
-    'apq11_shimmer',
-    'dda_shimmer',
-]
-
-# These are the names inputs that jitter pca needs
-jitter_pca_requirements = [
-    'local_jitter',
-    'local_abs_jitter',
-    'rap_jitter',
-    'ppq5_jitter',
-    'ddp_jitter'
-]
-
 # List of all available operations the user can perform as well as their associated function node
 avialable_functions = {
 
@@ -121,11 +102,24 @@ avialable_functions = {
 # List of default functions that will be performed.
 default_functions = [
 
-    'Measure Pitch',
+    'Manipulate Formants',
+    'Manipulate Gender and Age',
+    'Manipulate Pitch',
+
     'Measure Duration',
+    'Measure Formants',
+    'Measure Formant PCA',
     'Measure Harmonicity',
+    'Measure Jitter',
+    'Measure Jitter PCA',
+    'Measure Pitch',
     'Measure Formants',
     'Measure Shimmer',
-    'Measure Jitter',
-    'MeasureJitterPCANode'
+    'Measure Shimmer PCA',
+    'Measure Vocal Tract Estimates',
+
+    'Visualize Pitch',
+    'Visualize Intensity',
+    'Visualize Formants'
+
 ]

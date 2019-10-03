@@ -26,12 +26,14 @@ class ManipulatePitchNode(VoicelabNode):
     def process(self):
         
         sound = self.args['voice']
+        factor = self.args['factor']
+        unit = self.args['unit']
 
-        f0min, f0max = pitch_bounds(sound)
+        f0min, f0max = self.pitch_bounds(sound)
 
         manipulation = call(sound, "To Manipulation", 0.001, f0min, f0max)
         pitch_tier = call(manipulation, "Extract pitch tier")
-        call(pitch_tier, "Shift frequencies", f0min, f0max, self.factor, self.unit)
+        call(pitch_tier, "Shift frequencies", f0min, f0max, factor, unit)
         call([pitch_tier, manipulation], "Replace pitch tier")
         manipulated_sound = call(manipulation, "Get resynthesis (overlap-add)")
         manipulated_sound.scale_intensity(70)

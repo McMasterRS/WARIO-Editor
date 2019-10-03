@@ -74,6 +74,7 @@ class MeasurePitchNode(VoicelabNode):
             'stdev_f0': stdev_f0,
             'min_f0': min_f0,
             'max_f0': max_f0,
+            'pitch': pitch
         }
 
     # Default generation of the pitch ceiling
