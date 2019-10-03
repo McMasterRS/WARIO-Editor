@@ -3,18 +3,19 @@ from pipeline.Node import Node
 from parselmouth.praat import call
 from pipeline.FileWidget import FileWidget
 
-class LoadVoiceNode(Node):
-    def process(self):
-        voice_file = self.args['voice_file']
-        voice = parselmouth.Sound(voice_file)
-
-        print('voice')
-        print(voice)
-        
-        return {'voice': voice}
+###################################################################################################
+# LOAD VOICES NODE
+# WARIO pipeline node for loading voice files.
+###################################################################################################
+# ARGUMENTS
+# 'file_locations'   : list of filesystem locations for where to find the voice files
+###################################################################################################
+# RETURNS
+# 'voice' [batch]   : returns a parselmouth voice object for each file loaded
+###################################################################################################
 
 class LoadVoicesNode(Node):
-    '<- files, -> voice'
+
     def __init__(self, name):
         super().__init__(name)
         self.done = False

@@ -44,9 +44,12 @@ class MeasureSettings(QWidget):
         super().__init__()
         self.model = model
 
-        self.measure_layout = QHBoxLayout()
+        self.measure_layout = QVBoxLayout()
         self.measure_list = QListWidget()
         self.measure_stack = QStackedWidget()
+
+        self.default_params_toggle = QCheckBox("Use Custom Parameters")
+        self.default_params_toggle.stateChanged.connect(self.toggle_defaults)
 
         self.list_items = {}
         self.list_stacks = {}
@@ -66,9 +69,9 @@ class MeasureSettings(QWidget):
             self.stack.addWidget(self.list_stacks[feature])
             self.stack_layouts[feature] = QFormLayout()
 
-            for parameter in self.model['functions'][feature]['parameters']:
+            for parameter in self.model['functions'][feature]['node'].args:
                 
-                param_value = self.model['functions'][feature]['parameters'][parameter]
+                param_value = self.model['functions'][feature]['node'].args[parameter]
 
                 if isinstance(param_value, tuple):
                     widget = QComboBox()
@@ -92,6 +95,9 @@ class MeasureSettings(QWidget):
         self.leftlist.itemChanged.connect(self.onchange_check)
 
     ###############################################################################################
+
+    def toggle_defaults(self):
+        print('toggle')
 
     def onchange_check(self, e):
 

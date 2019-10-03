@@ -25,7 +25,7 @@ class OutputTab(QWidget):
 
         # Model contains the state of data within the program
         self.model = self.parent().model
-        results = self.model['results']
+        # results = self.model['results']
 
         # Create a column layout
         layout = QHBoxLayout()
@@ -56,9 +56,9 @@ class OutputTab(QWidget):
         self.stack = QStackedWidget()
 
         voice_files = self.model['files']
-        results = self.model['results']
+        # results = self.model['results']
 
-        for i, voice_file in enumerate(results):
+        for i, voice_file in enumerate(results['files']):
 
             # fill the list with paths to the loaded voice files
             list_item = QListWidgetItem(parent=self.file_list)
@@ -77,38 +77,50 @@ class OutputTab(QWidget):
 
         sheets = {}
         results = self.model['results']
-        files = self.model['files']
-        functions = self.model['functions']
 
         sheets = {}
 
-        n_rows = len(files)
+        for i, fn in enumerate(results['functions']):
+            sheets[fn] = {
+                'file name': []
+            }
+            for j, file_name in enumerate(results['functions'][fn]):
+                sheets[fn]['file name'].append(file_name)
 
-        for i, run in enumerate(results):
-            file_name = files[i].split('/')[-1].split('.wav')[0]
-
-            for j, fn in enumerate(results[run]):
-
-                if fn not in sheets:
-
-                    sheets[fn] = {}
-                    sheets[fn]['file name'] = [None] * n_rows
-
-                sheets[fn]['file name'][i] = files[i]
-
-                for k, result in enumerate(results[run][fn]):
-
-                    result_value = results[run][fn][result]
-
+                for j, result in enumerate(results['functions'][fn][file_name]):
                     if result not in sheets[fn]:
-                        sheets[fn][result] = [None] * n_rows
+                        sheets[fn][result] = []
+                    sheets[fn][result].append(str(results['functions'][fn][file_name][result]))
 
-                    if isinstance(result_value, parselmouth.Sound): # if the result is a sound file, that is probably a manipulate node, save a seperate wav file
-                        save_file_name = file_name + '_' + fn.lower() + '.wav'
-                        print(save_file_name)
-                        result_value.save(save_file_name, 'WAV')
+        print(sheets)
+
+        # n_rows = len(files)
+
+        # for i, run in enumerate(results):
+        #     file_name = files[i].split('/')[-1].split('.wav')[0]
+
+        #     for j, fn in enumerate(results[run]):
+
+        #         if fn not in sheets:
+
+        #             sheets[fn] = {}
+        #             sheets[fn]['file name'] = [None] * n_rows
+
+        #         sheets[fn]['file name'][i] = files[i]
+
+        #         for k, result in enumerate(results[run][fn]):
+
+        #             result_value = results[run][fn][result]
+
+        #             if result not in sheets[fn]:
+        #                 sheets[fn][result] = [None] * n_rows
+
+        #             if isinstance(result_value, parselmouth.Sound): # if the result is a sound file, that is probably a manipulate node, save a seperate wav file
+        #                 save_file_name = file_name + '_' + fn.lower() + '.wav'
+        #                 print(save_file_name)
+        #                 result_value.save(save_file_name, 'WAV')
                     
-                    sheets[fn][result][i] = result_value
+        #             sheets[fn][result][i] = result_value
 
         writer = ExcelWriter('voicelab_results.xlsx')
 

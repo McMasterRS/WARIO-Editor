@@ -24,19 +24,21 @@ class VoicelabWizard(QMainWindow):
         tabs = QTabWidget()
         central_layout.addWidget(tabs)
 
+        # Persistant data throughout the system
         self.model = {
-            'files': [],    # loaded voice files
-            'results': {},  # ordered list of results corresponding with each loaded file
-            'functions': {}, # list of all available operations the user can perform.
+            'files': [],        # Collection of currently loaded voice files
+            'functions': {},    # Collection of available functions
+            'results': {
+                'functions': {},
+                'files': {}
+            }
         }
 
-        # Set up the internal state
+        # Set up the internal state for whether a function is checked
         for fn in avialable_functions:
             self.model['functions'][fn] = {
                 'checked': True if fn in default_functions else False,
-                'parameters': default_settings[fn] if fn in default_settings else {},
-                'node': avialable_functions[fn],
-                'name': avialable_functions[fn].node_id
+                'node': avialable_functions[fn]
             }
 
         tabs.addTab(InputTab(parent=self), "Input")

@@ -27,11 +27,13 @@ class ResultsWidget(QWidget):
         self.results = results
 
         # Generate the stack of results presentation widgets
-        for voice_file in results:
-            for fn_name in results[voice_file]:
-                for fn_result in results[voice_file][fn_name]:
-                    print(fn_result)
+        # for voice_file in results:
+        #     for fn_name in results[voice_file]:
+        #         for fn_result in results[voice_file][fn_name]:
+        #             print(fn_result)
     
+
+
     def show_result(self, voice_file):
 
         # Check if these results have already been presented
@@ -46,13 +48,17 @@ class ResultsWidget(QWidget):
             stack_layout = QVBoxLayout()
             stack_widget.setLayout(stack_layout)
 
-            figure = self.results[voice_file]['Visualize Voice']['figure']
+            figure = self.results['files'][voice_file]['Visualize Voice']['figure']
 
             spectrogram = FigureCanvas(figure)
 
             tabs = QTabWidget()
 
-            for i, fn_name in enumerate(self.results[voice_file]):
+            for i, fn_name in enumerate(self.results['files'][voice_file]):
+
+                n_rows = 1
+                n_cols = len(self.results['files'][voice_file][fn_name])
+
                 tab = QWidget()
                 tabs.addTab(tab, fn_name)
                 tab_layout = QVBoxLayout()
@@ -60,9 +66,19 @@ class ResultsWidget(QWidget):
 
                 table = QTableWidget()
                 tab_layout.addWidget(table)
+                # set row count
+                table.setRowCount(n_cols)
 
-                for fn_result in self.results[voice_file][fn_name]:
-                    print(fn_result)
+                # set column count
+                table.setColumnCount(n_rows)
+
+                table.setHorizontalHeaderLabels([fn_name])
+                table.setVerticalHeaderLabels(self.results['files'][voice_file][fn_name].keys())
+                table.setEditTriggers(QTableWidget.NoEditTriggers)
+                table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+                for j, fn_result in enumerate(self.results['files'][voice_file][fn_name]):
+                    table.setItem(j,0, QTableWidgetItem(str(self.results['files'][voice_file][fn_name][fn_result])))
 
             stack_layout.addWidget(spectrogram)
             stack_layout.addWidget(tabs)

@@ -1,9 +1,11 @@
 from parselmouth.praat import call
 from VoicelabWizard.AutomaticParams import *
 
-from toolkits.Voicelab.MeasureNode import *
-from toolkits.Voicelab.ManipulateNode import *
-from toolkits.Voicelab.VisualizeNode import *
+import toolkits.Voicelab as Voicelab
+
+# from toolkits.Voicelab.MeasureNode import *
+# from toolkits.Voicelab.ManipulateNode import *
+# from toolkits.Voicelab.VisualizeNode import *
 
 # List of default settings matching at least one of the available functions
 default_settings = {
@@ -39,14 +41,14 @@ default_settings = {
         'Maximum Period Factor': 1.3
     },
     'Measure Shimmer': {
-        'floor': 50,
-        'ceiling': 500,
-        'start_time': 0,
-        'end_time': 0,
-        'shortest_period': 0.0001,
-        'longest_period': 0.02,
-        'maximum_period_factor': 1.3,
-        'maximum_amplitude': 1.6
+        'Floor': 50,
+        'Ceiling': 500,
+        'Start Time': 0,
+        'End Time': 0,
+        'Shortest Period': 0.0001,
+        'Longest Period': 0.02,
+        'Maximum Period Factor': 1.3,
+        'maximum Amplitude': 1.6
     },
     'Measure Formants': {
         'Time Step': 0, # a zero value is equal to 25% of the window length
@@ -66,37 +68,64 @@ default_settings = {
 
 }
 
+# These are the names inputs that shimmer pca needs
+shimmer_pca_requirements = [
+    'local_shimmer',
+    'localdb_shimmer',
+    'apq3_shimmer',
+    'aqpq5_shimmer',
+    'apq11_shimmer',
+    'dda_shimmer',
+]
+
+# These are the names inputs that jitter pca needs
+jitter_pca_requirements = [
+    'local_jitter',
+    'local_abs_jitter',
+    'rap_jitter',
+    'ppq5_jitter',
+    'ddp_jitter'
+]
+
 # List of all available operations the user can perform as well as their associated function node
 avialable_functions = {
 
-    'Measure Pitch': MeasurePitchNode('Measure Pitch'),
-    'Measure Intensity': MeasureIntensityNode('Measure Intensity'),
-    'Measure Harmonicity': MeasureHarmonicityNode('Measure Harmonicity'),
-    'Measure Jitter': MeasureJitterNode('Measure Jitter'),
-    'Measure Shimmer': MeasureShimmerNode('Measure Shimmer'),
-    'Measure Formants': MeasureFormantNode('Measure Formants'),
-    'Measure Jitter PCA': MeasureJitterPCANode('Measure Jitter PCA'),
-    'Measure Shimmer PCA': MeasureShimmerPCANode('Measure Shimmer PCA'),
-    'Measure Formant PCA' : MeasureFormantPCANode('Measure Formant PCA'),
-    'Measure Vocal Tract Estimates': MeasureVocalTractEstimatesNode('Measure Vocal Tract Estimates'),
+    'Measure Duration': Voicelab.MeasureDurationNode('Measure Duration'),
+    'Measure Pitch': Voicelab.MeasurePitchNode('Measure Pitch'),
+    'Measure Harmonicity': Voicelab.MeasureHarmonicityNode('Measure Harmonicity'),
+    'Measure Jitter': Voicelab.MeasureJitterNode('Measure Jitter'),
+    'Measure Shimmer': Voicelab.MeasureShimmerNode('Measure Shimmer'),
+    'Measure Formants': Voicelab.MeasureFormantNode('Measure Formants'),
 
-    'Manipulate Pitch': ManipulatePitchNode('Manipulate Pitch'),
-    'Manipulate Formants': ManipulateFormantsNode('Manipulate Formants'),
-    'Manipulate Gender and Age': ManipulateGenderAgeNode('Manipulate Gender and Age'),
+    # These have additional requirements. The proceeding outputs will be passed to the final node
 
-    # 'Visualize Pitch': VisualizePitchNode(),
-    # 'Visualize Intensity': VisualizeIntensityNode(),
-    # 'Visualize Formants': VisualizeFormantNode(),
+    # Measure jitter, then perform PCA on the results
+    'Measure Jitter PCA': Voicelab.MeasureJitterPCANode('Measure Jitter PCA'),
+    # Measure shimmer, then perform PCA on the results
+    'Measure Shimmer PCA': Voicelab.MeasureShimmerPCANode('Measure Shimmer PCA'),
+    # Measure formants, then perform PCA on the results
+    'Measure Formant PCA' : Voicelab.MeasureFormantPCANode('Measure Formant PCA'),
+    # Measure the formants, then estimate the vocal tract properties based on them
+    'Measure Vocal Tract Estimates': Voicelab.MeasureVocalTractEstimatesNode('Measure Vocal Tract Estimates'),
+
+    'Manipulate Pitch': Voicelab.ManipulatePitchNode('Manipulate Pitch'),
+    'Manipulate Formants': Voicelab.ManipulateFormantsNode('Manipulate Formants'),
+    'Manipulate Gender and Age': Voicelab.ManipulateGenderAgeNode('Manipulate Gender and Age'),
+
+    'Visualize Pitch': Voicelab.VisualizePitchNode('Visualize Pitch'),
+    'Visualize Intensity':Voicelab.VisualizeIntensityNode('Visualize Intensity'),
+    'Visualize Formants':Voicelab.VisualizeFormantNode('Visualize Formants'),
 
 }
 
-# List of default operations that will be performed when there is no custom configuration
+# List of default functions that will be performed.
 default_functions = [
 
     'Measure Pitch',
+    'Measure Duration',
+    'Measure Harmonicity',
+    'Measure Formants',
     'Measure Shimmer',
     'Measure Jitter',
-    'Manipulate Pitch',
-    'Visualize Pitch',
-
+    'MeasureJitterPCANode'
 ]
