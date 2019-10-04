@@ -39,8 +39,9 @@ class InputTab(QWidget):
         btn_remove_voices.clicked.connect(self.onclick_remove)
 
         # Create and connect start button
-        btn_start = QPushButton("Start")
-        btn_start.clicked.connect(self.onclick_start)
+        self.btn_start = QPushButton("Start")
+        self.btn_start.clicked.connect(self.onclick_start)
+        self.btn_start.setDisabled(True)
 
         # self.progress = QProgressBar()
 
@@ -48,7 +49,7 @@ class InputTab(QWidget):
         self.layout.addWidget(btn_add_voices)
         self.layout.addWidget(btn_remove_voices)
         self.layout.addWidget(self.list_loaded_voices)
-        self.layout.addWidget(btn_start)
+        self.layout.addWidget(self.btn_start)
         # self.layout.addWidget(self.progress)
 
         # Loaded Voice List
@@ -65,6 +66,9 @@ class InputTab(QWidget):
                 self.model['files'].append(loaded)
                 QListWidgetItem(parent=self.list_loaded_voices).setText(loaded)
 
+        if len(self.model['files']) > 0:
+            self.btn_start.setDisabled(False)
+
     ###############################################################################################
     # onclick_remove()
     # Remove the all of the selected voice files from the list gui and the data model
@@ -73,6 +77,9 @@ class InputTab(QWidget):
         for item in self.list_loaded_voices.selectedItems():
             self.model['files'].pop(self.model['files'].index(item.text()))
             self.list_loaded_voices.takeItem(self.list_loaded_voices.row(item))
+
+        if len(self.model['files']) == 0:
+            self.btn_start.setDisabled(True)
 
     ###############################################################################################
     # onclick_start()
@@ -88,7 +95,7 @@ class InputTab(QWidget):
 
         active_functions = ['Visualize Voice']
         for fn in self.model['functions']:
-            if self.model['functions'][fn]['checked']:
+            if self.model['functions'][fn]['checked'] == Qt.PartiallyChecked or self.model['functions'][fn]['checked'] == Qt.Checked:
                 active_functions.append(fn)
 
         self.model['results']['files'] = {key: {} for key in self.model['files']}

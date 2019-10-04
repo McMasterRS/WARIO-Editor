@@ -36,7 +36,7 @@ class VisualizeIntensityNode(VoicelabNode):
         axis.plot(intensity.xs(), intensity.values.T, linewidth=1, color='g')
         axis.grid(False)
         plt.ylim(50)
-        axis.set_ylabel("Intensity [dB]")
+        axis.set_ylabel("Intensity [dB]", labelpad=10)
         axis.yaxis.label.set_color('g')
         return {
             'figure': figure,

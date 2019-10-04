@@ -25,7 +25,7 @@ class VisualizeVoiceNode(VoicelabNode):
         
         self.args = {
             'window_length': 0.05,
-            'colour_map': 'binary',
+            'colour_map': 'gist_heat',
         }
 
     def process(self):
@@ -45,12 +45,20 @@ class VisualizeVoiceNode(VoicelabNode):
         vgmin_value = sg_db.max() - 70
         host.pcolormesh(x, y, sg_db, vmin=vgmin_value, cmap=colour_map)
         host.set_ylim([spectrogram.ymin, spectrogram.ymax])
-        host.set_xlabel("Time [s]", labelpad=15)
-        host.set_ylabel("Frequency [Hz]", labelpad=15)
+        # host.set_xlabel("Time [s]", labelpad=10)
+        # host.set_ylabel("Frequency [Hz]", labelpad=10)
+
+        host.set_xlabel("Time [s]")
+        host.set_ylabel("Frequency [Hz]")
+
         host.yaxis.label.set_color('w')
         host.set_xlim([self.args['voice'].xmin, self.args['voice'].xmax])
         sns.set()
-        
+        plt.tight_layout()
+        plt.autoscale()
+        plt.subplots_adjust(right=0.8)
+        # plt.subplots_adjust(right=2)
+
         return {
             'figure': figure,
             'host': host,

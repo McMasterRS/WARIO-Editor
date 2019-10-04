@@ -58,7 +58,7 @@ class VisualizePitchNode(VoicelabNode):
         axis.grid(False)
         pitch_max = 500
         axis.set_ylim(0, pitch_max)
-        axis.set_ylabel("Fundamental frequency [Hz]")
+        axis.set_ylabel("Fundamental frequency [Hz]", labelpad=15)
         axis.yaxis.label.set_color('b')
 
         return {

@@ -43,25 +43,57 @@ class MeasureSettings(QWidget):
 
         super().__init__()
         self.model = model
+        self.existing_stack = None
 
         self.measure_layout = QVBoxLayout()
         self.measure_list = QListWidget()
         self.measure_stack = QStackedWidget()
 
+        self.list_stacks = {}
+        self.stack_layouts = {}
+        self.stack = QStackedWidget(self)
+
         self.default_params_toggle = QCheckBox("Use Custom Parameters")
         self.default_params_toggle.stateChanged.connect(self.toggle_defaults)
 
+        self.reset_defaults = QPushButton()
+        self.reset_defaults.setText('Reset all to defaults')
+        self.reset_defaults.clicked.connect(self.on_reset)
+
+        left_widget = QWidget()
+        left_layout = QVBoxLayout()
+        left_widget.setLayout(left_layout)
+
         self.list_items = {}
-        self.list_stacks = {}
-        self.stack_layouts = {}
         self.leftlist = QListWidget()
-        self.stack = QStackedWidget(self)
-        
+
+        left_layout.addWidget(self.leftlist)
+        left_layout.addWidget(self.reset_defaults)
+
+        self.layout = QHBoxLayout(self)
+        self.layout.addWidget(left_widget)
+        self.layout.addWidget(self.stack)
+
+        self.setLayout(self.layout)
+        self.leftlist.currentRowChanged.connect(self.display)
+        self.leftlist.itemChanged.connect(self.onchange_check)
+        self.display_options()
+
+    ###############################################################################################
+
+    def display_options(self):
+
+        # If there are already pages in the stack, delete them and recreate them
+        self.leftlist.itemChanged.disconnect()
+
         for feature in self.model['functions']:
+
+            checked = self.model['functions']['Measure Pitch']['checked']
 
             # Add this option to the list with appropriate text and checkbox
             self.list_items[feature] = QListWidgetItem(parent=self.leftlist)
             self.list_items[feature].setText(feature)
+
             self.list_items[feature].setCheckState(self.model['functions'][feature]['checked'])
 
             # Add the appropriate configuration widgets
@@ -86,25 +118,35 @@ class MeasureSettings(QWidget):
 
             self.list_stacks[feature].setLayout(self.stack_layouts[feature])
 
-        hbox = QHBoxLayout(self)
-        hbox.addWidget(self.leftlist)
-        hbox.addWidget(self.stack)
-
-        self.setLayout(hbox)
-        self.leftlist.currentRowChanged.connect(self.display)
         self.leftlist.itemChanged.connect(self.onchange_check)
-
-    ###############################################################################################
 
     def toggle_defaults(self):
         print('toggle')
 
     def onchange_check(self, e):
-
-        if e.checkState() == 2:
-            self.model['functions'][e.text()]['checked'] = True
-        else:
-            self.model['functions'][e.text()]['checked'] = False
+        self.model['functions'][e.text()]['checked'] = e.checkState()
+        print(self.model['functions'][e.text()]['checked'])
+        # if e.checkState() == Qt.Unchecked:
+        #     self.model['functions'][e.text()]['checked'] = Qt.Checked
+        # elif e.checkState() == Qt.Checked or e.checkState() == Qt.PartiallyChecked:
+        #     self.model['functions'][e.text()]['checked'] = Qt.Unchecked
 
     def display(self,i):
         self.stack.setCurrentIndex(i)
+
+    def on_reset(self):
+        self.leftlist.clear()
+        self.stack_layouts = {}
+        self.list_stacks = {}
+        n_stacks = self.stack.count()
+        for i in range(n_stacks):
+            self.stack.widget((n_stacks-1)-i).setParent(None)
+
+        for fn in self.model['functions']:
+            fn_node = self.model['functions'][fn]['node']
+            fn_node.args = self.model['defaults'][fn]['value']
+
+            self.model['functions'][fn]['checked'] = self.model['defaults'][fn]['checked']
+
+            
+        self.display_options()

@@ -41,11 +41,11 @@ class OutputTab(QWidget):
         self.file_list.itemSelectionChanged.connect(self.on_list_change)
 
         # presentation widget for the results of processing the voices
-
         results_container.setLayout(results_layout)
         self.results_widget = ResultsWidget()
         self.save_button = QPushButton("Save Results")
         self.save_button.clicked.connect(self.on_save)
+        self.save_button.setDisabled(True)
 
         layout.addWidget(results_container)
         layout.addWidget(self.save_button)
@@ -56,6 +56,11 @@ class OutputTab(QWidget):
 
     def update_results(self, results):
 
+        if len(self.model['results']['files']) > 0:
+            self.save_button.setDisabled(False)
+        else:
+            self.save_button.setDisabled(True)
+
         # reset the file list and results table from previous runs
         self.file_list.clear()
 
@@ -63,7 +68,6 @@ class OutputTab(QWidget):
         self.stack = QStackedWidget()
 
         voice_files = self.model['files']
-        # results = self.model['results']
 
         for i, voice_file in enumerate(results['files']):
 
@@ -82,7 +86,6 @@ class OutputTab(QWidget):
             self.results_widget.show_result(file_name)
         
     def on_save(self):
-        print('saved')
 
         options = QFileDialog.Options()
         temp_loaded = QFileDialog.getExistingDirectory (self)
@@ -118,8 +121,6 @@ class OutputTab(QWidget):
                                 sheets[fn][result] = []
                             sheets[fn][result].append(str(results['functions'][fn][file_path][result]))
 
-                print(sheets)
-
             writer = ExcelWriter('voicelab_results.xlsx')
 
             for sheet_data in sheets:
@@ -136,5 +137,5 @@ class OutputTab(QWidget):
     
     def save_spectrogram(self, spectrogram, file_name):
 
-        spectrogram.savefig(file_name)
+        spectrogram.savefig(file_name, dpi=250)
         return file_name

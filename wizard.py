@@ -31,14 +31,20 @@ class VoicelabWizard(QMainWindow):
             'results': {
                 'functions': {},
                 'files': {}
+            },
+            'defaults': {
             }
         }
 
         # Set up the internal state for whether a function is checked
         for fn in avialable_functions:
             self.model['functions'][fn] = {
-                'checked': True if fn in default_functions else False,
+                'checked': Qt.PartiallyChecked if fn in default_functions else Qt.Unchecked,
                 'node': avialable_functions[fn]
+            }
+            self.model['defaults'][fn] = {
+                'checked': Qt.PartiallyChecked if fn in default_functions else Qt.Unchecked,
+                'value': self.model['functions'][fn]['node'].args
             }
 
         tabs.addTab(InputTab(parent=self), "Input")

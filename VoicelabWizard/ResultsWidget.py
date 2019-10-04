@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from VoicelabWizard.DefaultSettings import display_whitelist
 
 import seaborn as sns
 
@@ -41,6 +42,7 @@ class ResultsWidget(QWidget):
 
         # Check if these results have already been presented
         if voice_file in self.cache:
+
             # If they have, switch to the approprate stack item
             index = self.stack.indexOf(self.cache[voice_file])
             self.stack.setCurrentIndex(index)
@@ -58,32 +60,35 @@ class ResultsWidget(QWidget):
             tabs = QTabWidget()
 
             for i, fn_name in enumerate(self.results['files'][voice_file]):
+                display_results = {}
 
-                n_rows = 1
-                n_cols = len(self.results['files'][voice_file][fn_name])
+                # loop through results, build a list of allowed outputs
+                for result_name in self.results['files'][voice_file][fn_name]:
+                    result_value = self.results['files'][voice_file][fn_name][result_name]
 
-                tab = QWidget()
-                tabs.addTab(tab, fn_name)
-                tab_layout = QVBoxLayout()
-                tab.setLayout(tab_layout)
+                    if type(result_value) in display_whitelist:
+                        display_results[result_name] = result_value
 
-                table = QTableWidget()
-                tab_layout.addWidget(table)
-                # set row count
-                table.setRowCount(n_cols)
+                n_cols = 1
+                n_rows = len(display_results)
 
-                # set column count
-                table.setColumnCount(n_rows)
+                if n_rows > 0:
+                    tab = QWidget()
+                    tabs.addTab(tab, fn_name)
+                    tab_layout = QVBoxLayout()
+                    tab.setLayout(tab_layout)
+                    table = QTableWidget()
+                    tab_layout.addWidget(table)
+                    table.setRowCount(n_rows)
+                    table.setColumnCount(n_cols)
+                    table.setHorizontalHeaderLabels([fn_name])
+                    table.setVerticalHeaderLabels(display_results.keys())
+                    table.setEditTriggers(QTableWidget.NoEditTriggers)
+                    table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-                table.setHorizontalHeaderLabels([fn_name])
-                table.setVerticalHeaderLabels(self.results['files'][voice_file][fn_name].keys())
-                table.setEditTriggers(QTableWidget.NoEditTriggers)
-                table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-                for j, fn_result in enumerate(self.results['files'][voice_file][fn_name]):
-                    if isinstance(self.results['files'][voice_file][fn_name][fn_result], parselmouth.Sound):
-                        pass
-                    table.setItem(j,0, QTableWidgetItem(str(self.results['files'][voice_file][fn_name][fn_result])))
+                    for j, fn_result in enumerate(display_results):
+                        result_value = display_results[fn_result]
+                        table.setItem(j,0, QTableWidgetItem(str(result_value)))
 
             stack_layout.addWidget(spectrogram)
             stack_layout.addWidget(tabs)

@@ -102,24 +102,33 @@ avialable_functions = {
 # List of default functions that will be performed.
 default_functions = [
 
-    'Manipulate Formants',
-    'Manipulate Gender and Age',
-    'Manipulate Pitch',
+    # 'Manipulate Formants',
+    # 'Manipulate Gender and Age',
+    # 'Manipulate Pitch',
 
-    'Measure Duration',
-    'Measure Formants',
-    'Measure Formant PCA',
-    'Measure Harmonicity',
-    'Measure Jitter',
-    'Measure Jitter PCA',
+    # 'Measure Duration',
+    # 'Measure Formants',
+    # 'Measure Formant PCA',
+    # 'Measure Harmonicity',
+    # 'Measure Jitter',
+    # 'Measure Jitter PCA',
     'Measure Pitch',
-    'Measure Formants',
-    'Measure Shimmer',
-    'Measure Shimmer PCA',
-    'Measure Vocal Tract Estimates',
+    # 'Measure Formants',
+    # 'Measure Shimmer',
+    # 'Measure Shimmer PCA',
+    # 'Measure Vocal Tract Estimates',
 
     'Visualize Pitch',
     'Visualize Intensity',
     'Visualize Formants'
 
+]
+
+
+# these are the types of values that are allowed to display, this is to prevent things like
+# sound objects printed to screen. Adding a new type here will let it show up in the results
+display_whitelist = [
+    int,
+    float,
+    str
 ]
