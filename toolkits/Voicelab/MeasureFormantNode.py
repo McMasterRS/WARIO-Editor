@@ -57,8 +57,8 @@ class MeasureFormantNode(VoicelabNode):
         f4_median = call(formant_object, "Get quantile", 4, 0, 0, "Hertz", 0.5)
 
         return {
-            'formant_medians': [f1_median, f2_median, f3_median, f4_median],
-            'formant_means': [f1_mean, f2_mean, f3_mean, f4_mean],
+            'Formant Medians': [f1_median, f2_median, f3_median, f4_median],
+            'Formant Means': [f1_mean, f2_mean, f3_mean, f4_mean],
         }
 
     def formant_max(self, voice):

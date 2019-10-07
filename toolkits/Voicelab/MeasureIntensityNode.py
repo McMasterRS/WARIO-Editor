@@ -5,5 +5,5 @@ class MeasureIntensityNode(VoicelabNode):
         voice = self.args['voice']
         intensity = voice.to_intensity()
         return {
-            'intensity': intensity
+            'Voice Intensity': intensity
         }

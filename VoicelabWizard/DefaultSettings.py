@@ -69,6 +69,7 @@ default_settings = {
 }
 
 # List of all available operations the user can perform as well as their associated function node
+# Human readable mapping
 avialable_functions = {
 
     'Measure Duration': Voicelab.MeasureDurationNode('Measure Duration'),
@@ -96,7 +97,7 @@ avialable_functions = {
     'Visualize Pitch': Voicelab.VisualizePitchNode('Visualize Pitch'),
     'Visualize Intensity':Voicelab.VisualizeIntensityNode('Visualize Intensity'),
     'Visualize Formants':Voicelab.VisualizeFormantNode('Visualize Formants'),
-
+    'Visualize Voice': Voicelab.VisualizeVoiceNode('Visualize Voice')
 }
 
 # List of default functions that will be performed.

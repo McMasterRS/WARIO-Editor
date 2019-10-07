@@ -53,7 +53,7 @@ class MeasureFormantPCANode(VoicelabNode):
         principal_components = pca.fit_transform(x)
 
         return {
-            'principal_components': principal_components
+            'Principle Components': principal_components
         }
 
     def measure_formant(self, voice):

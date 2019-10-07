@@ -19,8 +19,8 @@ class MeasureJitterNode(VoicelabNode):
 
         # initialize defaults
         self.args = {
-            'floor': self.pitch_floor,
-            'ceiling': self.pitch_ceiling,
+            'floor': self.pitch_floor, # by default pitch floor is calculated dynamically when this node is run
+            'ceiling': self.pitch_ceiling, # by default pitch ceiling is calculated dynamically when this node is run
             'start_time': 0,
             'end_time': 0,
             'shortest_period': 0.0001,
@@ -85,9 +85,9 @@ class MeasureJitterNode(VoicelabNode):
             max_period_factor)
 
         return {
-            'local_jitter': local_jitter,
-            'localabsolute_jitter': localabsolute_jitter,
-            'rap_jitter': rap_jitter,
-            'ppq5_jitter': ppq5_jitter,
-            'ddp_jitter': ddp_jitter
+            'Local Jitter': local_jitter,
+            'Local Absolute Jitter': localabsolute_jitter,
+            'RAP Jitter': rap_jitter,
+            'ppq5 Jitter': ppq5_jitter,
+            'ddp Jitter': ddp_jitter
         }

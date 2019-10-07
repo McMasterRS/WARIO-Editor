@@ -19,7 +19,7 @@ class MeasureVocalTractEstimatesNode(VoicelabNode):
         super().__init__(*args, **kwargs)
 
         self.args = {
-            'formants': lambda voice: self.measure_formants(voice)['formant_means']
+            'formants': self.measure_formants
         }
 
     def process(self):
@@ -58,5 +58,5 @@ class MeasureVocalTractEstimatesNode(VoicelabNode):
         measure_formants = MeasureFormantNode('Measure Formants')
         measure_formants.args['voice'] = voice
         results = measure_formants.process()
-        self.cached = { voice: results }
-        return results
+        self.cached = { voice: results['Formant Means'] }
+        return results['Formant Means']

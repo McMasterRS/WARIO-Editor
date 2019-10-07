@@ -10,6 +10,7 @@ from VoicelabWizard.DefaultSettings import display_whitelist
 import seaborn as sns
 
 import parselmouth
+
 ###################################################################################################
 # ResultsWidget :
 # Wraps the widgets and functionality for displaying results from a single analyzed voice file.
@@ -29,14 +30,6 @@ class ResultsWidget(QWidget):
     def load_results(self, results):
         self.cache = {}
         self.results = results
-
-        # Generate the stack of results presentation widgets
-        # for voice_file in results:
-        #     for fn_name in results[voice_file]:
-        #         for fn_result in results[voice_file][fn_name]:
-        #             print(fn_result)
-    
-
 
     def show_result(self, voice_file):
 

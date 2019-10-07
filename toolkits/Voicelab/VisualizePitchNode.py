@@ -24,20 +24,32 @@ class VisualizePitchNode(VoicelabNode):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Default argument values
         self.args = {
-            'pitch': lambda voice: self.measure_pitch(voice)['pitch'],
-            'intensity': lambda voice: self.measure_intensity(voice)['intensity'],
+
+            # Pitch and intensity are both calculated dynamically using the voice that is processed
+            # Other non 
+            'pitch': self.measure_pitch,
+            'intensity': self.measure_intensity,
         }
 
     def process(self):
 
         voice = self.args['voice']
         figure = self.args['figure']
-        pitch = self.args['pitch'](voice)
-        intensity = self.args['intensity'](voice)
 
-        # use the provided plot if one is provided, otherwise create a new one
-        # figure, host = self.args['figure'], self.args['host'] if ('figure' in self.args and 'host' in self.args) else plt.subplots()
+        pitch = self.args['pitch']
+        intensity = self.args['intensity']
+
+        try:
+            pitch = pitch(voice)
+        except:
+            print('oops')
+        
+        try:
+            intensity = intensity(voice)
+        except:
+            print('oops')
 
         host = figure.axes[0]
 
@@ -71,12 +83,13 @@ class VisualizePitchNode(VoicelabNode):
         measure_pitch = MeasurePitchNode('Measure Pitch')
         measure_pitch.args['voice'] = voice
         results = measure_pitch.process()
-        self.cached = { voice: results }
-        return results
+        self.cached = { voice: results['Pitch'] }
+        return results['Pitch']
 
     def measure_intensity(self, voice):
         measure_intensity = MeasureIntensityNode('Measure Intensity')
-        measure_intensity.args['voice'] = voice
+        measure_intensity.args['voice'] = self.args['voice']
         results = measure_intensity.process()
-        self.cached = { voice: results }
-        return results
+        self.cached = { voice: results['Voice Intensity'] }
+        return results['Voice Intensity']
+

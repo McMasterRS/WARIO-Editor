@@ -93,31 +93,3 @@ class MeasureJitterPCANode(VoicelabNode):
             self.cached = { voice: results }
             return results
         return self.cached[voice]
-
-
-        # if voice not in self.cached:
-
-        #     # create a temporary node to measure jitter
-        #     measure_jitter_node = MeasureJitterNode('MeasureJitter')
-        #     measure_jitter_node.args['voice'] = voice
-        #     results = measure_jitter_node.process()
-
-        #     # if these are properties measured by the jitter node
-        #     local_jitter = results['local_jitter'] if 'local_jitter' in results else None
-        #     local_absolute_jitter = results['local_absolute_jitter'] if 'local_absolute_jitter' in results else None
-        #     rap_jitter = results['rap_jitter'] if 'rap_jitter' in results else None
-        #     ppq5_jitter = results['ppq5_jitter'] if 'ppq5_jitter' in results else None
-        #     ddp_jitter = results['ddp_jitter'] if 'ddp_jitter' in results else None
-
-        #     # we want this function to only run once no matter how many parameters we measure
-        #     # so we cache the results and check them in each attributes getter
-        #     self.cached = {}
-        #     self.cached[voice] = {
-        #         'local_jitter': local_jitter,
-        #         'local_absolute_jitter': local_absolute_jitter,
-        #         'rap_jitter': rap_jitter,
-        #         'ppq5_jitter': ppq5_jitter,
-        #         'ddp_jitter': ddp_jitter
-        #     }
-
-        # return self.cached[voice]

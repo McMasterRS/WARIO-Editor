@@ -25,7 +25,9 @@ class VisualizeVoiceNode(VoicelabNode):
         
         self.args = {
             'window_length': 0.05,
-            'colour_map': 'gist_heat',
+            'colour_map': ('copper', ['binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
+               'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
+               'hot', 'afmhot', 'gist_heat', 'copper'])
         }
 
     def process(self):
@@ -34,6 +36,9 @@ class VisualizeVoiceNode(VoicelabNode):
         window_length = self.args['window_length']
         colour_map = self.args['colour_map']
         figure, host = plt.subplots()
+
+        if isinstance(colour_map, tuple):
+            colour_map = colour_map[0]
 
         pre_emphasized_voice = voice.copy()
         pre_emphasized_voice.pre_emphasize()

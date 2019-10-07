@@ -17,6 +17,7 @@ import parselmouth
 from parselmouth.praat import call
 
 from VoicelabWizard.ResultsWidget import ResultsWidget
+from VoicelabWizard.DefaultSettings import display_whitelist
 
 class OutputTab(QWidget):
     def __init__(self, *args, **kwargs):
@@ -96,6 +97,7 @@ class OutputTab(QWidget):
             results = self.model['results']
 
             sheets = {}
+            settings_sheets = {}
 
             for i, fn in enumerate(results['functions']):
                 sheets[fn] = {
@@ -116,26 +118,55 @@ class OutputTab(QWidget):
                             modified_path = temp_loaded + '/' + file_name + '.png'
                             self.save_spectrogram(result_value, modified_path)
 
-                        else:
+                        elif type(result_value) in display_whitelist:
                             if result not in sheets[fn]:
                                 sheets[fn][result] = []
                             sheets[fn][result].append(str(results['functions'][fn][file_path][result]))
 
-            writer = ExcelWriter('voicelab_results.xlsx')
+            for i, fn_name in enumerate(self.model['settings']):
+                settings_sheets[fn_name] = {}
+
+                for j, param_name in enumerate(self.model['settings'][fn_name]['value']):
+                    settings_sheets[fn_name][param_name] = []
+                    if callable(self.model['settings'][fn_name]['value'][param_name]):
+                        param_value = 'Automatic'
+
+                    elif isinstance(self.model['settings'][fn_name]['value'][param_name], tuple):
+                        param_value = self.model['settings'][fn_name]['value'][param_name][0]
+
+                    else:
+                        param_value = self.model['settings'][fn_name]['value'][param_name]
+                        
+                    settings_sheets[fn_name][param_name].append(str(param_value))
+
+            results_writer = ExcelWriter(temp_loaded+'/voicelab_results.xlsx')
+            settings_writer = ExcelWriter(temp_loaded+'/voicelab_settings.xlsx')
 
             for sheet_data in sheets:
                 sheet = pd.DataFrame(sheets[sheet_data])
-                sheet.to_excel(writer, sheet_data, index=False)
+                sheet.to_excel(results_writer, sheet_data, index=False)
 
-            writer.save()
+            for sheet_data in settings_sheets:
+                if len(settings_sheets[sheet_data]) > 0:
+                    sheet_df = pd.DataFrame(settings_sheets[sheet_data])
+                    sheet_df.to_excel(settings_writer, sheet_data, index=False)
 
+            try:
+                results_writer.save()
+            except:
+                print('error saving results')
+
+            try:
+                settings_writer.save()
+            except:
+                print('error saving settings')
 
     def save_voice(self, voice, file_name):
         
         voice.save(file_name, 'WAV')
         return file_name
     
-    def save_spectrogram(self, spectrogram, file_name):
-
-        spectrogram.savefig(file_name, dpi=250)
+    def save_spectrogram(self, figure, file_name):
+        figure.set_size_inches(10, 5)
+        figure.savefig(file_name, dpi=250, quality=95)
         return file_name

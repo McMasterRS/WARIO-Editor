@@ -22,7 +22,6 @@ class MeasurePitchNode(VoicelabNode):
 
         super().__init__(*args, **kwargs)
         # Default settings for measuring pitch.
-        # TODO: Come up with a better system for exposing these settings to the system.
         self.args = {
 
             # Simple default values
@@ -35,13 +34,13 @@ class MeasurePitchNode(VoicelabNode):
             'Voiced Unvoiced Cost': 0.14,
             'Unit': 'Hertz',
 
-            # Tuple defines a discrete set of options, 0 is selected value, 1 is a list of all options
+            # Tuple defines a discrete set of options, 0 = selected value, 1 = a list of all options
             'Algorithm': ('To Pitch (ac)', ['To Pitch (ac)', 'To Pitch (cc)']),
             'Very Accurate': ('no', ['yes', 'no']),
 
             # The default setting is to generate these when processing is done.
-            'Ceiling': self.pitch_ceiling,
-            'Floor': self.pitch_floor
+            'Pitch Ceiling': self.pitch_ceiling,
+            'Pitch Floor': self.pitch_floor
             
         }
 
@@ -50,19 +49,44 @@ class MeasurePitchNode(VoicelabNode):
         voice = self.args['voice']
         file_duration: float = call(voice, "Get total duration")
 
+        time_step = self.args['Time Step']
+        n_max_candidates = self.args['Max Number of Candidates']
+        silence_threshold = self.args['Silence Threshold']
+        voicing_threshold = self.args['Voicing Threshold']
+        octave_cost = self.args['Octave Cost']
+        octave_jump_cost = self.args['Octave Jump Cost']
+        voiced_unvoiced_cost = self.args['Voiced Unvoiced Cost']
+        unit = self.args['Unit']
+
+        algorithm = self.args['Algorithm'][0]
+        very_accurate = self.args['Very Accurate'][0]
+
+        pitch_ceiling = self.args['Pitch Ceiling']
+        pitch_floor = self.args['Pitch Floor']
+
+        try:
+            pitch_ceiling = pitch_ceiling(voice)
+        except:
+            print('not a function anymore')
+
+        try:
+            pitch_floor = pitch_floor(voice)
+        except:
+            print('not a function anymore')
+
         pitch = call(
             voice,
-            self.args["Algorithm"][0],
-            self.args["Time Step"], 
-            self.args['Floor'](voice),
-            self.args["Max Number of Candidates"],
-            self.args["Very Accurate"][0],
-            self.args["Silence Threshold"],
-            self.args["Voicing Threshold"],
-            self.args["Octave Cost"],
-            self.args["Octave Jump Cost"],
-            self.args["Voiced Unvoiced Cost"],
-            self.args['Ceiling'](voice))
+            algorithm,
+            time_step, 
+            pitch_floor,
+            n_max_candidates,
+            very_accurate,
+            silence_threshold,
+            voicing_threshold,
+            octave_cost,
+            octave_jump_cost,
+            voiced_unvoiced_cost,
+            pitch_ceiling)
 
         mean_f0: float = call(pitch, "Get mean", 0, 0, self.args['Unit'])
         stdev_f0: float = call(pitch, "Get standard deviation", 0, 0, self.args['Unit'])  # get standard deviation
@@ -70,37 +94,9 @@ class MeasurePitchNode(VoicelabNode):
         max_f0: float = call(pitch, "Get maximum", 0, 0, "hertz", "Parabolic")
 
         return {
-            'mean_f0': mean_f0,
-            'stdev_f0': stdev_f0,
-            'min_f0': min_f0,
-            'max_f0': max_f0,
-            'pitch': pitch
+            'Mean Pitch (F0)': mean_f0,
+            'Standard Deviation Pitch (F0)': stdev_f0,
+            'Pitch Min (F0)': min_f0,
+            'Pitch Max (F0)': max_f0,
+            'Pitch': pitch
         }
-
-    # Default generation of the pitch ceiling
-    def pitch_ceiling(self, voice):
-        broad_pitch = call(voice, "To Pitch (cc)", 0, 50, 15, "yes", 0.03, 0.45, 0.01, 0.35, 0.14, 800)
-        broad_mean_f0: float = call(broad_pitch, "Get mean", 0, 0, "hertz")  # get mean pitch
-        if broad_mean_f0 < 400:
-            pitch2 = call(voice, "To Pitch (cc)", 0, 50, 15, "yes", 0.03, 0.45, 0.01, 0.35, 0.14, 500)
-            pitch2_max_f0: float = call(pitch2, "Get maximum", 0, 0, "hertz", "Parabolic")  # get max pitch
-        else:
-            pitch2 = call(voice, "To Pitch (cc)", 0, 50, 15, "yes", 0.03, 0.45, 0.01, 0.35, 0.14, 800)
-            pitch2_max_f0: float = call(pitch2, "Get maximum", 0, 0, "hertz", "Parabolic")  # get max pitch
-
-        ceiling: float = pitch2_max_f0 * 1.1
-        return ceiling
-
-    # Default generation of the pitch floor
-    def pitch_floor(self, voice):
-        broad_pitch = call(voice, "To Pitch (cc)", 0, 50, 15, "yes", 0.03, 0.45, 0.01, 0.35, 0.14, 800)
-        broad_mean_f0: float = call(broad_pitch, "Get mean", 0, 0, "hertz")  # get mean pitch
-        if broad_mean_f0 < 400:
-            pitch2 = call(voice, "To Pitch (cc)", 0, 50, 15, "yes", 0.03, 0.45, 0.01, 0.35, 0.14, 500)
-            pitch2_min_f0: float = call(pitch2, "Get minimum", 0, 0, "hertz", "Parabolic")  # get min pitch
-        else:
-            pitch2 = call(voice, "To Pitch (cc)", 0, 50, 15, "yes", 0.03, 0.45, 0.01, 0.35, 0.14, 800)
-            pitch2_min_f0: float = call(pitch2, "Get minimum", 0, 0, "hertz", "Parabolic")  # get min pitch
-
-        floor: float = pitch2_min_f0 * 0.9
-        return floor

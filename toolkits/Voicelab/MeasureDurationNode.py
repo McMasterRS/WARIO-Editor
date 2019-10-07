@@ -20,5 +20,5 @@ class MeasureDurationNode(VoicelabNode):
         duration = call(voice, "Get total duration") 
 
         return {
-            'duration': duration
+            'Voice Duration': duration
         }

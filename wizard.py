@@ -32,17 +32,20 @@ class VoicelabWizard(QMainWindow):
                 'functions': {},
                 'files': {}
             },
-            'defaults': {
-            }
+            'settings': {}
         }
 
         # Set up the internal state for whether a function is checked
         for fn in avialable_functions:
+            
+            # TODO: This can become just a mapping name to node, possibly even just the available functions dict directly
             self.model['functions'][fn] = {
                 'checked': Qt.PartiallyChecked if fn in default_functions else Qt.Unchecked,
                 'node': avialable_functions[fn]
             }
-            self.model['defaults'][fn] = {
+
+            # Settings get their initial state based on the default arguments for each node
+            self.model['settings'][fn] = {
                 'checked': Qt.PartiallyChecked if fn in default_functions else Qt.Unchecked,
                 'value': self.model['functions'][fn]['node'].args
             }

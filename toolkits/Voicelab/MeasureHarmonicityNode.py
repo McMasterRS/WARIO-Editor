@@ -65,5 +65,5 @@ class MeasureHarmonicityNode(VoicelabNode):
         hnr: float = call(harmonicity, "Get mean", 0, 0)
 
         return {
-            "Harmonicity": hnr,
+            "Voice Harmonicity": hnr,
         }

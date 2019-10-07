@@ -2,6 +2,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
+import types
+
 ###################################################################################################
 ###################################################################################################
 
@@ -45,6 +47,9 @@ class MeasureSettings(QWidget):
         self.model = model
         self.existing_stack = None
 
+        # The default settings are presumed to be the settings this initialized with
+        self.default_settings = self.model['settings']
+
         self.measure_layout = QVBoxLayout()
         self.measure_list = QListWidget()
         self.measure_stack = QStackedWidget()
@@ -83,53 +88,64 @@ class MeasureSettings(QWidget):
 
     def display_options(self):
 
-        # If there are already pages in the stack, delete them and recreate them
-        self.leftlist.itemChanged.disconnect()
+        self.active_functions = {}
+        self.current_settings = {}
 
-        for feature in self.model['functions']:
+        for fn_name in self.model['settings']:
 
-            checked = self.model['functions']['Measure Pitch']['checked']
+            check_state = self.model['settings'][fn_name]['checked']
+            self.current_settings[fn_name] = {}
 
             # Add this option to the list with appropriate text and checkbox
-            self.list_items[feature] = QListWidgetItem(parent=self.leftlist)
-            self.list_items[feature].setText(feature)
-
-            self.list_items[feature].setCheckState(self.model['functions'][feature]['checked'])
+            self.list_items[fn_name] = QListWidgetItem(parent=self.leftlist)
+            self.list_items[fn_name].setText(fn_name)
+            self.list_items[fn_name].setCheckState(check_state)
 
             # Add the appropriate configuration widgets
-            self.list_stacks[feature] = QWidget()
-            self.stack.addWidget(self.list_stacks[feature])
-            self.stack_layouts[feature] = QFormLayout()
+            self.list_stacks[fn_name] = QWidget()
+            self.stack.addWidget(self.list_stacks[fn_name])
+            # self.stack_layouts[fn_name] = QFormLayout()
+            self.stack_layouts[fn_name] = QVBoxLayout()
+            self.stack_layouts[fn_name].setAlignment(Qt.AlignTop)
 
-            for parameter in self.model['functions'][feature]['node'].args:
-                
-                param_value = self.model['functions'][feature]['node'].args[parameter]
+            if len(self.model['settings'][fn_name]['value']) == 0:
+                label = QLabel()
+                label.setText('No settings to  configure')
+                self.stack_layouts[fn_name].addWidget(label)
+            else:
+                for parameter in self.model['settings'][fn_name]['value']:
+                    param_value = self.model['settings'][fn_name]['value'][parameter]
 
-                if isinstance(param_value, tuple):
-                    widget = QComboBox()
-                    widget.addItem(param_value[0])
-                    for item in param_value[1]:
-                        widget.addItem(item)
-                else:
-                    widget = QLineEdit()
-                    widget.setText(str(param_value))
+                    # If there are options, display them as a combo box
+                    if isinstance(param_value, tuple):
+                        widget = ComboSetting(parameter, param_value, model=self.model['settings'][fn_name]['value'])
+                        # widget = QComboBox()
+                        # widget.addItem(param_value[0])
+                        # for item in param_value[1]:
+                        #     widget.addItem(item)
 
-                self.stack_layouts[feature].addRow(parameter, widget)
+                    # If this parameter is a function, it's default behaviour is dynamic.
+                    # We have to do something... hmmm
+                    elif callable(param_value):
+                        widget = FunctionSetting(parameter, param_value, model=self.model['settings'][fn_name]['value'])
 
-            self.list_stacks[feature].setLayout(self.stack_layouts[feature])
+                    else:
+                        widget = SettingWidget(parameter, param_value, model=self.model['settings'][fn_name]['value'])
+                        # widget = QLineEdit()
+                        # widget.setText(str(param_value))
 
-        self.leftlist.itemChanged.connect(self.onchange_check)
+                    # self.stack_layouts[fn_name].addRow('', widget)
+                    self.stack_layouts[fn_name].addWidget(widget)
+
+            self.list_stacks[fn_name].setLayout(self.stack_layouts[fn_name])
+
+        # self.leftlist.itemChanged.connect(self.onchange_check)
 
     def toggle_defaults(self):
         print('toggle')
 
     def onchange_check(self, e):
         self.model['functions'][e.text()]['checked'] = e.checkState()
-        print(self.model['functions'][e.text()]['checked'])
-        # if e.checkState() == Qt.Unchecked:
-        #     self.model['functions'][e.text()]['checked'] = Qt.Checked
-        # elif e.checkState() == Qt.Checked or e.checkState() == Qt.PartiallyChecked:
-        #     self.model['functions'][e.text()]['checked'] = Qt.Unchecked
 
     def display(self,i):
         self.stack.setCurrentIndex(i)
@@ -148,5 +164,144 @@ class MeasureSettings(QWidget):
 
             self.model['functions'][fn]['checked'] = self.model['defaults'][fn]['checked']
 
-            
         self.display_options()
+
+class SettingWidget(QWidget):
+    def __init__(self, name, default, model=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.default = default
+        self.inactive = True
+        self.cached = default
+        self.model = model
+        self.name = name
+        self.type = type(default)
+
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
+
+        self.label = QLabel()
+        self.label.setText(str(name))
+
+        self.checkbox = QCheckBox()
+        self.checkbox.stateChanged.connect(self.toggle)
+        self.lineedit = QLineEdit()
+        self.lineedit.setDisabled(self.inactive)
+        self.lineedit.setText(str(self.default))
+        self.lineedit.textChanged.connect(self.on_textchanged)
+
+        self.layout.addWidget(self.checkbox)
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.lineedit)
+    
+    # Toggle resets the control widget and it's bound value to the default settings
+    def toggle (self, e):
+        self.inactive = not self.inactive
+        self.lineedit.setDisabled(self.inactive)
+        if self.inactive:
+            self.cached = self.lineedit.text()
+            self.lineedit.setText(str(self.default))
+            self.model[self.name] = self.default
+        else:
+            self.lineedit.setText(str(self.cached))
+            self.model[self.name] = self.cached
+
+    def on_textchanged(self, new_text):
+
+        if isinstance(self.default, int):
+            self.model[self.name] = int(new_text)
+
+        elif isinstance(self.default, float):
+            self.model[self.name] = float(new_text)
+
+        elif isinstance(self.default, str):
+            self.model[self.name] = new_text
+
+    @property
+    def value (self):
+        return self.lineedit.text()
+
+class FunctionSetting(QWidget):
+    def __init__(self, name, default, model=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inactive = True
+        self.cached = ''
+        self.default = default
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
+
+        self.label = QLabel()
+        self.label.setText(str(name))
+
+        self.checkbox = QCheckBox()
+        self.checkbox.stateChanged.connect(self.toggle)
+        self.lineedit = QLineEdit()
+        self.lineedit.setDisabled(self.inactive)
+        self.lineedit.setText('Automatic')
+
+        self.layout.addWidget(self.checkbox)
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.lineedit)
+    
+    def toggle (self, e):
+        self.inactive = not self.inactive
+        self.lineedit.setDisabled(self.inactive)
+        if self.inactive:
+            self.cached = self.lineedit.text()
+            self.lineedit.setText('Automatic')
+        else:
+            self.lineedit.setText(self.cached)
+
+    @property
+    def value (self):
+        if self.inactive:
+            return self.default
+
+        return lambda: self.lineedit.text()
+
+class ComboSetting(QWidget):
+    def __init__(self, name, default, model=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.default = default[0]
+        self.inactive = True
+        self.cached = self.default
+        self.model = model
+        self.name = name
+
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
+
+        self.label = QLabel()
+        self.label.setText(str(name))
+
+        self.checkbox = QCheckBox()
+        self.checkbox.stateChanged.connect(self.toggle)
+
+        self.combobox = QComboBox()
+        for item in default[1]:
+            self.combobox.addItem(item)
+        self.combobox.setDisabled(self.inactive)
+        self.combobox.currentTextChanged.connect(self.on_statechanged)
+
+        self.layout.addWidget(self.checkbox)
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.combobox)
+    
+    def toggle (self, e):
+        self.inactive = not self.inactive
+        self.combobox.setDisabled(self.inactive)
+        if self.inactive:
+            self.cached = self.combobox.currentText()
+            self.combobox.setCurrentText(str(self.default))
+            self.model[self.name] = self.default
+
+        else:
+            self.combobox.setCurrentText(str(self.cached))
+            self.model[self.name] = self.cached
+
+    def on_statechanged(self, e):
+        self.model[self.name] = type(self.default)(e)
+        print(e)
+
+    @property
+    def value (self):
+        return self.combobox.currentText()

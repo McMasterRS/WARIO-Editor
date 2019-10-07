@@ -132,6 +132,8 @@ class InputTab(QWidget):
 
         # Create a node that will draw the default spectrogram for the loaded voices, we always want to plot the spectrogram
         visualize_voices = Voicelab.VisualizeVoiceNode('Visualize Voice')
+        for value in self.model['settings']['Visualize Voice']['value']:
+            visualize_voices.args[value] = self.model['settings']['Visualize Voice']['value'][value]
         # Connect the loaded voice to the visualize node
         pipeline.connect((load_voices, 'voice'), (visualize_voices, 'voice'))
         # Add the node to the pipeline
@@ -143,7 +145,8 @@ class InputTab(QWidget):
 
             # We only want the checked functions
             if self.model['functions'][fn]['checked']:
-                
+                for param in self.model['settings'][fn]['value']:
+                    self.model['functions'][fn]['node'].args[param] = self.model['settings'][fn]['value'][param]
                 pipeline.add(self.model['functions'][fn]['node'])
                 pipeline.connect((load_voices, 'voice'), (self.model['functions'][fn]['node'], 'voice'))
                 pipeline.connect((visualize_voices, 'figure'), (self.model['functions'][fn]['node'], 'figure'))
