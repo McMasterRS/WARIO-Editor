@@ -32,6 +32,8 @@ class TestSettings(QtWidgets.QWidget):
             
         return False
         
+    def updateGlobals(self, globals):
+        return
         
     # Build the settings UI
     def buildUI(self, settings):

@@ -3,16 +3,74 @@ from nodz.customSettings import CustomSettings
 from nodz.customWidgets import LinkedCheckbox, LinkedSpinbox
 import mne
 
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
+
+class CriterionTable(QtWidgets.QTableWidget):
+    def __init__(self, settings):
+        super(CriterionTable, self).__init__(3, 2)
+        
+        names = ["Skew", "Kurt", "Var"]
+        self.setHorizontalHeaderLabels(["Type", "Value"])
+        self.setVerticalHeaderLabels(names) 
+        
+        for i in range(self.rowCount()):
+            combobox = QtWidgets.QComboBox()
+            combobox.addItems(["None", "Int", "Float"])
+            combobox.currentIndexChanged.connect(lambda index, row=i: self.updateTypes(index, row))
+            textbox = QtWidgets.QLineEdit(" ")
+            textbox.setEnabled(False)
+            
+            self.setCellWidget(i, 0, combobox)
+            self.setCellWidget(i, 1, textbox)
+            
+            if names[i].lower() + "Text" in settings.keys():
+                textbox.setText(settings[names[i].lower() + "Text"])
+                combobox.setCurrentIndex(settings[names[i].lower() + "Index"])
+
+        self.setTableSize()
+        
+    def updateTypes(self, index, i):
+        item = self.cellWidget(i, 1)
+
+        if index == 0:
+            item.setEnabled(False)
+            item.setText(" ")
+        else:
+            item.setEnabled(True)
+            if item.text() == " ":
+                item.setText("0")
+            
+            if index == 1:
+                v = QtGui.QIntValidator(0, 9999, self)
+                item.setValidator(v)
+                item.setText(item.text().split(".")[0])
+
+            else:
+                v = QtGui.QDoubleValidator(self)
+                item.setValidator(v)
+                item.setText(str(float(item.text())))
+
+
+    def setTableSize(self):
+        w = self.verticalHeader().width() + 30
+        for i in range(self.columnCount()):
+            w += self.columnWidth(i)
+        h = self.horizontalHeader().height() + 4
+        for i in range(self.rowCount()):    
+            h += self.rowHeight(i)
+        self.setMinimumSize(QtCore.QSize(w, h))
+        self.setMaximumHeight(h)
+        
 
 class FitICASettings(CustomSettings):
-    
+        
     def __init__(self, parent, settings):
         super(FitICASettings, self).__init__(parent, settings)
 
     # Build the settings UI
     def buildUI(self, settings):
+    
+        self.baseLayout = QtWidgets.QVBoxLayout()
         self.layout = QtWidgets.QFormLayout()
         
         # ICA method
@@ -46,33 +104,18 @@ class FitICASettings(CustomSettings):
         self.startWidget.linkWidgets(self.stopWidget, "Higher")
         self.stopWidget.linkWidgets(self.startWidget, "Lower")
         
-        # Skew
-        self.skewWidget = QtWidgets.QSpinBox()
-        self.skewLabel = LinkedCheckbox("Skew Criterion", self.skewWidget)
-        self.skewLabel.buildLinkedCheckbox("skew", self.settings)
-        self.layout.insertRow(-1, self.skewLabel, self.skewWidget)
+        self.criterionWidget = CriterionTable(settings)
         
-        # Kurt
-        self.kurtWidget = QtWidgets.QSpinBox()
-        self.kurtLabel = LinkedCheckbox("Kurt Criterion", self.kurtWidget)
-        self.kurtLabel.buildLinkedCheckbox("kurt", self.settings)
-        self.layout.insertRow(-1, self.kurtLabel, self.kurtWidget)
+        self.layout.setSpacing(5)
         
-        # Var
-        self.varWidget = QtWidgets.QSpinBox()
-        self.varLabel = LinkedCheckbox("Var Criterion", self.varWidget)
-        self.varLabel.buildLinkedCheckbox("var", self.settings)
-        self.layout.insertRow(-1, self.varLabel, self.varWidget)
-        
-        self.setLayout(self.layout)
+        self.baseLayout.addItem(self.layout)
+        self.baseLayout.addWidget(self.criterionWidget)
+        self.setLayout(self.baseLayout)
         return
         
     def updateGlobals(self, globals):
-        self.skewWidget.setMaximum(int(globals["Channel Count"]["value"]))
-        self.kurtWidget.setMaximum(int(globals["Channel Count"]["value"]))
-        self.varWidget.setMaximum(int(globals["Channel Count"]["value"]))
         self.stopWidget.setMaximum(int(globals["Data Length"]["value"]))
-            
+        return   
         
     # Return the values from each setting type
     def genSettings(self):
@@ -91,9 +134,20 @@ class FitICASettings(CustomSettings):
         
         self.startLabel.getSettings("start", varList, settingList)
         self.stopLabel.getSettings("stop", varList, settingList)
-        self.skewLabel.getSettings("skew", varList, settingList)
-        self.kurtLabel.getSettings("kurt", varList, settingList)
-        self.varLabel.getSettings("var", varList, settingList)
+
+        nameList = ["skew", "kurt", "var"]
+        for i in range(3):
+            index = self.criterionWidget.cellWidget(i, 0).currentIndex()
+            text = self.criterionWidget.cellWidget(i, 1).text()
+            if index == 0:
+                varList[nameList[i]] = None
+            elif index == 1:
+                varList[nameList[i]] = int(text)
+            else:
+                varList[nameList[i]] = float(text)
+            
+            settingList[nameList[i] + "Index"] = index
+            settingList[nameList[i] + "Text"] = text
     
         self.parent.variables = varList
         self.parent.settings = settingList
@@ -109,11 +163,14 @@ class fitICA(Node):
             
         if self.parameters["kurt"] == "None":
             self.parameters["kurt"] = None
+            
+        if self.parameters["var"] == "None":
+            self.parameters["var"] = None
         
-    def process(self):
+    def process(self):  
     
         # Possibly will be epoch data - needs to work for both
-        data = self.args["Raw"] 
+        data = self.args["Raw/Epoch"] 
         
         randomState = None
         if self.parameters["randomState"] == True:

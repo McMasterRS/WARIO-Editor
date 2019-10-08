@@ -10,7 +10,6 @@ nodes, connections, globals = NodzInterface.load(file)
 pipeline = Pipeline(global_vars = globals)
 
 for node in nodes:
-    print(node[1])
     pipeline.add(node[1])
     
 for conn in connections:

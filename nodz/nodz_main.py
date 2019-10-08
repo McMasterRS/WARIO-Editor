@@ -73,6 +73,7 @@ class Nodz(QtWidgets.QGraphicsView):
         self.gridSnapToggle = False
         self._nodeSnap = False
         self.selectedNodes = None
+        self.currentFileName = ""
 
         # Connections data.
         self.drawingConnection = False
@@ -989,6 +990,8 @@ class Nodz(QtWidgets.QGraphicsView):
             print('Save aborted !')
             return False
 
+        self.currentFileName = filePath
+        
         # Emit signal.
         self.signal_GraphSaved.emit()
 
@@ -1108,6 +1111,8 @@ class Nodz(QtWidgets.QGraphicsView):
                                   targetNode, targetAttr)          
         
         self.scene().update()
+        
+        self.currentFileName = filePath
 
         # Emit signal.
         self.signal_GraphLoaded.emit()
@@ -1681,14 +1686,15 @@ class NodeItem(QtWidgets.QGraphicsItem):
             # Search non-connectable attributes.
             if nodzInst.drawingConnection:
                 if self == nodzInst.currentHoveredNode:
-                    if ((attrData['dataType'].casefold() != nodzInst.sourceSlot.dataType.casefold() or    
-                        (nodzInst.sourceSlot.slotType == 'plug' and attrData['socket'] == False) or
-                         (nodzInst.sourceSlot.slotType == 'socket' and attrData['plug'] == False)) and 
-                         (attrData['dataType'].casefold() != 'file') and (nodzInst.sourceSlot.dataType.casefold() != "file")):
-
-                        # Set non-connectable attributes color.
-                        painter.setPen(utils._convertDataToColor(config['non_connectable_color']))
+                    matchingTypes = False
+                    if isinstance(nodzInst.sourceSlot.dataType, str):
+                        matchingTypes = nodzInst.sourceSlot.dataType not in attrData['dataType']         
+                    if isinstance(attrData['dataType'], str):
+                        matchingTypes = attrData['dataType'] not in nodzInst.sourceSlot.dataType
                         
+                    if (matchingTypes or (nodzInst.sourceSlot.slotType == 'plug' and attrData['socket'] == False) or (nodzInst.sourceSlot.slotType == 'socket' and attrData['plug'] == False)) and (('file' not in attrData['dataType']) and ("file" not in nodzInst.sourceSlot.dataType)):
+                        # Set non-conn  ectable attributes color.
+                        painter.setPen(utils._convertDataToColor(config['non_connectable_color']))
 
             textRect = QtCore.QRect(rect.left() + self.radius,
                                      rect.top(),
@@ -1808,7 +1814,10 @@ class SlotItem(QtWidgets.QGraphicsItem):
         self.preset = preset
         self.index = index
         self.dataType = dataType
-        self.setToolTip(dataType)
+        if isinstance(dataType, str):
+            self.setToolTip(dataType)
+        else:
+            self.setToolTip("/".join(dataType))
 
         # Style.
         self.brush = QtGui.QBrush()
@@ -1929,8 +1938,15 @@ class SlotItem(QtWidgets.QGraphicsItem):
         if nodzInst.drawingConnection:
             if self.parentItem() == nodzInst.currentHoveredNode:
                 painter.setBrush(utils._convertDataToColor(config['non_connectable_color']))
-                if ((self.slotType == nodzInst.sourceSlot.slotType or self.dataType.lower() != nodzInst.sourceSlot.dataType.lower())
-                    and (self.dataType.casefold() != "file") and (nodzInst.sourceSlot.dataType.casefold() != "file")):
+                    
+                matchingTypes = False
+                if isinstance(nodzInst.sourceSlot.dataType, str):
+                    matchingTypes = nodzInst.sourceSlot.dataType not in self.dataType
+                if isinstance(self.dataType, str):
+                    matchingTypes = self.dataType not in nodzInst.sourceSlot.dataType 
+                    
+                if ((self.slotType == nodzInst.sourceSlot.slotType or matchingTypes)
+                    and ("file" not in self.dataType) and ("file" not in nodzInst.sourceSlot.dataType)):
                     painter.setBrush(utils._convertDataToColor(config['non_connectable_color']))
                 else:
                     _penValid = QtGui.QPen()
@@ -2026,7 +2042,7 @@ class PlugItem(SlotItem):
         """
         if isinstance(socket_item, SocketItem):
             if self.parentItem() != socket_item.parentItem():
-                if socket_item.dataType.casefold() == self.dataType.casefold() or socket_item.dataType.casefold() == "file" or self.dataType.casefold() == "file":
+                if self.dataType in socket_item.dataType or socket_item.dataType == "file" or self.dataType == "file":
                     if socket_item in self.connected_slots:
                         return False
                     else:
@@ -2148,7 +2164,7 @@ class SocketItem(SlotItem):
         if isinstance(plug_item, PlugItem):
             if (self.parentItem() != plug_item.parentItem() and
                 len(self.connected_slots) <= 1):
-                if plug_item.dataType.casefold() == self.dataType.casefold() or plug_item.dataType.casefold() == "file" or self.dataType.casefold() == "file":
+                if plug_item.dataType in self.dataType or plug_item.dataType == "file" or self.dataType == "file":
                     if plug_item in self.connected_slots:
                         return False
                     else:

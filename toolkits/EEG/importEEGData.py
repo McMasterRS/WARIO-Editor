@@ -1,5 +1,6 @@
 from pipeline.Node import Node
 import mne 
+import numpy as np
 
 class importEEGData(Node):
 
@@ -7,22 +8,32 @@ class importEEGData(Node):
         super(importEEGData, self).__init__(name)
         self.parameters = params
 
-        
     def process(self):
   
         data = np.load(self.parameters["file"])
-        sfreq = self.parameters["sfreq"])
+        sfreq = self.parameters["sfreq"]
         
-        ch_types = self.parameters["channelTypes"]
-        montage = mne.channels.read_montage(kind = self.parameters["montageData"].split(".")[-1], ch_names = None, path = self.parameters["montageData"], transform = True)
+        trigTimes = data["SampleTime"][data["TriggerTime"] != 0.][:13] ## FIXME
+        trigData = [data["TriggerValues"], trigTimes]
+        
+        filenameNoExt = self.parameters["montageData"].split(".")[0]
+        file = filenameNoExt.split("/")[-1]
+        folder = filenameNoExt[:-1*len(file)]
+
+        montage = mne.channels.read_montage(kind = file, ch_names = None, path = folder, transform = True)
         ch_names = montage.ch_names
-        
-        info = mne.create_info(ch_names = ch_names, sfreq = sfreq, ch_types = ch_types)
-        raw = mne.io.RawArray(data, info, first_samp = 0)
+
+        info = mne.create_info(ch_names = ch_names[-16:], sfreq = sfreq, ch_types = 'eeg') ## FIXME
+        raw = mne.io.RawArray(data["EEG"], info, first_samp = 0)
         
         raw.set_montage(montage, set_dig=True) 
         raw.pick_types(eeg=True,exclude='bads')
         raw.set_eeg_reference('average',projection=False)
         raw.filter(self.parameters["filter1"], self.parameters["filter2"], n_jobs=1, fir_design='firwin')
         
-        return {"Raw" : raw}
+        return {"Raw" : raw, "Triggers" : trigData}    
+        
+# ISSUES:
+#   - Need a way to set channel names
+#   - Need to only pull in eeg channels
+#   - Need to confirm this works with multiple input file types

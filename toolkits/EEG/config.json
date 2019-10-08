@@ -13,7 +13,7 @@
     },
 
     "node_types": {
-        "Import Raw": {
+        "Import Raw File": {
             "preset": "node_default",
             "file": "importRawData.py",
             "alternate": true,
@@ -53,6 +53,13 @@
                     "plug": true,
                     "socket": false,
                     "type": "rawEEG"
+                },
+                "Triggers": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "trigTV"
                 }
             },
             "settings" : {
@@ -85,68 +92,28 @@
                         "maximum" : 2147483647,
                         "value" : 100
                     }
-                }
-            }
-        },
-        "Data to Raw": {
-            "preset": "node_default",
-            "file": "data2raw.py",
-            "alternate": true,
-            "position": "none",
-            "category": "Preprocessing",
-            "toolkit" : "EEG",
-            "attributes": {
-                "Data": {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": false,
-                    "socket": true,
-                    "type": "EEGdata"
                 },
-                "Bad Channels" : {
-                    "index" : -1,
-                    "preset" : "attr_preset_1",
-                    "plug" : false,
-                    "socket" : true,
-                    "type" : "badChans"
-                },
-                "Montage" : {
-                    "index" : -1,
-                    "preset" : "attr_preset_1",
-                    "plug" : false,
-                    "socket" : true,
-                    "type" : "montageData"                
-                },
-                "Raw": {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": true,
-                    "socket": false,
-                    "type": "rawEEG"
-                }
-            },
-            "settings" : {
                 "filter1" : {
-                    "text"   : "Low-pass filter cutoff",
-                    "type"   : "spinbox",
+                    "text" : "Min Filter",
+                    "type" : "spinbox",
                     "params" : {
-                        "minimum" : 1,
+                        "minimum" : 0,
                         "maximum" : 2147483647,
-                        "value"   : 1
+                        "value" : 10
                     }
                 },
                 "filter2" : {
-                    "text"   : "High-pass filter cutoff",
-                    "type"   : "spinbox",
+                "text" : "Max Filter",
+                    "type" : "spinbox",
                     "params" : {
-                        "minimum" : 1,
+                        "minimum" : 0,
                         "maximum" : 2147483647,
-                        "value"   : 1
+                        "value" : 30
                     }
                 }
             }
         },
-        "Raw to epoch" : {
+        "Raw To Epoch" : {
             "preset" : "node_default",
             "file" : "raw2epoch.py",
             "alternate" : true,
@@ -159,28 +126,14 @@
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": "rawEEG"
+                    "type": ["rawEEG"]
                 },
-                "Trigger Times": {
+                "Trigger Times/Values": {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": "trigTimes"
-                },
-                "Trigger Values": {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": false,
-                    "socket": true,
-                    "type": "trigVals"
-                },
-                "Subject IDs": {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": false,
-                    "socket": true,
-                    "type": "int"
+                    "type": ["trigTV"]
                 },
                 "Epoch Data": {
                     "index": -1,
@@ -217,12 +170,12 @@
             "category" : "ICA",
             "toolkit" : "EEG",
             "attributes" : {
-                "Raw": {
+                "Raw/Epoch": {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": "rawEEG"
+                    "type": ["rawEEG", "epoch"]
                 },
                 "ICA Solution": {
                     "index": -1,
@@ -250,14 +203,14 @@
                     "preset": "attr_preset_1",
                     "plug": false,  
                     "socket": true,
-                    "type": "ICA"   
+                    "type": ["ICA"]  
                 },
                 "Epoch Data": {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": "epoch"   
+                    "type": ["epoch"]   
                 },
                 "Epochs ICA": {     
                     "index": -1,
@@ -283,7 +236,7 @@
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": "epoch"   
+                    "type": ["epoch"]   
                 }
             },
             "settings" : {
@@ -309,7 +262,7 @@
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": "epochICA"   
+                    "type": ["epochICA"]   
                 }
             },
             "settings" : {}

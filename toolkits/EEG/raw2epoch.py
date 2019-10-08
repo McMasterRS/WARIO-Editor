@@ -2,6 +2,7 @@ from pipeline.Node import Node
 from nodz.customSettings import CustomSettings
 from nodz.customWidgets import LinkedCheckbox, ExpandingTable
 import mne
+import numpy as np
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
@@ -22,12 +23,12 @@ class Raw2EpochSettings(CustomSettings):
         if "tminValue" in settings.keys():
             self.tminWidget.setValue(settings["tminValue"])
         else:
-            self.tminWidget.setValue(-2)
+            self.tminWidget.setValue(0.0)
         self.tminLabel = QtWidgets.QLabel("TMin")
         self.layout.insertRow(-1, self.tminLabel, self.tminWidget)
         
         self.tmaxWidget = QtWidgets.QSpinBox()
-        self.tmaxWidget.setMinimum(0)
+        self.tmaxWidget.setMinimum(.0)
         self.tmaxWidget.setMaximum(1000)
         if "tmaxValue" in settings.keys():
             self.tmaxWidget.setValue(settings["tmaxValue"])
@@ -70,7 +71,7 @@ class Raw2EpochSettings(CustomSettings):
         self.detrendLabel.getSettings("detrend", vars, settings)
         self.verboseLabel.getSettings("verbose", vars, settings)
         
-        self.eventIDWidget.getSettings("eventIDs", vars settings)
+        self.eventIDWidget.getSettings("eventIDs", vars, settings)
         
         self.parent.settings = settings
         self.parent.variables = vars
@@ -89,15 +90,12 @@ class raw2epoch(Node):
         Raw = self.args["Raw"]
         sfreq = Raw.info['sfreq']
         
-        verboseDict = {0 : "DEBUG", 1 : "INFO", 2 : "WARNING", 3 : "ERROR", 4 : "CRITICAL"}
+        verboseDict = {None : None, 0 : "DEBUG", 1 : "INFO", 2 : "WARNING", 3 : "ERROR", 4 : "CRITICAL"}
         
-        # NEED TO IMPORT T AND Y
-        # Can be in either files or stored as a channel
-        # Need settings options for both
-     
-        ###################
-    #    Y[Y==3] = 1
-        ##################
+        T = self.args["Trigger Times/Values"][1]
+        Y = self.args["Trigger Times/Values"][0]
+        
+        print("Converting raw file into epoch data")
         
         # MNE needs trigger data in a certain format
         trigger_data = np.concatenate((np.expand_dims(T*sfreq,axis=1),

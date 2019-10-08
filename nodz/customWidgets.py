@@ -16,7 +16,6 @@ class ExpandingTable(QtWidgets.QTableWidget):
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         
         if name + "Values" in settings.keys():
-            print(settings[name + "Values"])
             for i in range(len(settings[name + "Values"])):
                 self.insertRow(self.rowCount())
                 self.setItem(i, 0, QtWidgets.QTableWidgetItem(settings[name + "Values"][str(i)]))
@@ -38,7 +37,7 @@ class ExpandingTable(QtWidgets.QTableWidget):
     
         for i in range(self.rowCount() - 1):
             settingsDict[i] = self.item(i, 0).text()
-            varDict[self.item(i, 0).text()] = i
+            varDict[self.item(i, 0).text()] = i + 1
             
         var[name] = varDict
         settings[name + "Values"] = settingsDict

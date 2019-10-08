@@ -35,7 +35,7 @@ class Pipeline():
     def add(self, node):
         """ Add a new node to the pipeline """
 
-        self.nodes[node] = {}   
+        self.nodes[node] = []   
         self.roots[node] = node
         if len(node.event_callbacks) > 0:
             print(node.event_callbacks)

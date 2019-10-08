@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
+from pipeline.RunPipeline import runPipeline
 import sys, os, textwrap
 
 version = "0.0.1"
@@ -68,14 +69,28 @@ def startNodz():
 
     ### FILE MENU
 
+    def saveFile():
+        nodz.saveGraphDialog()
+        if nodz.currentFileName != "":
+            window.setWindowTitle("WARIO - " + nodz.currentFileName)
+        
     saveAct = QtWidgets.QAction(getIcon('SP_DialogSaveButton'), "&Save", window)
     saveAct.setShortcut("Ctrl+S")
     saveAct.setStatusTip("Save Flowchart")
-    saveAct.triggered.connect(nodz.saveGraphDialog)
+    saveAct.triggered.connect(saveFile)
+    
+    def saveRunFile():
+        if nodz.currentFileName != "":
+            nodz.saveGraph(nodz.currentFileName)
+            runPipeline(nodz.currentFileName)
+        else:
+            nodz.loadGraphDialog()
+            runPipeline(nodz.currentFileName)
     
     saveRunAct = QtWidgets.QAction(getIcon('SP_DriveHDIcon'), "&Run", window)
     saveRunAct.setShortcut("Ctrl+R")
     saveRunAct.setStatusTip("Save flowchart and run")
+    saveRunAct.triggered.connect(saveRunFile)
     
     def loadFile():
         nodz.loadGraphDialog()
@@ -86,6 +101,9 @@ def startNodz():
                 tk.setChecked(True)
             else:
                 tk.setChecked(False)
+                
+        if nodz.currentFileName != "":
+            window.setWindowTitle("WARIO - " + nodz.currentFileName)
 
     loadAct = QtWidgets.QAction(getIcon('SP_DialogOpenButton'), "&Load", window)
     loadAct.setShortcut("Ctrl+L")
