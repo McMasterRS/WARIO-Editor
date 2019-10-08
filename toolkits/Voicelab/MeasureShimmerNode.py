@@ -27,6 +27,9 @@ class MeasureShimmerNode(VoicelabNode):
             'maximum_amplitude': 1.6
         }
 
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
     def process(self):
         'shimmer'
 

@@ -27,6 +27,9 @@ class VisualizeFormantNode(VoicelabNode):
 
         self.args = {}
 
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
     def process(self):
         ''
 

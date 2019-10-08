@@ -34,7 +34,11 @@ class MeasureShimmerPCANode(VoicelabNode):
             'APQ11 Shimmer': lambda voice: self.measure_shimmer(voice)['apq11_shimmer'],
             'DDA Shimmer': lambda voice: self.measure_shimmer(voice)['dda_shimmer'],
         }
-    
+        
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
+
     def process(self):
 
         voice = self.args['voice']

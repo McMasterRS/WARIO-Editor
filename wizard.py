@@ -28,10 +28,7 @@ class VoicelabWizard(QMainWindow):
         self.model = {
             'files': [],        # Collection of currently loaded voice files
             'functions': {},    # Collection of available functions
-            'results': {
-                'functions': {},
-                'files': {}
-            },
+            'results': {},
             'settings': {}
         }
 

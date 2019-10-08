@@ -16,7 +16,6 @@ from pandas import ExcelFile
 import parselmouth
 from parselmouth.praat import call
 
-from VoicelabWizard.ResultsWidget import ResultsWidget
 from VoicelabWizard.DefaultSettings import display_whitelist
 
 class OutputTab(QWidget):
@@ -57,7 +56,7 @@ class OutputTab(QWidget):
 
     def update_results(self, results):
 
-        if len(self.model['results']['files']) > 0:
+        if len(self.model['results']) > 0:
             self.save_button.setDisabled(False)
         else:
             self.save_button.setDisabled(True)
@@ -70,7 +69,7 @@ class OutputTab(QWidget):
 
         voice_files = self.model['files']
 
-        for i, voice_file in enumerate(results['files']):
+        for i, voice_file in enumerate(results):
 
             # fill the list with paths to the loaded voice files
             list_item = QListWidgetItem(parent=self.file_list)
@@ -170,3 +169,99 @@ class OutputTab(QWidget):
         figure.set_size_inches(10, 5)
         figure.savefig(file_name, dpi=250, quality=95)
         return file_name
+
+
+###################################################################################################
+# ResultsWidget :
+# Wraps the widgets and functionality for displaying results from a single analyzed voice file.
+###################################################################################################
+
+class ResultsWidget(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        
+        # The results widgets are created as needed when its clicked on, the 
+        # cache variable allows us to retrieve rather than create every time
+        self.cache = {}
+
+        # swaps between the different results
+        self.stack = QStackedWidget()
+
+        # layout for the widget as a whole
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.stack)
+        self.setLayout(self.layout)
+
+    # TODO: this probably can be removed
+    def load_results(self, results):
+        self.cache = {}
+        self.results = results
+
+    # Show the results for a given voice file, create them and cache them as needed
+    def show_result(self, voice_file):
+
+        # Check if these results have already been presented
+        if voice_file in self.cache:
+
+            # If they have, switch to the approprate stack item
+            index = self.stack.indexOf(self.cache[voice_file])
+            self.stack.setCurrentIndex(index)
+
+            # If not, create a new stack item, add it to the stack, and switch to it
+        else:
+
+            results = self.results
+            stack_widget = QWidget()
+            stack_layout = QVBoxLayout()
+            stack_widget.setLayout(stack_layout)
+
+            # Access the resulting spectrogram
+            figure = results[voice_file]['Visualize Voice']['figure']
+            
+            # QWidget for displaying the voice spectrograms
+            spectrogram = FigureCanvas(figure)
+
+            tabs = QTabWidget()
+
+            # Loop through each of the results for this file, and display them
+            for i, fn_name in enumerate(results[voice_file]):
+                display_results = {}
+
+                # loop through results, build a list of allowed outputs
+                for result_name in results[voice_file][fn_name]:
+                    result_value = results[voice_file][fn_name][result_name]
+
+                    if type(result_value) in display_whitelist:
+                        display_results[result_name] = result_value
+
+                n_cols = 1
+                n_rows = len(display_results)
+
+                if n_rows > 0:
+                    tab = QWidget()
+                    tabs.addTab(tab, fn_name)
+                    tab_layout = QVBoxLayout()
+                    tab.setLayout(tab_layout)
+                    table = QTableWidget()
+                    tab_layout.addWidget(table)
+                    table.setRowCount(n_rows)
+                    table.setColumnCount(n_cols)
+                    table.setHorizontalHeaderLabels([fn_name])
+                    table.setVerticalHeaderLabels(display_results.keys())
+                    table.setEditTriggers(QTableWidget.NoEditTriggers)
+                    table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+                    for j, fn_result in enumerate(display_results):
+                        if isinstance(fn_result, list):
+                            pass
+                        result_value = display_results[fn_result]
+                        table.setItem(j, 0, QTableWidgetItem(str(result_value)))
+
+            stack_layout.addWidget(spectrogram)
+            stack_layout.addWidget(tabs)
+
+            self.stack.addWidget(stack_widget)
+            self.cache[voice_file] = stack_widget
+            index = self.stack.indexOf(stack_widget)
+            self.stack.setCurrentIndex(index)

@@ -43,6 +43,9 @@ class MeasurePitchNode(VoicelabNode):
             'Pitch Floor': self.pitch_floor
             
         }
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
 
     def process(self):
 
@@ -64,15 +67,11 @@ class MeasurePitchNode(VoicelabNode):
         pitch_ceiling = self.args['Pitch Ceiling']
         pitch_floor = self.args['Pitch Floor']
 
-        try:
+        if callable(pitch_ceiling):
             pitch_ceiling = pitch_ceiling(voice)
-        except:
-            print('not a function anymore')
 
-        try:
+        if callable(pitch_floor):
             pitch_floor = pitch_floor(voice)
-        except:
-            print('not a function anymore')
 
         pitch = call(
             voice,

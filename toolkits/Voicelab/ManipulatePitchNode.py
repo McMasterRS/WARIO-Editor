@@ -22,6 +22,9 @@ class ManipulatePitchNode(VoicelabNode):
             'factor': -0.5,
             'pitch bounds': 12
         }
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
 
     def process(self):
         

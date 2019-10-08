@@ -87,66 +87,93 @@ class InputTab(QWidget):
     ###############################################################################################
     def onclick_start(self):
 
-        self.model['results'] = {}
 
         # Create a pipeline reflecting the user's settings
         pipeline = self.create_pipeline(self.model['files'], self.model['functions'])
         pipeline_results = pipeline.start()
 
-        active_functions = ['Visualize Voice']
-        for fn in self.model['functions']:
-            if self.model['functions'][fn]['checked'] == Qt.PartiallyChecked or self.model['functions'][fn]['checked'] == Qt.Checked:
-                active_functions.append(fn)
+        self.model['results'] = {}
 
-        self.model['results']['files'] = {key: {} for key in self.model['files']}
-        self.model['results']['functions'] = {key: {} for key in active_functions }
-
-        # Turn the pipeline results into a more convenient format
+        # Index our results by file path, then function name, then results
         for i, run in enumerate(pipeline_results):
-            voice_file = self.model['files'][i]
-            self.model['results']['files'][voice_file] = {}
+            file_path = self.model['files'][i]
+            self.model['results'][file_path] = {}
 
-            for node in run:
-                node_name = node.node_id
+            for j, fn_node in enumerate(run):
+                fn_name = fn_node.node_id
+                self.model['results'][file_path][fn_name] = run[fn_node]
 
-                if node_name != 'Load Voice':
-                    self.model['results']['files'][voice_file][node_name] = {}
-                    self.model['results']['functions'][node_name][voice_file] = {}
+        # active_functions = ['Visualize Voice']
+        # for fn in self.model['functions']:
+        #     if self.model['settings'][fn]['checked'] == Qt.PartiallyChecked or self.model['settings'][fn]['checked'] == Qt.Checked:
+        #         active_functions.append(fn)
 
-                    for result in run[node]:
-                        self.model['results']['files'][voice_file][node_name][result] = run[node][result]
-                        self.model['results']['functions'][node_name][voice_file][result] = run[node][result]
+        # self.model['results']['files'] = {key: {} for key in self.model['files']}
+        # self.model['results']['functions'] = {key: {} for key in active_functions }
 
+        # # Turn the pipeline results into a more convenient format
+        # for i, run in enumerate(pipeline_results):
+        #     voice_file = self.model['files'][i]
+        #     self.model['results']['files'][voice_file] = {}
+
+        #     for node in run:
+        #         node_name = node.node_id
+
+        #         if node_name != 'Load Voice':
+        #             self.model['results']['files'][voice_file][node_name] = {}
+        #             self.model['results']['functions'][node_name][voice_file] = {}
+
+        #             for result in run[node]:
+        #                 self.model['results']['files'][voice_file][node_name][result] = run[node][result]
+        #                 self.model['results']['functions'][node_name][voice_file][result] = run[node][result]
+
+        # This is a basic callback function, once the results are finished we want to trigger an
+        # update on the results tab
         self.model['update results'](self.model['results'])
 
+
+    ###############################################################################################
+    # create_pipeline: create the approprate WARIO pipeline based on the current settings
+    ###############################################################################################
     def create_pipeline(self, file_locations, functions):
 
+        # Empty WARIO pipeline
         pipeline = Pipeline()
 
         # Create a node that will load all of the voices
         load_voices = Voicelab.LoadVoicesNode('Load Voice')
+
         # Set up the load node with the appropriate file locations
         load_voices.args['file_locations'] = file_locations
+
         # Add the node to the pipeline
         pipeline.add(load_voices)
 
         # Create a node that will draw the default spectrogram for the loaded voices, we always want to plot the spectrogram
         visualize_voices = Voicelab.VisualizeVoiceNode('Visualize Voice')
+
+        # if there are settings the user has configured, we want to attach them to the node
         for value in self.model['settings']['Visualize Voice']['value']:
             visualize_voices.args[value] = self.model['settings']['Visualize Voice']['value'][value]
-        # Connect the loaded voice to the visualize node
+
+        # Connect the loaded voice to the visualize node so it has access to it
         pipeline.connect((load_voices, 'voice'), (visualize_voices, 'voice'))
+
         # Add the node to the pipeline
         pipeline.add(visualize_voices)
 
         # For each checked operation we create the appropriate node, assign its associated
-        # parameters, and add it to the pipeline connecting it to the load voice node
+        # parameters, and add it to the pipeline connecting it to the load voice node and
+        # visualize node. those two functions are always performed
         for fn in functions:
 
             # We only want the checked functions
-            if self.model['functions'][fn]['checked']:
+            if self.model['settings'][fn]['checked'] and fn != 'Visualize Voice':
+
+                # Attach the approprate user settings to each node
                 for param in self.model['settings'][fn]['value']:
                     self.model['functions'][fn]['node'].args[param] = self.model['settings'][fn]['value'][param]
+
                 pipeline.add(self.model['functions'][fn]['node'])
                 pipeline.connect((load_voices, 'voice'), (self.model['functions'][fn]['node'], 'voice'))
                 pipeline.connect((visualize_voices, 'figure'), (self.model['functions'][fn]['node'], 'figure'))

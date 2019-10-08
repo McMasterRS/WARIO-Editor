@@ -24,20 +24,18 @@ class MeasureJitterPCANode(VoicelabNode):
 
         super().__init__(*args, **kwargs)
 
-        # this node can construct it's own node for measuring jitter if none is attached
-        # this means that it uses the same functionality as all other measurement nodes
-        # without having to specify dependancies
-        # the default getter functions are linked to the internal measure jitter node
-        # constant variables can be passed in, in which case these will not run
         self.args = {
-            'local_jitter': lambda voice: self.measure_jitter(voice)['local_jitter'],
-            'localabsolute_jitter': lambda voice: self.measure_jitter(voice)['localabsolute_jitter'],
-            'rap_jitter': lambda voice: self.measure_jitter(voice)['rap_jitter'],
-            'ppq5_jitter': lambda voice: self.measure_jitter(voice)['ppq5_jitter'],
-            'ddp_jitter': lambda voice: self.measure_jitter(voice)['ddp_jitter'],
+            'local_jitter': lambda voice: self.measure_jitter(voice)['Local Jitter'],
+            'localabsolute_jitter': lambda voice: self.measure_jitter(voice)['Local Absolute Jitter'],
+            'rap_jitter': lambda voice: self.measure_jitter(voice)['RAP Jitter'],
+            'ppq5_jitter': lambda voice: self.measure_jitter(voice)['ppq5 Jitter'],
+            'ddp_jitter': lambda voice: self.measure_jitter(voice)['ddp Jitter'],
         }
 
         self.cached = {}
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
 
     def process(self):
 
@@ -61,9 +59,7 @@ class MeasureJitterPCANode(VoicelabNode):
 
         # df = self.args['df'] # dataframe
         try:
-            # z-score the Jitter measurements
             measures = ['localJitter', 'localabsoluteJitter', 'rapJitter', 'ppq5Jitter', 'ddpJitter']
-            # x = df.loc[:, measures].values
             x = jitter_df
             x = StandardScaler().fit_transform(x)
 
@@ -73,7 +69,7 @@ class MeasureJitterPCANode(VoicelabNode):
             jitter_pca_df = pd.DataFrame(data=principal_components, columns=['JitterPCA'])
 
             return {
-                'jitter_pca_df': jitter_pca_df
+                'jitter_pca_df': jitter_pca_df.values.tolist()
             }
 
         except:

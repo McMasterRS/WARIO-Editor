@@ -27,6 +27,9 @@ class MeasureHarmonicityNode(VoicelabNode):
             'Silence Threshold': 0.1,
             'Periods per Window': 1.0
         }
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
 
     def process(self):
         'hnr'

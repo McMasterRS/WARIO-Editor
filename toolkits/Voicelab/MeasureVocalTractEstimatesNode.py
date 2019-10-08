@@ -22,6 +22,9 @@ class MeasureVocalTractEstimatesNode(VoicelabNode):
             'formants': self.measure_formants
         }
 
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
     def process(self):
         'vocal_tract_estimates_mean'
 

@@ -14,6 +14,10 @@ from toolkits.Voicelab.VoicelabNode import VoicelabNode
 
 class ManipulateGenderAgeNode(VoicelabNode):
 
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
+
     def process(self):
 
         sound = self.args['voice']

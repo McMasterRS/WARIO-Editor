@@ -2,6 +2,7 @@ from pipeline.Node import Node
 from parselmouth.praat import call
 
 ###################################################################################################
+# Extends the basic node with some shared voicelab functionalities
 ###################################################################################################
 
 class VoicelabNode(Node):

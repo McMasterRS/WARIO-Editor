@@ -11,7 +11,7 @@ from pipeline.FileWidget import FileWidget
 # 'file_locations'   : list of filesystem locations for where to find the voice files
 ###################################################################################################
 # RETURNS
-# 'voice' [batch]   : returns a parselmouth voice object for each file loaded
+# 'voice' [batch]   : return a parselmouth voice object for each file loaded
 ###################################################################################################
 
 class LoadVoicesNode(Node):
@@ -20,16 +20,22 @@ class LoadVoicesNode(Node):
         super().__init__(name)
         self.done = False
 
+    ###############################################################################################
+    # process: Retrieve the next file location and return it
+    ###############################################################################################
     def process(self):
         item = self.get_next(self.state['voices'])
         return {
             'voice': item
         }
 
+    ###############################################################################################
+    # start: WARIO hook, run before any data is processed to load the data in
+    ###############################################################################################
     def start(self):
         self.state['voices'] = []
 
-        # You can optionally pass in file locations otherwise it will prompt for files
+        # If a collection of file locations are present use those, otherwise prompt for them
         if len(self.args['file_locations']) == 0:
             ex = FileWidget()
             self.state['files'] = ex.openFileNamesDialog()
@@ -38,7 +44,10 @@ class LoadVoicesNode(Node):
 
         for file_path in self.state['files']:
             self.state['voices'].append(parselmouth.Sound(file_path))
-
+            
+    ###############################################################################################
+    # get_next: Retrieve the next file location by simply poping off the stack
+    ###############################################################################################
     def get_next(self, collection):
         item = collection.pop()
         if len(collection) <= 0:

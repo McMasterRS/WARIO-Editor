@@ -33,6 +33,9 @@ class VisualizePitchNode(VoicelabNode):
             'intensity': self.measure_intensity,
         }
 
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
     def process(self):
 
         voice = self.args['voice']
@@ -41,15 +44,11 @@ class VisualizePitchNode(VoicelabNode):
         pitch = self.args['pitch']
         intensity = self.args['intensity']
 
-        try:
+        if callable(pitch):
             pitch = pitch(voice)
-        except:
-            print('oops')
         
-        try:
+        if callable(intensity):
             intensity = intensity(voice)
-        except:
-            print('oops')
 
         host = figure.axes[0]
 
@@ -88,7 +87,7 @@ class VisualizePitchNode(VoicelabNode):
 
     def measure_intensity(self, voice):
         measure_intensity = MeasureIntensityNode('Measure Intensity')
-        measure_intensity.args['voice'] = self.args['voice']
+        measure_intensity.args['voice'] = voice
         results = measure_intensity.process()
         self.cached = { voice: results['Voice Intensity'] }
         return results['Voice Intensity']

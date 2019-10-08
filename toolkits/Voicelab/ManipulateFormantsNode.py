@@ -26,6 +26,9 @@ class ManipulateFormantsNode(VoicelabNode):
             'factor': 0.85
         }
 
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
     def process(self):
         sound = self.args['voice']
         unit = self.args['unit']

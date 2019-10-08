@@ -22,6 +22,9 @@ from toolkits.Voicelab.MeasureIntensityNode import MeasureIntensityNode
 
 class VisualizeIntensityNode(VoicelabNode):
 
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
     def process(self):
 
         figure = self.args['figure']

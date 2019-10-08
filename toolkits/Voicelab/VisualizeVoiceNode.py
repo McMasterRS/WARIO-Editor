@@ -30,6 +30,9 @@ class VisualizeVoiceNode(VoicelabNode):
                'hot', 'afmhot', 'gist_heat', 'copper'])
         }
 
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
     def process(self):
 
         voice = self.args['voice']

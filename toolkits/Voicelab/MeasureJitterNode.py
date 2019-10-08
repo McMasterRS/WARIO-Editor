@@ -27,6 +27,9 @@ class MeasureJitterNode(VoicelabNode):
             'longest_period': 0.02,
             'maximum_period_factor': 1.3
         }
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
 
     def process(self):
 
@@ -58,28 +61,28 @@ class MeasureJitterNode(VoicelabNode):
         # todo change this so that it accepts defaults unless user is in advanced mode
         localabsolute_jitter: float = call(point_process, "Get jitter (local, absolute)",
             start_time,
-            shortest_period,
+            end_time,
             shortest_period,
             longest_period,
             max_period_factor)
 
         rap_jitter: float = call(point_process, "Get jitter (rap)",
             start_time,
-            shortest_period,
+            end_time,
             shortest_period,
             longest_period,
             max_period_factor)
 
         ppq5_jitter: float = call(point_process, "Get jitter (ppq5)",
             start_time,
-            shortest_period,
+            end_time,
             shortest_period,
             longest_period,
             max_period_factor)
 
         ddp_jitter: float = call(point_process, "Get jitter (ddp)",
             start_time,
-            shortest_period,
+            end_time,
             shortest_period,
             longest_period,
             max_period_factor)

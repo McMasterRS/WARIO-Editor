@@ -22,6 +22,9 @@ class ManipulatePitchAndFormantsNode(VoicelabNode):
             "pitch_factor": -0.5,
             "formant_factor": 0.25
         }
+    ###############################################################################################
+    # process: WARIO hook called once for each voice file.
+    ###############################################################################################
 
     def process(self):
 
