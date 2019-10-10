@@ -93,6 +93,7 @@ class InputTab(QWidget):
         pipeline_results = pipeline.start()
 
         self.model['results'] = {}
+        self.model['active_fn'] = []
 
         # Index our results by file path, then function name, then results
         for i, run in enumerate(pipeline_results):
@@ -102,6 +103,7 @@ class InputTab(QWidget):
             for j, fn_node in enumerate(run):
                 fn_name = fn_node.node_id
                 self.model['results'][file_path][fn_name] = run[fn_node]
+                self.model['active_fn'].append(fn_name)
 
         # active_functions = ['Visualize Voice']
         # for fn in self.model['functions']:

@@ -89,28 +89,26 @@ class OutputTab(QWidget):
 
         options = QFileDialog.Options()
         temp_loaded = QFileDialog.getExistingDirectory (self)
+        flag = False
 
         if temp_loaded != '':
 
-            sheets = {}
             results = self.model['results']
+            active_fn = self.model['active_fn']
 
-            sheets = {}
+            sheets = {fn_name: {'file': []} for fn_name in active_fn}
             settings_sheets = {}
 
-            for i, fn in enumerate(results['functions']):
-                sheets[fn] = {
-                    'file name': []
-                }
-                for j, file_path in enumerate(results['functions'][fn]):
-                    sheets[fn]['file name'].append(file_path)
-                    file_name = file_path.split('/')[-1].split('.wav')[0]
+            for i, file_path in enumerate(results):
+                file_name = file_path.split('/')[-1].split('.wav')[0]
 
-                    for j, result in enumerate(results['functions'][fn][file_path]):
-                        result_value = results['functions'][fn][file_path][result]
+                for fn_name in results[file_path]:
+
+                    for result_name in results[file_path][fn_name]:
+                        result_value = results[file_path][fn_name][result_name]
 
                         if isinstance(result_value, parselmouth.Sound):
-                            modified_path = temp_loaded + '/' + file_name + '_' + fn.lower().replace(' ', '_') + '.wav'
+                            modified_path = temp_loaded + '/' + file_name + '_' + fn_name.lower().replace(' ', '_') + '.wav'
                             self.save_voice(result_value, modified_path)
 
                         elif isinstance(result_value, Figure):
@@ -118,9 +116,41 @@ class OutputTab(QWidget):
                             self.save_spectrogram(result_value, modified_path)
 
                         elif type(result_value) in display_whitelist:
-                            if result not in sheets[fn]:
-                                sheets[fn][result] = []
-                            sheets[fn][result].append(str(results['functions'][fn][file_path][result]))
+                            if result_name not in sheets[fn_name]:
+                                sheets[fn_name][result_name] = []
+                            sheets[fn_name][result_name].append(str(result_value))
+                            flag = True
+
+                    # We only want the file path to be added once, and only if there are results to add
+                    if flag:
+                        sheets[fn_name]['file'].append(file_path)
+                    flag = False
+
+            # for i, file_path in enumerate(results):
+            #     file_name = file_path.split('/')[-1].split('.wav')[0]
+
+            #     # sheets[fn] = {
+            #     #     'file name': []
+            #     # }
+
+            #     for j, fn_name in enumerate(results[file_path]):
+            #         sheets[fn_name]['file name'].append(file_path)
+
+            #         for k, result in enumerate(results[fn][file_path]):
+            #             result_value = results[fn][file_path][result]
+
+            #             if isinstance(result_value, parselmouth.Sound):
+            #                 modified_path = temp_loaded + '/' + file_name + '_' + fn.lower().replace(' ', '_') + '.wav'
+            #                 self.save_voice(result_value, modified_path)
+
+            #             elif isinstance(result_value, Figure):
+            #                 modified_path = temp_loaded + '/' + file_name + '.png'
+            #                 self.save_spectrogram(result_value, modified_path)
+
+            #             elif type(result_value) in display_whitelist:
+            #                 if result not in sheets[fn]:
+            #                     sheets[fn][result] = []
+            #                 sheets[fn][result].append(str(results[fn][file_path][result]))
 
             for i, fn_name in enumerate(self.model['settings']):
                 settings_sheets[fn_name] = {}

@@ -115,7 +115,7 @@ class MeasureSettings(QWidget):
 
             if len(self.model['settings'][fn_name]['value']) == 0:
                 label = QLabel()
-                label.setText('No settings to  configure')
+                label.setText('No settings to configure')
                 self.stack_layouts[fn_name].addWidget(label)
             else:
                 for parameter in self.model['settings'][fn_name]['value']:
@@ -172,6 +172,7 @@ class SettingWidget(QWidget):
         self.model = model
         self.name = name
         self.type = type(default)
+        self.fn_name = fn_name
 
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
