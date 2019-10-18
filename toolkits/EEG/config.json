@@ -92,24 +92,6 @@
                         "maximum" : 2147483647,
                         "value" : 100
                     }
-                },
-                "filter1" : {
-                    "text" : "Min Filter",
-                    "type" : "spinbox",
-                    "params" : {
-                        "minimum" : 0,
-                        "maximum" : 2147483647,
-                        "value" : 10
-                    }
-                },
-                "filter2" : {
-                "text" : "Max Filter",
-                    "type" : "spinbox",
-                    "params" : {
-                        "minimum" : 0,
-                        "maximum" : 2147483647,
-                        "value" : 30
-                    }
                 }
             }
         },
@@ -142,13 +124,6 @@
                     "socket": false,
                     "type": "epoch"
                 },
-                "Evoked Data": {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": true,
-                    "socket": false,
-                    "type": "evoked"
-                },
                 "Trigger Data": {
                     "index": -1,
                     "preset": "attr_preset_1",
@@ -160,6 +135,62 @@
             "settings" : {
                 "settingsFile" : "raw2epoch",
                 "settingsClass" : "Raw2EpochSettings"
+            }
+        },
+        "Filter" : {
+            "preset" : "node_default",
+            "file" : "filter.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Preprocessing",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Raw": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["rawEEG"]
+                },
+                "Filtered Raw": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "rawEEG"   
+                }
+            },
+            "settings" : {
+                "settingsFile" : "filter",
+                "settingsClass" : "FilterSettings"
+            }
+        },
+        "Create Evoked" : {
+            "preset" : "node_default",
+            "file" : "evoked.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Preprocessing",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Epoch Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "epoch"
+                },
+                "Evoked Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "evoked"
+                }
+            },
+            "settings" : {
+                "settingsFile" : "evoked",
+                "settingsClass" : "EvokedSettings"
             }
         },
         "Fit ICA" : {
@@ -240,13 +271,8 @@
                 }
             },
             "settings" : {
-                "folder" : {
-                    "text" : "Save Location",
-                    "type" : "loadbox",
-                    "params" : {
-                        "text" : ""
-                    }
-                }
+                "settingsFile" : "saveEpochs",
+                "settingsClass" : "SaveEpochSettings"
             }
         },
         "Save Epochs ICA" : {
@@ -265,7 +291,234 @@
                     "type": ["epochICA"]   
                 }
             },
-            "settings" : {}
+            "settings" : {
+                "settingsFile" : "saveEpochs",
+                "settingsClass" : "SaveEpochSettings"
+            }
+        },
+        "EOG Correlation AC" : {
+            "preset" : "node_default",
+            "file" : "eogCorrelationArti.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Artifact Correction",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "ICA Solution": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["ICA"]   
+                },
+                "Epochs": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["epoch"]   
+                },
+                "Corrected ICA": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "ICA"   
+                },
+                "Corrected Epochs": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "epoch"   
+                },
+                "Removed Indices": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "list"   
+                }
+            },
+            "settings" : {
+                "settingsFile" : "eogCorrelationArti",
+                "settingsClass" : "EogCorrelationArtiSettings"
+            }
+        },
+        "EEG Correlation AC" : {
+            "preset" : "node_default",
+            "file" : "eegCorrelationArti.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Artifact Correction",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "ICA Solution": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["ICA"]   
+                },
+                "Epochs": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["epoch"]   
+                },
+                "Corrected ICA": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "ICA"   
+                },
+                "Corrected Epochs": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "epoch"   
+                },
+                "Removed Indices": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "list"   
+                }
+            },
+            "settings" : {
+                "settingsFile" : "eogCorrelationArti",
+                "settingsClass" : "EogCorrelationArtiSettings"
+            }
+        },
+        "ECG Correlation AC" : {
+            "preset" : "node_default",
+            "file" : "ecgCorrelationArti.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Artifact Correction",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "ICA Solution": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["ICA"]   
+                },
+                "Epochs": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["epoch"]   
+                },
+                "Corrected ICA": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "ICA"   
+                },
+                "Corrected Epochs": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "epoch"   
+                },
+                "Removed Indices": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "list"   
+                }
+            },
+            "settings" : {
+                "settingsFile" : "eogCorrelationArti",
+                "settingsClass" : "EogCorrelationArtiSettings"
+            }
+        },
+        "Plot Sources" : {
+            "preset" : "node_default",
+            "file" : "plotSources.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Output",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Data": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["rawEEG", "epoch"]   
+                },  
+                "ICA Solution": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["ICA"]   
+                }
+            },
+            "settings" : {
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
+            }
+        },
+        "Plot Components" : {
+            "preset" : "node_default",
+            "file" : "plotComponents.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Output",
+            "toolkit" : "EEG",
+            "attributes" : {  
+                "ICA Solution": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["ICA"]   
+                }
+            },
+            "settings" : {
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
+            }
+        },
+        "Plot Properties" : {
+            "preset" : "node_default",
+            "file" : "plotProperties.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Output",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Data": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["rawEEG", "epoch"]   
+                },  
+                "ICA Solution": {     
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["ICA"]   
+                }
+            },
+            "settings" : {
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
+            }
         }
     }
 }

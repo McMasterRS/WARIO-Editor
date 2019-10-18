@@ -29,7 +29,6 @@ class importEEGData(Node):
         raw.set_montage(montage, set_dig=True) 
         raw.pick_types(eeg=True,exclude='bads')
         raw.set_eeg_reference('average',projection=False)
-        raw.filter(self.parameters["filter1"], self.parameters["filter2"], n_jobs=1, fir_design='firwin')
         
         return {"Raw" : raw, "Triggers" : trigData}    
         

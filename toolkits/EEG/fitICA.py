@@ -188,5 +188,4 @@ class fitICA(Node):
                                     kurt_criterion=self.parameters["kurt"], 
                                     var_criterion=self.parameters["var"],
                                     method=self.parameters["method"])
-
         return {"ICA Solution" : ica}

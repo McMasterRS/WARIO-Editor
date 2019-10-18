@@ -28,7 +28,7 @@ class Raw2EpochSettings(CustomSettings):
         self.layout.insertRow(-1, self.tminLabel, self.tminWidget)
         
         self.tmaxWidget = QtWidgets.QSpinBox()
-        self.tmaxWidget.setMinimum(.0)
+        self.tmaxWidget.setMinimum(1)
         self.tmaxWidget.setMaximum(1000)
         if "tmaxValue" in settings.keys():
             self.tmaxWidget.setValue(settings["tmaxValue"])
@@ -117,10 +117,5 @@ class raw2epoch(Node):
                             reject_by_annotation=True,
                             detrend=self.parameters["detrend"], 
                             verbose=verboseDict[self.parameters["verbose"]])
-                            
-                 
-        
-        # create Evoked object
-        Evoked = [Epochs[name].average() for name in ('NMW', 'MW')]
-      
-        return {"Epoch Data" : Epochs, "Evoked Data" : Evoked, "Trigger Data" :trigger_data}
+  
+        return {"Epoch Data" : Epochs, "Trigger Data" :trigger_data}

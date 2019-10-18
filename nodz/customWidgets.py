@@ -234,7 +234,6 @@ class GlobalNodeComboBox(QtWidgets.QComboBox):
             
         self.loaded = False
         
-
 # Loadbox widget with file dialog
 class loadWidget(QtWidgets.QHBoxLayout):
     def __init__(self, parent):
@@ -252,6 +251,18 @@ class loadWidget(QtWidgets.QHBoxLayout):
             self.textbox.setText(f)
         self.parent.genSettings()
         
+        
+class saveWidget(loadWidget):
+    def __init__(self, parent):
+        super(saveWidget, self).__init__(parent)
+        self.button.clicked.connect(self.saveFile)
+        self.button.setText("Save")
+        
+    def saveFile(self):
+        f = QtWidgets.QFileDialog.getSaveFileName()[0]
+        if f is not "":
+            self.textbox.setText(f)
+            
 # Loadbox exclusively for loading custom widget code
 class customWidget(loadWidget):
     def __init__(self, parent):

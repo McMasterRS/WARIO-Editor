@@ -3,8 +3,8 @@ import random
 
 class randomInt(Node):
 
-    def __init__(self, name):
-        super(randomInt, self).__init__(name)
+    def __init__(self, name, params):
+        super(randomInt, self).__init__(name, params)
         
     def process(self):
         return {

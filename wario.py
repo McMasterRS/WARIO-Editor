@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
 from pipeline.RunPipeline import runPipeline
+from nodz.genGraph import generateGraph
 import sys, os, textwrap
 
 version = "0.0.1"
@@ -85,7 +86,9 @@ def startNodz():
             runPipeline(nodz.currentFileName)
         else:
             nodz.loadGraphDialog()
-            runPipeline(nodz.currentFileName)
+            if nodz.currentFileName != "":
+                window.setWindowTitle("WARIO - " + nodz.currentFileName)
+                runPipeline(nodz.currentFileName)
     
     saveRunAct = QtWidgets.QAction(getIcon('SP_DriveHDIcon'), "&Run", window)
     saveRunAct.setShortcut("Ctrl+R")
@@ -109,6 +112,22 @@ def startNodz():
     loadAct.setShortcut("Ctrl+L")
     loadAct.setStatusTip("Load Flowchart")
     loadAct.triggered.connect(loadFile)
+    
+    def plotGraph():
+        if nodz.currentFileName == "":
+            nodz.loadGraphDialog()
+            if nodz.currentFileName != "":
+                window.setWindowTitle("WARIO - " + nodz.currentFileName)
+            else:
+                return
+        
+        dialog = QtWidgets.QFileDialog.getSaveFileName(caption = "Graph Save Location",directory='.', filter="PDF files (*.pdf)")
+        if (dialog[0] != ''):
+            generateGraph(nodz.currentFileName, dialog[0])
+    
+    graphAct = QtWidgets.QAction(getIcon('SP_FileDialogListView'), "&Plot Graph", window)
+    graphAct.setStatusTip("Plot Graph")
+    graphAct.triggered.connect(plotGraph)
 
     quitAct = QtWidgets.QAction(getIcon('SP_DialogCancelButton'), "&Quit", window)
     quitAct.setStatusTip("Quit")
@@ -117,6 +136,7 @@ def startNodz():
     fileMenu.addAction(saveAct)  
     fileMenu.addAction(saveRunAct)
     fileMenu.addAction(loadAct)
+    fileMenu.addAction(graphAct)    
     fileMenu.addAction(quitAct)
     
     ### EDIT MENU
@@ -136,7 +156,7 @@ def startNodz():
     clearAct.triggered.connect(nodz.clearGraph)
 
     editMenu.addAction(globalAct)
-    editMenu.addAction(duplicateAct)
+    #editMenu.addAction(duplicateAct)
     editMenu.addAction(clearAct)
 
     # Function generator that creates individual function calls for each of the 
@@ -185,7 +205,7 @@ def startNodz():
                     
             Data pipeline with integrated flowchart-based interface allowing for the quick and effective development of complex data analysis flows.
 
-            Developed by Ron Harwood, Thomas Mudway and Oliver Cook at the McMaster University CANARIE research software development group  
+            Developed by Ron Harwood, Thomas Mudway and Oliver Cook at the McMaster University Research Software Engineering group 
             '''.format(version)))
     
     def openRepo():
