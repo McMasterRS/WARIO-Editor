@@ -44,7 +44,7 @@ class eogCorrelationArti(Node):
         epochs = self.args["Epochs"]
         
         # Repeat this for ECG
-        eog_epochs = mne.preprocessing.create_eog_epochs(epochs.copy(), reject = None)
+        eog_epochs = mne.preprocessing.create_eog_epochs(epochs.copy(), picks = 'eog', reject = None)
         eog_average = eog_epochs.average()
         
         # Get ICs that are highly correlated to each EOG channel

@@ -9,6 +9,16 @@
             "type"  : "Int",
             "value" : "100",
             "const" : false
+        },
+        "Output Folder" : {
+            "type"  : "String",
+            "value" : "./",
+            "const" : true
+        },
+        "Output Filename" : {
+            "type"  : "String",
+            "value" : "data",
+            "const" : true
         }
     },
 
@@ -178,7 +188,7 @@
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": "epoch"
+                    "type": ["epoch"]
                 },
                 "Evoked Data": {
                     "index": -1,
@@ -243,12 +253,12 @@
                     "socket": true,
                     "type": ["epoch"]   
                 },
-                "Epochs ICA": {     
+                "Epochs": {     
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": true,
                     "socket": false,
-                    "type": "epochICA"   
+                    "type": "epoch"   
                 }
             },
             "settings" : {}
@@ -518,6 +528,90 @@
             "settings" : {
                 "settingsFile" : "plotProperties",
                 "settingsClass" : "PlotSettings"
+            }
+        },
+        "Plot Peak" : {
+            "preset" : "node_default",
+            "file" : "evokedPeak.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Analysis",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                }
+            },
+            "settings" : {
+                "settingsFile" : "evokedPeak",
+                "settingsClass" : "EvokedPeakSettings"
+            }
+        },
+        "Plot Local Peaks" : {
+            "preset" : "node_default",
+            "file" : "evokedLocalPeak.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Analysis",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                }
+            },
+            "settings" : {
+                "settingsFile" : "evokedPeak",
+                "settingsClass" : "EvokedPeakSettings"
+            }
+        },
+        "Plot Evoked Times" : {
+            "preset" : "node_default",
+            "file" : "evokedCustomTimes.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Analysis",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                }
+            },
+            "settings" : {
+                "settingsFile" : "evokedPeak",
+                "settingsClass" : "EvokedPeakSettings"
+            }
+        },
+        "Compare Evokeds" : {
+            "preset" : "node_default",
+            "file" : "compareEvokeds.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Analysis",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                }
+            },
+            "settings" : {
+                "settingsFile" : "evokedPeak",
+                "settingsClass" : "EvokedPeakSettings"
             }
         }
     }

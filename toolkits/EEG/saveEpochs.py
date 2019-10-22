@@ -49,11 +49,9 @@ class saveEpochs(Node):
 
     def __init__(self, name, params):
         super(saveEpochs, self).__init__(name, params)
-        
+        assert (self.parameters["file"] is not ""), "ERROR: No filename given in 'Save Epochs' node. Please update the node settings and re-run"
         
     def process(self):
     
         epochs = self.args["Epochs"]
-        epochs.save(self.parameters["file"])
-        
-        return
+        epochs.save(self.parameters["file"], overwrite = True)

@@ -253,13 +253,15 @@ class loadWidget(QtWidgets.QHBoxLayout):
         
         
 class saveWidget(loadWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, types):
         super(saveWidget, self).__init__(parent)
+        self.button.clicked.disconnect()
         self.button.clicked.connect(self.saveFile)
         self.button.setText("Save")
+        self.types = types
         
     def saveFile(self):
-        f = QtWidgets.QFileDialog.getSaveFileName()[0]
+        f = QtWidgets.QFileDialog.getSaveFileName(filter = self.types)[0]
         if f is not "":
             self.textbox.setText(f)
             
@@ -271,7 +273,7 @@ class customWidget(loadWidget):
         
     def loadFile(self):
         f = QtWidgets.QFileDialog.getOpenFileName(directory='.', filter="Python source files (*.py)")[0]
-        if f is not "":
+        if f is not "": 
             self.textbox.setText(f)
             self.buildCustomUI()
         else:

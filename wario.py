@@ -151,9 +151,13 @@ def startNodz():
     duplicateAct.setStatusTip("Duplicate selected nodes")
     duplicateAct.triggered.connect(nodz._copySelectedNodes)
 
+    def clearGraph():
+        nodz.clearGraph()
+        nodz.currentFileName = ""
+        
     clearAct = QtWidgets.QAction(getIcon('SP_DialogDiscardButton'), "&Clear flowchart", window)
     clearAct.setStatusTip("Clear flowchart of all nodes")
-    clearAct.triggered.connect(nodz.clearGraph)
+    clearAct.triggered.connect(clearGraph)
 
     editMenu.addAction(globalAct)
     #editMenu.addAction(duplicateAct)

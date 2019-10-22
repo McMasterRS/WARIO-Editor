@@ -27,6 +27,8 @@ class Pipeline():
         self.event_callbacks = {}
         #
         self.results = {}
+        # Enable debug prints
+        self.verbose = False
 
     ################################################################################################
     # Pipeline: Add
@@ -79,7 +81,8 @@ class Pipeline():
     ###############################################################################################
     def start(self):
         """ Initializes all the nodes and starts the first pass """
-        print(self.nodes)
+        if self.verbose:
+            print(self.nodes)
 
         print("############################ Starting ############################")
 

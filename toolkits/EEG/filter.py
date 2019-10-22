@@ -152,7 +152,6 @@ class FilterSettings(CustomSettings):
             self.firWindow.setDisabled(False)
             
     def updateName(self, index):
-        print("Test")
         names = ["Low Pass", "High Pass", "Band Pass", "Notch"]
         self.parent.name = names[index] + " Filter"
         
@@ -166,7 +165,7 @@ class filter(Node):
     
         tab = self.parameters["tab"]
         raw = self.args["Raw"]
-        
+
         # If not a notch filter
         if tab != 3:
         

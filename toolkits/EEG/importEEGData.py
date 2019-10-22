@@ -5,8 +5,8 @@ import numpy as np
 class importEEGData(Node):
 
     def __init__(self, name, params = None):
-        super(importEEGData, self).__init__(name)
-        self.parameters = params
+        super(importEEGData, self).__init__(name, params)
+        assert(self.parameters["file"] is not ""), "ERROR: Import Data node has no input file set. Please update the node's settings and re-run"
 
     def process(self):
   
@@ -22,8 +22,10 @@ class importEEGData(Node):
 
         montage = mne.channels.read_montage(kind = file, ch_names = None, path = folder, transform = True)
         ch_names = montage.ch_names
+        
+        ch_types = open(self.parameters["channelTypes"], 'r').read().split(",")
 
-        info = mne.create_info(ch_names = ch_names[-16:], sfreq = sfreq, ch_types = 'eeg') ## FIXME
+        info = mne.create_info(ch_names = ch_names[-16:], sfreq = sfreq, ch_types = ch_types)
         raw = mne.io.RawArray(data["EEG"], info, first_samp = 0)
         
         raw.set_montage(montage, set_dig=True) 

@@ -1,6 +1,5 @@
 from pipeline.Node import Node
 from nodz.customSettings import CustomSettings
-from nodz.customWidgets import ExpandingTable
 import mne
 
 from PyQt5 import QtWidgets
@@ -32,17 +31,15 @@ class EvokedSettings(CustomSettings):
         self.parent.settings = settings
         self.parent.variables = vars
 
-class evoked(Node):
+class compareEvokeds(Node):
 
     def __init__(self, name, params):
-        super(evoked, self).__init__(name, params)
+        super(compareEvokeds, self).__init__(name, params)
     
     def process(self):
-        epochs = self.args["Epoch Data"]
-        
-        # create Evoked object
-        evoked = [epochs[name].average() for name in self.parameters["eventIDs"].keys()]
-        for i, name in enumerate(self.parameters["eventIDs"].keys()):
-            evoked[i].comment = name
-        
-        return {"Evoked Data" : evoked}
+        evokedData = self.args["Evoked Data"]
+        evokedDict = {}
+        for evoked in evokedData:
+            evokedDict[evoked.comment] = evoked
+        fig = mne.viz.plot_compare_evokeds(evokedDict, show = False)
+        fig.show()

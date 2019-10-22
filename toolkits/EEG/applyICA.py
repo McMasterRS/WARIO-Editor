@@ -13,8 +13,8 @@ class applyICA(Node):
     
         # Make compatable with both epochs/raw
     
-        EpochsICA = solution.apply(epochs)
+        correctedEpochs = solution.apply(epochs)
         
         # Exclude
         
-        return {"Epochs ICA" : EpochsICA}
+        return {"Epochs" : correctedEpochs}

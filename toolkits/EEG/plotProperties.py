@@ -3,6 +3,7 @@ import mne
 import pickle
 from nodz.customSettings import CustomSettings
 from nodz.customWidgets import saveWidget
+import matplotlib.pyplot as plt
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
@@ -21,13 +22,7 @@ class PlotSettings(CustomSettings):
             self.showGraph.setChecked(True)
         self.layout.insertRow(-1, self.showGraph, None)
         
-        label = QtWidgets.QLabel("File type")
-        self.fileType = QtWidgets.QComboBox()
-        self.fileType.addItems(["Image", "PDF", "Pickle"])
-        if "fileType" in settings.keys():
-            self.fileType.setCurrentText(settings["fileType"])
-        
-        self.saveLoc = saveWidget(self)
+        self.saveLoc = saveWidget(self, "PNG image (*.png);; PDF (*.pdf);; Pickle (*.pkl)")
         if "saveLoc" in settings.keys():
             self.saveLoc.textbox.setText(settings["saveLoc"])
                     
@@ -39,7 +34,6 @@ class PlotSettings(CustomSettings):
             self.saveGraph.setChecked(False)
             
         self.layout.insertRow(-1, self.saveGraph, self.saveLoc)
-        self.layout.insertRow(-1, label, self.fileType)
         
         self.setLayout(self.layout)
         
@@ -63,7 +57,6 @@ class PlotSettings(CustomSettings):
         self.parent.variables = vars
         
     def updateSave(self, state):
-        self.fileType.setEnabled(state)
         self.saveLoc.textbox.setEnabled(state)
         self.saveLoc.button.setEnabled(state)
 
@@ -71,6 +64,9 @@ class plotProperties(Node):
     def __init__(self, name, params):
         super(plotProperties, self).__init__(name, params)
 
+        if self.parameters["saveGraph"] is not None:
+            assert(self.parameters["saveGraph"] is not ""), "ERROR: Plot Properties node set to save but no filename has been given. Please update the node settings and re-run"
+            
     def process(self):
 
         inst = self.args["Data"]
@@ -80,13 +76,17 @@ class plotProperties(Node):
         if self.parameters["showGraph"] == True:
             for fig in figs:
                 fig.show()
-              
-        f = self.paramters["saveGraph"]
-        if f is not None:
-            if self.parameters["fileType"] == "Image":
-                return
-            elif self.parameters["fileType"] == "PDF":
-                return
-            elif self.parameters["fileType"] == "Pickle":
-                return
+                
+        if self.parameters["saveGraph"] is not None:
+            for i, fig in enumerate(figs):
+                f = self.parameters["saveGraph"]
+                name = f.split(".")[0]
+                type = f.split(".")[-1]
+                f = name + "_" +  str(i) + "." + type
+                if type == "png":
+                    fig.savefig(f, format = "png")
+                elif type == "pdf":
+                    fig.savefig(f, format = "pdf")
+                elif type == "pkl":
+                    pickle.dump(fig, open(f, "wb"))
             

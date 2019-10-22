@@ -35,9 +35,12 @@ class NodeFactory():
     @classmethod
     def import_node(cls, type_id, toolkit_id, class_name):
         """ import the class for a new node and register it """
-        if type_id not in cls.registered_nodes:
-            module_name = "toolkits." + toolkit_id + '.' + class_name
-            module = importlib.import_module(module_name)
-            cls.register_node(type_id, getattr(module, class_name))
+        module_name = "toolkits." + toolkit_id + '.' + class_name
+        module = importlib.import_module(module_name)
+        
+        if type_id in cls.registered_nodes:
+            importlib.reload(module)
+
+        cls.register_node(type_id, getattr(module, class_name))
 
         return cls.registered_nodes[type_id]
