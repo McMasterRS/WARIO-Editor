@@ -69,6 +69,15 @@ def startNodz():
     toolkitMenu = menu.addMenu("&Toolkits")
 
     ### FILE MENU
+    
+    def clearGraph():
+        nodz.clearGraph()
+        nodz.currentFileName = ""
+        
+    clearAct = QtWidgets.QAction(getIcon('SP_FileIcon'), "&New", window)
+    clearAct.setShortcut("Ctrl+N")
+    clearAct.setStatusTip("Clear flowchart of all nodes")
+    clearAct.triggered.connect(clearGraph)
 
     def saveFile():
         nodz.saveGraphDialog()
@@ -90,23 +99,24 @@ def startNodz():
                 window.setWindowTitle("WARIO - " + nodz.currentFileName)
                 runPipeline(nodz.currentFileName)
     
-    saveRunAct = QtWidgets.QAction(getIcon('SP_DriveHDIcon'), "&Run", window)
+    saveRunAct = QtWidgets.QAction(getIcon('SP_DriveHDIcon'), "Run", window)
     saveRunAct.setShortcut("Ctrl+R")
     saveRunAct.setStatusTip("Save flowchart and run")
     saveRunAct.triggered.connect(saveRunFile)
     
     def loadFile():
         nodz.loadGraphDialog()
-        # Auto check toolkit options based on what the loaded file uses
-        toolkitList = nodz.toolkits
-        for tk in toolkitMenu.actions():
-            if tk.text() in toolkitList:
-                tk.setChecked(True)
-            else:
-                tk.setChecked(False)
-                
         if nodz.currentFileName != "":
-            window.setWindowTitle("WARIO - " + nodz.currentFileName)
+            # Auto check toolkit options based on what the loaded file uses
+            toolkitList = nodz.toolkits
+            for tk in toolkitMenu.actions():
+                if tk.text() in toolkitList:
+                    tk.setChecked(True)
+                else:
+                    tk.setChecked(False)
+                    
+            
+                window.setWindowTitle("WARIO - " + nodz.currentFileName)
 
     loadAct = QtWidgets.QAction(getIcon('SP_DialogOpenButton'), "&Load", window)
     loadAct.setShortcut("Ctrl+L")
@@ -133,9 +143,10 @@ def startNodz():
     quitAct.setStatusTip("Quit")
     quitAct.triggered.connect(nodz.checkClose)
 
+    fileMenu.addAction(clearAct)
     fileMenu.addAction(saveAct)  
-    fileMenu.addAction(saveRunAct)
     fileMenu.addAction(loadAct)
+    fileMenu.addAction(saveRunAct)
     fileMenu.addAction(graphAct)    
     fileMenu.addAction(quitAct)
     
@@ -151,17 +162,8 @@ def startNodz():
     duplicateAct.setStatusTip("Duplicate selected nodes")
     duplicateAct.triggered.connect(nodz._copySelectedNodes)
 
-    def clearGraph():
-        nodz.clearGraph()
-        nodz.currentFileName = ""
-        
-    clearAct = QtWidgets.QAction(getIcon('SP_DialogDiscardButton'), "&Clear flowchart", window)
-    clearAct.setStatusTip("Clear flowchart of all nodes")
-    clearAct.triggered.connect(clearGraph)
-
     editMenu.addAction(globalAct)
     #editMenu.addAction(duplicateAct)
-    editMenu.addAction(clearAct)
 
     # Function generator that creates individual function calls for each of the 
     # toolboxes to handle them being enabled/disabled

@@ -14,7 +14,7 @@ class Raw2EpochSettings(CustomSettings):
 
     # Build the settings UI
     def buildUI(self, settings):
-        self.baseLayout = QtWidgets.QHBoxLayout()
+        self.baseLayout = QtWidgets.QVBoxLayout()
         self.layout = QtWidgets.QFormLayout()
         
         self.tminWidget = QtWidgets.QSpinBox()
@@ -47,13 +47,12 @@ class Raw2EpochSettings(CustomSettings):
         self.verboseLabel.buildLinkedCheckbox("verbose", self.settings)
         self.layout.insertRow(-1, self.verboseLabel, self.verboseWidget)
         
-        rightLayout = QtWidgets.QVBoxLayout()
-        rightLayout.addWidget(QtWidgets.QLabel("Event IDs"))
         self.eventIDWidget = ExpandingTable("eventIDs", settings)
-        rightLayout.addWidget(self.eventIDWidget)
+        self.eventIDWidget.setHorizontalHeaderLabels(["Event ID"])
         
         self.baseLayout.addItem(self.layout)
-        self.baseLayout.addItem(rightLayout)
+        self.baseLayout.addWidget(self.eventIDWidget)
+        
         self.setLayout(self.baseLayout)
         
     # Return the values from each setting type

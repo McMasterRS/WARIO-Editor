@@ -10,5 +10,11 @@ class saveEpochsICA(Node):
         
         
     def process(self):
-        self.args["Epochs ICA"].save(self.parameters["file"], overwrite = True)
+    
+        if "globalSaveStart" in self.parameters.keys():
+            f = self.parameters["globalSaveStart"] + self.global_vars["Output Filename"] + self.parameters["globalSaveEnd"]
+        else:
+            f = self.parameters["file"]
+                
+        self.args["Epochs ICA"].save(f, overwrite = True)
         return 

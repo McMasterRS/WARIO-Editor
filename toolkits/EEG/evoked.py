@@ -13,8 +13,8 @@ class EvokedSettings(CustomSettings):
     # Build the settings UI
     def buildUI(self, settings):
         self.layout = QtWidgets.QFormLayout()
-        self.layout.addWidget(QtWidgets.QLabel("Event IDs"))
         self.eventIDWidget = ExpandingTable("eventIDs", settings)
+        self.eventIDWidget.setHorizontalHeaderLabels(["Event ID"])
         self.layout.addWidget(self.eventIDWidget)
         
         self.setLayout(self.layout)

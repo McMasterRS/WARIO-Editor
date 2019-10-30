@@ -14,7 +14,7 @@ class CustomSettings(QtWidgets.QWidget):
         
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
         self.setWindowIcon(self.style().standardIcon(getattr(QtWidgets.QStyle,"SP_TitleBarMenuButton")))
-        self.setWindowTitle("Settings")
+        self.setWindowTitle(self.parent.name + " Settings")
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         
         # Build the UI

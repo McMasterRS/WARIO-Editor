@@ -169,14 +169,12 @@ class fitICA(Node):
         
     def process(self):  
     
-        # Possibly will be epoch data - needs to work for both
         data = self.args["Raw/Epoch"] 
         
         randomState = None
         if self.parameters["randomState"] == True:
             randomState = 1
             
-        # Look at docs for this function https://mne.tools/dev/generated/mne.preprocessing.run_ica.html
         ica = mne.preprocessing.run_ica(data, 
                                     n_components=None, 
                                     max_pca_components=None,

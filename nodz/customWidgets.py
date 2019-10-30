@@ -4,6 +4,76 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 
+class GlobalSaveTabs(QtWidgets.QTabWidget):
+    def __init__(self, saveTypes, saveDialogString, settings):
+        super(GlobalSaveTabs, self).__init__()
+        self.globalName = ""
+        self.globalFolder = ""
+    
+        self.globalTab = QtWidgets.QWidget()
+        self.globalLayout = QtWidgets.QFormLayout()
+        self.customTab = QtWidgets.QWidget()
+        self.customLayout = QtWidgets.QFormLayout()
+        
+        self.previewLabel = QtWidgets.QLabel("")
+        
+        self.globalFilename = QtWidgets.QLineEdit()  
+        if "globalFilename" in settings.keys():
+            self.globalFilename.setText(settings["globalFilename"])
+        label = QtWidgets.QLabel("File Identifier")
+        self.globalLayout.addRow(label, self.globalFilename)
+        
+        self.globalFileType = QtWidgets.QComboBox()
+        self.globalFileType.addItems(saveTypes)
+        if "globalFileType" in settings.keys():
+            self.globalFileType.setCurrentText(settings["globalFileType"])
+        label = QtWidgets.QLabel("File type")
+        self.globalLayout.addRow(label, self.globalFileType)
+        
+        self.globalFilename.textChanged.connect(self.updatePreview)
+        self.globalFileType.currentTextChanged.connect(self.updatePreview)
+        
+        label = QtWidgets.QLabel("Filename:")
+        self.globalLayout.addRow(label, self.previewLabel)
+        
+        self.globalTab.setLayout(self.globalLayout)
+        self.addTab(self.globalTab, "Use Global Filename")
+         
+        label = QtWidgets.QLabel("File Location")
+        self.saveLoc = saveWidget(self, saveDialogString)
+        if "saveLoc" in settings.keys():
+            self.saveLoc.textbox.setText(settings["saveLoc"])
+        self.customLayout.insertRow(-1, label, self.saveLoc)
+        
+        self.customTab.setLayout(self.customLayout)
+        self.addTab(self.customTab, "Use Custom Filename")
+        
+        if "currentTab" in settings.keys():
+            self.setCurrentIndex(settings["currentTab"])
+    
+    def updateGlobals(self, globals):
+        self.globalName = globals["Output Filename"]["value"]
+        self.globalFolder = globals["Output Folder"]["value"]
+        
+        self.updatePreview("")
+        
+    def updatePreview(self, signal):
+        self.previewLabel.setText(self.globalName + "_" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower())
+
+    def genSettings(self, settings):
+        settings["saveLoc"] = self.saveLoc.textbox.text()
+        settings["globalFilename"] = self.globalFilename.text()
+        settings["globalFileType"] = self.globalFileType.currentText()
+        settings["currentTab"] = self.currentIndex()
+        
+    def genVars(self, vars):
+        if self.currentIndex() == 0:
+            vars["saveGraph"] = self.globalFolder + self.globalName + "_" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower()
+            vars["globalSaveStart"] = self.globalFolder + "\\"
+            vars["globalSaveEnd"] = "_" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower()
+        else:
+            vars["saveGraph"] = self.saveLoc.textbox.text()
+
 
 class ExpandingTable(QtWidgets.QTableWidget):
     def __init__(self, name, settings):
@@ -11,7 +81,6 @@ class ExpandingTable(QtWidgets.QTableWidget):
         
         self.cellChanged.connect(self.checkRowCount)
         
-        self.setHorizontalHeaderLabels(["Name"])
         header = self.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         
@@ -240,7 +309,7 @@ class loadWidget(QtWidgets.QHBoxLayout):
         super(loadWidget, self).__init__()
         self.parent = parent
         self.textbox = QtWidgets.QLineEdit()
-        self.button = QtWidgets.QPushButton("Load")
+        self.button = QtWidgets.QPushButton("Browse")
         self.button.clicked.connect(self.loadFile)
         self.addWidget(self.textbox)
         self.addWidget(self.button)
@@ -257,7 +326,6 @@ class saveWidget(loadWidget):
         super(saveWidget, self).__init__(parent)
         self.button.clicked.disconnect()
         self.button.clicked.connect(self.saveFile)
-        self.button.setText("Save")
         self.types = types
         
     def saveFile(self):

@@ -6,12 +6,10 @@ class GlobalVar():
         self.__val = val
         self.__cons = cons
         
-    def getVal():
+    def getVal(self):
         return self.__val
         
-    def setVal(newVal):
-        if not self.__cons:
-            self.__val = newVal
-        else:
-            print("ERROR: ATTEMPTED TO MODIFY VALUE OF CONSTANT GLOBAL VARIABLE")
-            sys.exit()
+    def setVal(self, newVal):
+        assert(not self.__cons), "ERROR: ATTEMPTED TO MODIFY VALUE OF CONSTANT GLOBAL VARIABLE"
+        self.__val = newVal
+

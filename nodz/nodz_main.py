@@ -1005,7 +1005,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
     def loadGraphDialog(self):
         dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.', filter="JSON files (*.json)")
-        if (dialog != ''):
+        if (dialog[0] != ''):
             if (not self.clearGraph()):
                 return
             self.loadGraph(filePath=dialog[0])
@@ -2414,12 +2414,12 @@ class ConnectionItem(QtWidgets.QGraphicsPathItem):
 
         path = QtGui.QPainterPath()
         path.moveTo(self.source_point)
-        dx = (self.target_point.x() - self.source_point.x()) * 0.5
+        dx = (self.target_point.x() - self.source_point.x()) 
         dy = self.target_point.y() - self.source_point.y()
-        ctrl1 = QtCore.QPointF(self.source_point.x() + dx, self.source_point.y() + dy * 0)
-        ctrl2 = QtCore.QPointF(self.source_point.x() + dx, self.source_point.y() + dy * 1)
-        path.cubicTo(ctrl1, ctrl2, self.target_point)
 
+        ctrl1 = QtCore.QPointF(self.source_point.x() + dx * 0.5, self.source_point.y() + dy * 0)
+        ctrl2 = QtCore.QPointF(self.source_point.x() + dx * 0.5, self.source_point.y() + dy * 1)
+        path.cubicTo(ctrl1, ctrl2, self.target_point)
         self.setPath(path)
 
 

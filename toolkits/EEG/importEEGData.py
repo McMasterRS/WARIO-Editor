@@ -1,16 +1,46 @@
 from pipeline.Node import Node
 import mne 
 import numpy as np
+import os
+
+from nodz.customSettings import CustomSettings
+from PyQt5 import QtWidgets, QtCore, QtGui
+
+class ImportDataSettings(CustomSettings):
+    def __init__(self, parent, settings):
+        super(ImportDataSettings, self).__init__(parent, settings)
+        
+    def buildUI(self, settings):
+        return
 
 class importEEGData(Node):
 
     def __init__(self, name, params = None):
         super(importEEGData, self).__init__(name, params)
         assert(self.parameters["file"] is not ""), "ERROR: Import Data node has no input file set. Please update the node's settings and re-run"
+        
+        self.parameters["updateGlobal"] = True
+        self.parameters["files"] = ["C:/Users/mudwayt/Documents/GitHub/nodz/saves/Data/MWEEG_Subject_0.npz", "C:/Users/mudwayt/Documents/GitHub/nodz/saves/Data/MWEEG_Subject_9.npz"]
+        self.parameters["makeFolders"] = True
 
     def process(self):
   
-        data = np.load(self.parameters["file"])
+        currentFile = self.parameters["files"][0]
+        data = np.load(currentFile)
+        print(data)
+        
+        # Update the global filename variable with each new file
+        # Useful for batch jobs where you want each dataset to output results with matching names
+        if self.parameters["updateGlobal"] == True:
+            self.global_vars["Output Filename"] = os.path.splitext(os.path.split(currentFile)[1])[0]
+
+        # Save output from each data file in its own folder
+        if self.parameters["makeFolders"] == True:
+            dir = os.path.join(self.global_vars["Output Folder"].getVal(), self.global_vars["Output Filename"])
+            self.global_vars["Output Filename"] = os.path.join(self.global_vars["Output Filename"], self.global_vars["Output Filename"])
+            if not os.path.isdir(dir):
+                os.mkdir(dir)
+              
         sfreq = self.parameters["sfreq"]
         
         trigTimes = data["SampleTime"][data["TriggerTime"] != 0.][:13] ## FIXME
@@ -32,9 +62,12 @@ class importEEGData(Node):
         raw.pick_types(eeg=True,exclude='bads')
         raw.set_eeg_reference('average',projection=False)
         
+        # Check if more data needs to be ran
+        self.parameters["files"].pop(0)
+        self.done = not len(self.parameters["files"]) > 0
+            
         return {"Raw" : raw, "Triggers" : trigData}    
         
 # ISSUES:
-#   - Need a way to set channel names
 #   - Need to only pull in eeg channels
 #   - Need to confirm this works with multiple input file types

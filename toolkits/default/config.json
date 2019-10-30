@@ -458,15 +458,56 @@
             },
             "settings": {}
         },
-        "Test Settings": {
+        "Merge Lists": {
             "preset": "node_default",
-            "file": "getGlobal.py",
-            "category": "Test Settings",
+            "file": "mergeLists",
+            "alternate": true,
+            "position": "none",
+            "category": "Utility",
             "toolkit" : "default",
-            "attributes": {},
-            "settings": {
-                "settingsFile" : "testSettings",
-                "settingsClass" : "TestSettings"
+            "attributes" : {
+                "List 1": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"]
+                },
+                "List 2": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"]
+                },
+                "List 3": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"]
+                },
+                "List 4": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"]
+                },
+                "Merged List": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "list"
+                }
+            },
+            "settings" : {
+                "delduplicates" : {
+                    "text"   : "Delete Duplicates",
+                    "type"   : "checkbox",
+                    "params" : {}
+                }
             }
         }
     }

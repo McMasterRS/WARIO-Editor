@@ -1,5 +1,6 @@
 from pipeline.Node import Node
 from nodz.customSettings import CustomSettings
+from nodz.customWidgets import GlobalSaveTabs
 import mne
 
 from PyQt5 import QtWidgets
@@ -11,20 +12,13 @@ class SaveEpochSettings(CustomSettings):
         super(SaveEpochSettings, self).__init__(parent, settings)
         
     def buildUI(self, settings):
-        self.layout = QtWidgets.QFormLayout()
-        self.saveLayout = QtWidgets.QHBoxLayout()
-        
-        self.textbox = QtWidgets.QLineEdit()
-        if "saveText" in settings.keys():
-            self.textbox.setText(settings["saveText"])
-        self.button = QtWidgets.QPushButton("Save")
-        self.button.clicked.connect(self.selectFolder)
-        self.saveLayout.addWidget(self.textbox)
-        self.saveLayout.addWidget(self.button)
-        
-        self.label = QtWidgets.QLabel("File Location")
-        self.layout.insertRow(-1, self.label, self.saveLayout)
+        self.layout = QtWidgets.QVBoxLayout()
+        self.tabs = GlobalSaveTabs(["FIF"], "FIF file (*.fif)", settings)
+        self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
+        
+    def updateGlobals(self, globals):
+        self.tabs.updateGlobals(globals)
         
     def genSettings(self):
         varList = {}
@@ -33,8 +27,11 @@ class SaveEpochSettings(CustomSettings):
         settingList["settingsFile"] = self.settings["settingsFile"]
         settingList["settingsClass"] = self.settings["settingsClass"]
         
-        varList["file"] = self.textbox.text()
-        settingList["saveText"] = self.textbox.text()
+        self.tabs.genSettings(settingList)
+        self.tabs.genVars(varList)
+        
+        varList["file"] = varList["saveGraph"]
+        varList.pop("saveGraph")
         
         self.parent.variables = varList
         self.parent.settings = settingList
@@ -54,4 +51,10 @@ class saveEpochs(Node):
     def process(self):
     
         epochs = self.args["Epochs"]
-        epochs.save(self.parameters["file"], overwrite = True)
+        
+        if "globalSaveStart" in self.parameters.keys():
+            f = self.parameters["globalSaveStart"] + self.global_vars["Output Filename"] + self.parameters["globalSaveEnd"]
+        else:
+            f = self.parameters["file"]
+        
+        epochs.save(f, overwrite = True)

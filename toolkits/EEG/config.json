@@ -13,41 +13,81 @@
         "Output Folder" : {
             "type"  : "String",
             "value" : "./",
-            "const" : true
+            "const" : false
         },
         "Output Filename" : {
             "type"  : "String",
             "value" : "data",
-            "const" : true
+            "const" : false
         }
     },
 
     "node_types": {
-        "Import Raw File": {
+        "Import Montage File" : {
             "preset": "node_default",
-            "file": "importRawData.py",
+            "file": "importEEGData.py",
             "alternate": true,
             "position": "none",
             "category": "Input",
             "toolkit" : "EEG",
             "attributes": {
-                "Raw": {
+                "Montage Data": {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": true,
                     "socket": false,
-                    "type": "rawEEG"
+                    "type": "montage"
                 }
             },
             "settings" : {
-                "file" : {
-                    "text" : "File",
-                    "type" : "loadbox",
-                    "params" : {
-                        "text" : ""
-                    }
-                }
+                "settingsFile" : "importEEGData",
+                "settingsClass" : "ImportDataSettings"
             }
+            
+        },
+        "Import Channel Data" : {
+            "preset": "node_default",
+            "file": "importEEGData.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Input",
+            "toolkit" : "EEG",
+            "attributes": {
+                "Channel Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "channelData"
+                }
+            },
+            "settings" : {
+                "settingsFile" : "importEEGData",
+                "settingsClass" : "ImportDataSettings"
+            }
+            
+        },
+        "Import Trigger Data" : {
+            "preset": "node_default",
+            "file": "importEEGData.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Input",
+            "toolkit" : "EEG",
+            "attributes": {
+                "Trigger Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "triggerData"
+                }
+            },
+            "settings" : {
+                "settingsFile" : "importEEGData",
+                "settingsClass" : "ImportDataSettings"
+            }
+            
         },
         "Import Data": {
             "preset": "node_default",
@@ -73,6 +113,8 @@
                 }
             },
             "settings" : {
+                "settingsFile" : "importEEGData",
+                "settingsClass" : "ImportDataSettings",
                 "file" : {
                     "text" : "File",
                     "type" : "loadbox",
@@ -110,7 +152,7 @@
             "file" : "raw2epoch.py",
             "alternate" : true,
             "position" : "none",
-            "category" : "Preprocessing",
+            "category" : "Processing",
             "toolkit" : "EEG",
             "attributes" : {
                 "Raw": {
@@ -152,7 +194,7 @@
             "file" : "filter.py",
             "alternate" : true,
             "position" : "none",
-            "category" : "Preprocessing",
+            "category" : "Processing",
             "toolkit" : "EEG",
             "attributes" : {
                 "Raw": {
@@ -180,7 +222,7 @@
             "file" : "evoked.py",
             "alternate" : true,
             "position" : "none",
-            "category" : "Preprocessing",
+            "category" : "Processing",
             "toolkit" : "EEG",
             "attributes" : {
                 "Epoch Data": {
@@ -251,7 +293,14 @@
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": ["epoch"]   
+                    "type": ["epoch", "raw"]   
+                },
+                "Excluded Channels" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"]   
                 },
                 "Epochs": {     
                     "index": -1,
@@ -547,8 +596,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "evokedPeak",
-                "settingsClass" : "EvokedPeakSettings"
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
             }
         },
         "Plot Local Peaks" : {
@@ -568,8 +617,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "evokedPeak",
-                "settingsClass" : "EvokedPeakSettings"
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
             }
         },
         "Plot Evoked Times" : {
@@ -589,8 +638,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "evokedPeak",
-                "settingsClass" : "EvokedPeakSettings"
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
             }
         },
         "Compare Evokeds" : {
@@ -610,9 +659,99 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "evokedPeak",
-                "settingsClass" : "EvokedPeakSettings"
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
             }
+        },
+        "Peak Latency Mean" : {
+            "preset" : "node_default",
+            "file" : "latencyMean.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Batch",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                }
+            },
+            "settings" : {}
+        },
+        "Peak Latency \u03C3" : {
+            "preset" : "node_default",
+            "file" : "latencyStdev.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Batch",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                }
+            },
+            "settings" : {}
+        },
+        "Peak Amplitude Mean" : {
+            "preset" : "node_default",
+            "file" : "amplitudeMean.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Batch",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                }
+            },
+            "settings" : {}
+        },
+        "Peak Amplitude \u03C3" : {
+            "preset" : "node_default",
+            "file" : "amplitudeStdev.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Batch",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                }
+            },
+            "settings" : {}
+        },
+        "Average Event Signal" : {
+            "preset" : "node_default",
+            "file" : "avSignal.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Batch",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Epoch Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["epoch"] 
+                }
+            },
+            "settings" : {}
         }
     }
 }

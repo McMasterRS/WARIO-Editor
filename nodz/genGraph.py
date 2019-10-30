@@ -33,6 +33,6 @@ def generateGraph(file_location, save_location):
                     conNames.append(name)              
                     
             for i, item in enumerate(conList):
-                dot.edge(item[0], item[1], label = conNames[i])
+                dot.edge(item[0], item[1])#, label = conNames[i])
 
     dot.render(save_location.split(".")[0], view=True)  
