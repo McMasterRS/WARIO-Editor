@@ -1,5 +1,7 @@
 import random
-import collections
+from collections import OrderedDict
+from collections.abc import Callable, Iterable
+from typing import Tuple
 
 class Node():
 
@@ -16,10 +18,10 @@ class Node():
 
         # store all incoming and outgoing labels as ordered dictionaries to maintain their mapping to functon's arguments and returns
         if isinstance(incoming_labels, list):
-            self.incoming_labels = collections.OrderedDict({key: None for key in incoming_labels})
+            self.incoming_labels = OrderedDict({key: None for key in incoming_labels})
 
         if isinstance(outgoing_labels, list):
-            self.outgoing_labels = collections.OrderedDict({key: None for key in outgoing_labels})
+            self.outgoing_labels = OrderedDict({key: None for key in outgoing_labels})
 
         # internal mapping for if all upstream data dependacies have been fulfilled
         self._ready = {}
@@ -39,118 +41,99 @@ class Node():
         return results
 
 class Pipeline():
+    def __init__(self):
+        self.functions = {}
+        self.connections = {}
+        self.arguments = {}
+        self.ready = {}
+        self.roots = {}
 
-    fns = {}
-    connections = {}
-    results = {}
-    ready = {}
-    roots = {}
+    def add(self, fn: Callable, incoming_labels=None, outgoing_labels=None):
+        self.roots[fn] = fn
+        self.functions[fn] = {
+            'incoming_labels': incoming_labels if isinstance(incoming_labels, Iterable) else [],
+            'outgoing_labels': outgoing_labels if isinstance(outgoing_labels, Iterable) else []
+        }
+        self.arguments[fn] = OrderedDict({key: None for key in self.functions[fn]['incoming_labels']})
+        self.ready[fn] = OrderedDict({key: False for key in self.functions[fn]['incoming_labels']})
 
-    nodes = {}
-
-    @classmethod
-    def add(cls, fn, incoming_labels=None, outgoing_labels=None):
-
-        cls.fns[fn] = {}
-        cls.roots[fn] = fn
-
-        cls.nodes[fn] = {}
-
-        # store any incoming labels as an ordered dictionary
-        if incoming_labels is not None and isinstance(incoming_labels, list):
-            cls.fns[fn]['incoming_labels'] = incoming_labels
-            cls.ready[fn] = {}
-            cls.nodes[fn] = collections.OrderedDict({key: None for key in incoming_labels})
-
-        # store any outgoing labels as an ordered dictionary
-        if outgoing_labels is not None and isinstance(outgoing_labels, list):
-            cls.fns[fn]['outgoing_labels'] = outgoing_labels
-
-    @classmethod
-    def connect(cls, parent, child):
+    def connect(self, parent: Tuple[Callable, str], child: Tuple[Callable, str]):
         child_fn, child_label = child
-        cls.connections[parent] = child
-        cls.ready[child_fn][child_label] = False
-        if child_fn in cls.roots:
-            cls.roots.pop(child_fn)
+        self.connections[parent] = child
+        self.ready[child_fn][child_label] = False
+        if child_fn in self.roots:
+            self.roots.pop(child_fn)
 
-    @classmethod
-    def start(cls):
-        for root in cls.roots:
-            cls.run(root)
+    def start(self):
+        for root in self.roots:
+            self.run(root)
 
-    @classmethod
-    def run(cls, fn, arguments=None):
+    def run(self, fn, arguments=None):
 
         if arguments is not None:
             results = fn(*arguments)
         else:
             results = fn()
 
-        if not isinstance(results, tuple) or not isinstance(results, list):
+        # if only a single value was returned we spoof it as a list
+        if len(self.functions[fn]['outgoing_labels']) == 1:
             results = [results]
 
-        if 'outgoing_labels' in cls.fns[fn]:
-            for i, result in enumerate(results):
-                result_label = cls.fns[fn]['outgoing_labels'][i]
-                child_fn, child_label = cls.connections[(fn, result_label)]
+        for i, outgoing_label in enumerate(self.functions[fn]['outgoing_labels']):
+            result = results[i]
+            child_fn, child_label = self.connections[(fn, outgoing_label)]
 
-                cls.nodes[child_fn][child_label] = result
-                cls.ready[child_fn][child_label] = True
+            self.arguments[child_fn][child_label] = result
+            self.ready[child_fn][child_label] = True
 
-                if all(cls.ready[child_fn].values()):
-                    print(child_fn, 'ready')
-                    args = list(cls.nodes[child_fn].values())
-                    cls.run(child_fn, arguments=args)
-                else:
-                    print(child_fn, 'waiting')
+            if all(self.ready[child_fn].values()):
+                print(child_fn, 'ready')
+                args = list(self.arguments[child_fn].values())
+                self.run(child_fn, arguments=args)
+            else:
+                print(child_fn, 'waiting')
 
 def hello_world():
     return 'hello world'
 
-Node(hello_world, name='Hello World', outgoing_labels=['text'])
-
 def speak(text):
     print(text)
 
-Node(speak, name='Speak', outgoing_labels=['text'])
-
 def manipulate(text, deliminator='_'):
     return text.replace(' ', deliminator)
-
-Node(manipulate, name='Manipulate', incoming_labels=['text', 'deliminator'], outgoing_labels=['text'])
 
 def space():
     return '$'
 
 if __name__ == "__main__":
-    Pipeline.add(
+    pipeline = Pipeline()
+    pipeline.add(
             hello_world,
             outgoing_labels=['text'])
 
-    Pipeline.add(
+    pipeline.add(
             speak,
             incoming_labels=['text'])
 
-    Pipeline.add(
+    pipeline.add(
             manipulate,
             incoming_labels=['text', 'deliminator'],
             outgoing_labels=['text'])
 
-    Pipeline.add(
+    pipeline.add(
             space,
             outgoing_labels=['text'])
 
-    Pipeline.connect(
+    pipeline.connect(
             (hello_world, 'text'),
             (manipulate, 'text'))
     
-    Pipeline.connect(
+    pipeline.connect(
             (manipulate, 'text'),
             (speak, 'text'))
 
-    Pipeline.connect(
+    pipeline.connect(
             (space, 'text'),
             (manipulate, 'deliminator'))
 
-    Pipeline.start()
+    pipeline.start()
