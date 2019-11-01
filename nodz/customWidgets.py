@@ -5,10 +5,11 @@ from PyQt5 import QtGui
 from PyQt5 import uic
 
 class GlobalSaveTabs(QtWidgets.QTabWidget):
-    def __init__(self, saveTypes, saveDialogString, settings):
+    def __init__(self, saveTypes, saveDialogString, settings, name = ""):
         super(GlobalSaveTabs, self).__init__()
         self.globalName = ""
         self.globalFolder = ""
+        self.name = name
     
         self.globalTab = QtWidgets.QWidget()
         self.globalLayout = QtWidgets.QFormLayout()
@@ -18,15 +19,15 @@ class GlobalSaveTabs(QtWidgets.QTabWidget):
         self.previewLabel = QtWidgets.QLabel("")
         
         self.globalFilename = QtWidgets.QLineEdit()  
-        if "globalFilename" in settings.keys():
-            self.globalFilename.setText(settings["globalFilename"])
+        if "globalFilename" + name in settings.keys():
+            self.globalFilename.setText(settings["globalFilename" + name])
         label = QtWidgets.QLabel("File Identifier")
         self.globalLayout.addRow(label, self.globalFilename)
         
         self.globalFileType = QtWidgets.QComboBox()
         self.globalFileType.addItems(saveTypes)
-        if "globalFileType" in settings.keys():
-            self.globalFileType.setCurrentText(settings["globalFileType"])
+        if "globalFileType" + name in settings.keys():
+            self.globalFileType.setCurrentText(settings["globalFileType" + name])
         label = QtWidgets.QLabel("File type")
         self.globalLayout.addRow(label, self.globalFileType)
         
@@ -41,15 +42,15 @@ class GlobalSaveTabs(QtWidgets.QTabWidget):
          
         label = QtWidgets.QLabel("File Location")
         self.saveLoc = saveWidget(self, saveDialogString)
-        if "saveLoc" in settings.keys():
-            self.saveLoc.textbox.setText(settings["saveLoc"])
+        if "saveLoc" + name in settings.keys():
+            self.saveLoc.textbox.setText(settings["saveLoc" + name])
         self.customLayout.insertRow(-1, label, self.saveLoc)
         
         self.customTab.setLayout(self.customLayout)
         self.addTab(self.customTab, "Use Custom Filename")
         
-        if "currentTab" in settings.keys():
-            self.setCurrentIndex(settings["currentTab"])
+        if "currentTab" + name in settings.keys():
+            self.setCurrentIndex(settings["currentTab" + name])
     
     def updateGlobals(self, globals):
         self.globalName = globals["Output Filename"]["value"]
@@ -61,18 +62,18 @@ class GlobalSaveTabs(QtWidgets.QTabWidget):
         self.previewLabel.setText(self.globalName + "_" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower())
 
     def genSettings(self, settings):
-        settings["saveLoc"] = self.saveLoc.textbox.text()
-        settings["globalFilename"] = self.globalFilename.text()
-        settings["globalFileType"] = self.globalFileType.currentText()
-        settings["currentTab"] = self.currentIndex()
+        settings["saveLoc" + self.name] = self.saveLoc.textbox.text()
+        settings["globalFilename" + self.name] = self.globalFilename.text()
+        settings["globalFileType" + self.name] = self.globalFileType.currentText()
+        settings["currentTab" + self.name] = self.currentIndex()
         
     def genVars(self, vars):
         if self.currentIndex() == 0:
-            vars["saveGraph"] = self.globalFolder + self.globalName + "_" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower()
-            vars["globalSaveStart"] = self.globalFolder + "\\"
-            vars["globalSaveEnd"] = "_" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower()
+            vars["saveGraph" + self.name] = self.globalFolder + self.globalName + "_" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower()
+            vars["globalSaveStart" + self.name] = self.globalFolder + "\\"
+            vars["globalSaveEnd" + self.name] = "_" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower()
         else:
-            vars["saveGraph"] = self.saveLoc.textbox.text()
+            vars["saveGraph" + self.name] = self.saveLoc.textbox.text()
 
 
 class ExpandingTable(QtWidgets.QTableWidget):
@@ -138,6 +139,31 @@ class LinkedSpinbox(QtWidgets.QSpinBox):
         elif self.linkedType == "Higher":
             self.linkedWidget.setMinimum(value + 1)
     
+    
+# Same as above but for doubles
+class LinkedDoubleSpinbox(QtWidgets.QDoubleSpinBox):
+    def __init__(self):
+        super(LinkedDoubleSpinbox, self).__init__()
+        self.linkedWidget = None
+        self.linkType = None
+        self.valueChanged.connect(self.updateLink)
+        
+    def linkWidgets(self, widget, type):
+        self.linkedWidget = widget
+        self.linkedType = type
+        self.updateLink(self.value())
+    
+    def updateLink(self, value):
+        if self.linkedWidget == None:
+            return
+            
+        # Linked widget is always lower
+        if self.linkedType == "Lower":
+            self.linkedWidget.setMaximum(value - 0.01)
+            
+        # Linked widget is always higher
+        elif self.linkedType == "Higher":
+            self.linkedWidget.setMinimum(value + 0.01)
 
 # Checkbox that is linked to another widget and enables/disables it
 class LinkedCheckbox(QtWidgets.QCheckBox):

@@ -663,9 +663,9 @@
                 "settingsClass" : "PlotSettings"
             }
         },
-        "Peak Latency Mean" : {
+        "Bulk Peak Analysis" : {
             "preset" : "node_default",
-            "file" : "latencyMean.py",
+            "file" : "batchAnalysis.py",
             "alternate" : true,
             "position" : "none",
             "category" : "Batch",
@@ -679,61 +679,10 @@
                     "type": ["evoked"] 
                 }
             },
-            "settings" : {}
-        },
-        "Peak Latency \u03C3" : {
-            "preset" : "node_default",
-            "file" : "latencyStdev.py",
-            "alternate" : true,
-            "position" : "none",
-            "category" : "Batch",
-            "toolkit" : "EEG",
-            "attributes" : {
-                "Evoked Data" : {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": false,
-                    "socket": true,
-                    "type": ["evoked"] 
-                }
-            },
-            "settings" : {}
-        },
-        "Peak Amplitude Mean" : {
-            "preset" : "node_default",
-            "file" : "amplitudeMean.py",
-            "alternate" : true,
-            "position" : "none",
-            "category" : "Batch",
-            "toolkit" : "EEG",
-            "attributes" : {
-                "Evoked Data" : {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": false,
-                    "socket": true,
-                    "type": ["evoked"] 
-                }
-            },
-            "settings" : {}
-        },
-        "Peak Amplitude \u03C3" : {
-            "preset" : "node_default",
-            "file" : "amplitudeStdev.py",
-            "alternate" : true,
-            "position" : "none",
-            "category" : "Batch",
-            "toolkit" : "EEG",
-            "attributes" : {
-                "Evoked Data" : {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": false,
-                    "socket": true,
-                    "type": ["evoked"] 
-                }
-            },
-            "settings" : {}
+            "settings" : {
+                "settingsFile" : "batchAnalysis",
+                "settingsClass" : "BatchAnalysisSettings"
+            }
         },
         "Average Event Signal" : {
             "preset" : "node_default",
@@ -743,13 +692,13 @@
             "category" : "Batch",
             "toolkit" : "EEG",
             "attributes" : {
-                "Epoch Data" : {
+                "E Data" : {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
                     "type": ["epoch"] 
-                }
+                }   
             },
             "settings" : {}
         }

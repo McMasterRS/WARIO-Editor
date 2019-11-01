@@ -4,9 +4,9 @@ import numpy as np
 
 from tempfile import TemporaryFile
 
-class latencyMean(Node):
+class batchAnalysis(Node):
     def __init__(self, name, params):
-        super(latencyMean, self).__init__(name, params)
+        super(batchAnalysis, self).__init__(name, params)
         
         self.latencies = None
         self.amplitudes = None
@@ -48,9 +48,17 @@ class latencyMean(Node):
         # Numpy is great. Calculate all means simultaniously
         meanLatencies = np.mean(self.latencies, axis = 3)
         meanAmplitudes = np.mean(self.amplitudes, axis = 3)
+        
+        stdevLatencies = np.std(self.latencies, axis = 3)
+        stdevAmplitudes = np.std(self.amplitudes, axis = 3)
 
         outfile = TemporaryFile()
-        np.savez(outfile, chNames = self.chanNames, eventNames = self.eventNames, meanLatency = meanLatencies.transpose(2, 0, 1)[0], meanAmplitude = meanAmplitudes.transpose(2, 0, 1)[0])
+        np.savez(outfile, chNames = self.chanNames, 
+                          eventNames = self.eventNames, 
+                          meanLatency = meanLatencies.transpose(2, 0, 1)[0], 
+                          meanAmplitude = meanAmplitudes.transpose(2, 0, 1)[0],
+                          stdLatency = stdevLatencies.transpose(2, 0, 1)[0],
+                          stdAmplitude = stdevAmplitudes.transpose(2, 0, 1)[0])
         outfile.seek(0)
         
         npz = np.load(outfile)
