@@ -334,20 +334,20 @@
                 "settingsClass" : "SaveEpochSettings"
             }
         },
-        "Save Epochs ICA" : {
+        "Save Evoked" : {
             "preset" : "node_default",
-            "file" : "saveEpochsICA.py",
+            "file" : "saveEvoked.py",
             "alternate" : true,
             "position" : "none",
             "category" : "Output",
             "toolkit" : "EEG",
             "attributes" : {
-                "Epochs ICA": {     
+                "Evoked": {     
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": ["epochICA"]   
+                    "type": ["evoked"]   
                 }
             },
             "settings" : {
@@ -684,23 +684,59 @@
                 "settingsClass" : "BatchAnalysisSettings"
             }
         },
-        "Average Event Signal" : {
+        "Bulk Average Signal" : {
             "preset" : "node_default",
-            "file" : "avSignal.py",
+            "file" : "batchAvSignal.py",
             "alternate" : true,
             "position" : "none",
             "category" : "Batch",
             "toolkit" : "EEG",
             "attributes" : {
-                "E Data" : {
+                "Evoked Data" : {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": false,
                     "socket": true,
-                    "type": ["epoch"] 
+                    "type": ["evoked"] 
                 }   
             },
-            "settings" : {}
+            "settings" : {
+                "settingsFile" : "batchAvSignal",
+                "settingsClass" : "BatchAvSignalSettings"
+            }
+        },    
+        "Pick Evoked Channels" : {
+            "preset" : "node_default",
+            "file" : "pickChannels.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Pick Channels",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["evoked"] 
+                },
+                "Channels" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"] 
+                },
+                "Selected Evoked Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "evoked" 
+                }                  
+            },
+            "settings" : {
+            }
         }
     }
 }

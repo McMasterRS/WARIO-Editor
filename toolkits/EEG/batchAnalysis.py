@@ -5,89 +5,10 @@ import mne
 import numpy as np
 import matplotlib.pyplot as plt
 
-from nodz.customWidgets import GlobalSaveTabs, LinkedSpinbox
+from nodz.customWidgets import LinkedSpinbox, BatchSavePanel, BatchSaveTab
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
-
-from tempfile import TemporaryFile
-
-class BatchSavePanel(GlobalSaveTabs):
-    def __init__(self, saveTypes, saveDialogString, settings, name = ""):
-        super(BatchSavePanel, self).__init__(saveTypes, saveDialogString, settings, name)
-        
-    def updatePreview(self, signal):
-        self.previewLabel.setText(self.globalFilename.text() + "." + self.globalFileType.currentText().lower())
-
-    def genVars(self, vars):
-        if self.currentIndex() == 0:
-            vars["saveGraph" + self.name] = self.globalFolder + "\\" + self.globalFilename.text() + "." + self.globalFileType.currentText().lower()
-        else:
-            vars["saveGraph" + self.name] = self.saveLoc.textbox.text()
-
-class BatchSaveTab(QtWidgets.QWidget):
-    def __init__(self, name, type, settings):
-    
-        super(BatchSaveTab, self).__init__()
-        
-        self.name = name
-        self.type = type
-        
-        self.layout = QtWidgets.QVBoxLayout()
-        
-        if type == "data":
-            saveTypes = ["NPX"] 
-            saveDialogString = "Numpy File (*.npx)"
-            
-            self.saveData = QtWidgets.QCheckBox("Save Data")
-            if "toggleSave" + name in settings.keys():
-                self.saveData.setChecked(settings["toggleSave" + name])
-            else:
-                self.saveData.setChecked(True)
-            self.layout.addWidget(self.saveData)
-            
-        elif type == "graph":
-            saveTypes = ["PNG", "PDF", "PKL"]
-            saveDialogString = "PNG image (*.png);; PDF (*.pdf);; Pickle (*.pkl)"
-            
-            graphLayout = QtWidgets.QHBoxLayout()
-            
-            self.saveData = QtWidgets.QCheckBox("Save Graph")
-            if "toggleSave" + name in settings.keys():
-                self.saveData.setChecked(settings["toggleSave" + name ])
-            else:
-                self.saveData.setChecked(True)
-            
-            self.showGraph = QtWidgets.QCheckBox("Show Graph")
-            if "toggleShow" + name in settings.keys():
-                self.showGraph.setChecked(settings["toggleShow" + name ])
-            else:
-                self.showGraph.setChecked(True)
-            
-            graphLayout.addWidget(self.saveData)
-            graphLayout.addWidget(self.showGraph)
-            
-            self.layout.addItem(graphLayout)
-        
-        self.tabBox = BatchSavePanel(saveTypes, saveDialogString, settings, name)
-        self.layout.addWidget(self.tabBox)
-        
-        self.setLayout(self.layout)
-        
-    def genSettings(self, settings, vars):
-        
-        settings["toggleSave" + self.name ] = self.saveData.isChecked()
-        vars["toggleSave" + self.name] = self.saveData.isChecked()
-        if self.type == "graph":
-            settings["toggleShow" + self.name] = self.showGraph.isChecked()
-            vars["toggleShow" + self.name] = self.showGraph.isChecked()
-            
-        self.tabBox.genSettings(settings)
-        self.tabBox.genVars(vars)
-        
-    def updateGlobals(self, globals):
-        self.tabBox.updateGlobals(globals)
-        
 
 class BatchAnalysisSettings(CustomSettings):
     def __init__(self, parent, settings):
