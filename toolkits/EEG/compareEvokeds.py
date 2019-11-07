@@ -43,8 +43,8 @@ class compareEvokeds(Node):
         for evoked in evokedData:
             evokedDict[evoked.comment] = evoked
             
-        fig = mne.viz.plot_compare_evokeds(evokedDict, show = False)
-        
+        fig = mne.viz.plot_compare_evokeds(evokedDict, show = False)[0]
+
         if self.parameters["saveGraph"] is not None:
             if "globalSaveStart" in self.parameters.keys():
                 f = self.parameters["globalSaveStart"] + self.global_vars["Output Filename"] + self.parameters["globalSaveEnd"]
