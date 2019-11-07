@@ -172,9 +172,9 @@ class ExpandingTable(QtWidgets.QTableWidget):
         if self.item(self.rowCount() - 1, 0) != None:
             if self.item(self.rowCount() - 1, 0).text() != "":
                 self.insertRow(self.rowCount())
-            
-        if self.item(self.rowCount() - 2, 0).text() == "":
-            self.removeRow(self.rowCount() - 1)
+        if self.item(self.rowCount() - 2, 0) != None:
+            if self.item(self.rowCount() - 2, 0).text() == "":
+                self.removeRow(self.rowCount() - 1)
             
             
     def getSettings(self, name, var, settings):
