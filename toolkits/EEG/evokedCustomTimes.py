@@ -7,26 +7,6 @@ import matplotlib.pyplot as plt
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
-class EvokedCustomTimesSettings(CustomSettings):
-    def __init__(self, parent, settings):
-        super(EvokedPeakSettings, self).__init__(parent, settings)
-        
-    # Build the settings UI
-    def buildUI(self, settings):
-        self.layout = QtWidgets.QFormLayout() 
-        self.setLayout(self.layout)
-        
-    def genSettings(self):
-    
-        settings = {}
-        vars = {}
-        
-        settings["settingsFile"] = self.settings["settingsFile"]
-        settings["settingsClass"] = self.settings["settingsClass"]
-        
-        self.parent.settings = settings
-        self.parent.variables = vars
-
 class evokedCustomTimes(Node):
 
     def __init__(self, name, params):
@@ -35,19 +15,18 @@ class evokedCustomTimes(Node):
     def process(self):
     
         evokedData = self.args["Evoked Data"]
-        for evoked in evokedData:
+        for i, evoked in enumerate(evokedData):
         
             max = evoked.times[-1]
             chName, latency, amplitude = evoked.get_peak(return_amplitude = True)
             fig = evoked.plot_joint(title = "Event ID {0}".format(evoked.comment),
                               times=np.arange(max / 10.0, max, max / 10.0), show = False)      
                 
-            if self.parameters["saveGraph"] is not None:
-                if "globalSaveStart" in self.parameters.keys():
-                    f = self.parameters["globalSaveStart"] + self.global_vars["Output Filename"] + self.parameters["globalSaveEnd"]
-                else:
-                    f = self.parameters["saveGraph"]
+            if self.parameters["toggleSaveGraph"] is not None:
+                f = self.parameters["saveGraphGraph"]
                 type = f.split(".")[-1]
+                name = f.split(".")[0]
+                f = name + "_{0}.".format(i) + type
                 if type == "png":
                     fig.savefig(f, format = "png")
                 elif type == "pdf":

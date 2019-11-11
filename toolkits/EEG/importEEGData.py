@@ -4,7 +4,6 @@ import numpy as np
 import os
 
 from nodz.customSettings import CustomSettings
-from nodz.customWidgets import ExpandingTable
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
@@ -12,52 +11,12 @@ class ImportDataSettings(CustomSettings):
     def __init__(self, parent, settings):
         super(ImportDataSettings, self).__init__(parent, settings)
         
-    def buildUI(self, settings):
-    
-        self.layout = QtWidgets.QVBoxLayout()
-        
-        self.table = ExpandingTable("channel", settings)
-        self.table.setHorizontalHeaderLabels(["Channel #s"])
-        
-        self.layout.addWidget(self.table)
-        self.setLayout(self.layout)
-        
-    def genSettings(self):
-        settings = {}
-        vars = {}
-        settings["settingsFile"] = self.settings["settingsFile"]
-        settings["settingsClass"] = self.settings["settingsClass"]
-        
-        self.table.getSettings(settings, vars)
-        
-        self.parent.settings = settings
-        self.parent.variables = vars
         
 class placeholderClass(Node):
     def __init__(self, name, params = None):
         super(placeholderClass, self).__init__(name, params)
         
-    def process(self):
-        
-        evokeds = self.args["Evoked Data"]
-        chans = self.parameters["channelValues"]
-        chanNames = evokeds[0].info["chan_names"]
-        
-        if "Channel Indexes" in self.args.keys():
-            blacklist = self.args["Channel Indexes"]
-            
-        for chan in chans:
-            c = int(chan)
-            if c < len(chanNames) and c >= 0:
-                blacklist.append(chanNames[c])
-        
-        selectedEvokeds = evokeds.copy()
-        for evoked in selectedEvokeds:
-            evoked.drop_channels(blacklist)
-            
-        print(selectedEvokeds[0].info)
-       
-        return {"Selected Data" : selectedEvokeds}
+ 
         
     def process(self):
         
@@ -87,7 +46,7 @@ class importEEGData(Node):
         assert(self.parameters["file"] is not ""), "ERROR: Import Data node has no input file set. Please update the node's settings and re-run"
         
         self.parameters["updateGlobal"] = True
-        self.parameters["files"] = ["C:/Users/Tom/Documents/Github/nodz/saves/Data/MWEEG_Subject_0.npz"]# "C:/Users/mudwayt/Documents/GitHub/nodz/saves/Data/MWEEG_Subject_9.npz"]
+        self.parameters["files"] = ["C:/Users/mudwayt/Documents/GitHub/nodz/saves/Data/MWEEG_Subject_0.npz",     "C:/Users/mudwayt/Documents/GitHub/nodz/saves/Data/MWEEG_Subject_9.npz"]
         self.parameters["makeFolders"] = True
 
     def process(self):

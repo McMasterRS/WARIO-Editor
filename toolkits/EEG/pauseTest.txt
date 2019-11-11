@@ -1,0 +1,8 @@
+
+
+class pause(Node):
+
+    def __init__(self, name, params):
+        super(pause, self).__init__(name, params)
+        
+    def process(self):

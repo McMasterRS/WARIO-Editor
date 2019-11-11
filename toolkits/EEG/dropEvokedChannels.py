@@ -2,9 +2,13 @@ from pipeline.Node import Node
 import mne
 import sys
 
-class DropEvokedSettings(CustomSettings):
+from nodz.customSettings import CustomSettings
+from nodz.customWidgets import ExpandingTable
+from PyQt5 import QtWidgets, QtCore, QtGui
+
+class DropEvokedChannelsSettings(CustomSettings):
     def __init__(self, parent, settings):
-        super(DropEvokedSettings, self).__init__(parent, settings)
+        super(DropEvokedChannelsSettings, self).__init__(parent, settings)
         
     def buildUI(self, settings):
     
@@ -22,7 +26,7 @@ class DropEvokedSettings(CustomSettings):
         settings["settingsFile"] = self.settings["settingsFile"]
         settings["settingsClass"] = self.settings["settingsClass"]
         
-        self.table.getSettings(settings, vars)
+        self.table.getSettings("channel", vars, settings)
         
         self.parent.settings = settings
         self.parent.variables = vars
@@ -32,12 +36,13 @@ class dropEvokedChannels(Node):
     def __init__(self, name, params):
         super(dropEvokedChannels, self).__init__(name, params)
         
-   def process(self):
+    def process(self):
         
         evokeds = self.args["Evoked Data"]
-        chans = self.parameters["channelValues"]
-        chanNames = evokeds[0].info["chan_names"]
+        chans = self.parameters["channel"]
+        chanNames = evokeds[0].info["ch_names"]
         
+        blacklist = []
         if "Channel Indexes" in self.args.keys():
             blacklist = self.args["Channel Indexes"]
             
@@ -49,7 +54,5 @@ class dropEvokedChannels(Node):
         selectedEvokeds = evokeds.copy()
         for evoked in selectedEvokeds:
             evoked.drop_channels(blacklist)
-            
-        print(selectedEvokeds[0].info)
        
         return {"Selected Data" : selectedEvokeds}

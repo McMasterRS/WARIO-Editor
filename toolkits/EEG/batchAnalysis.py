@@ -11,7 +11,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
 class BatchAnalysisSettings(CustomSettings):
-    def __init__(self, parent, settings):
+    def __init__(self, parent, settings):   
         super(BatchAnalysisSettings, self).__init__(parent, settings)
         
     def buildUI(self, settings):

@@ -117,21 +117,22 @@ class BatchSaveTab(QtWidgets.QWidget):
             
             graphLayout = QtWidgets.QHBoxLayout()
             
-            self.saveData = QtWidgets.QCheckBox("Save Graph")
-            if "toggleSave" + name in settings.keys():
-                self.saveData.setChecked(settings["toggleSave" + name ])
-            else:
-                self.saveData.setChecked(True)
-            
             self.showGraph = QtWidgets.QCheckBox("Show Graph")
             if "toggleShow" + name in settings.keys():
                 self.showGraph.setChecked(settings["toggleShow" + name ])
             else:
                 self.showGraph.setChecked(True)
             
-            graphLayout.addWidget(self.saveData)
-            graphLayout.addWidget(self.showGraph)
+            self.saveData = QtWidgets.QCheckBox("Save Graph")
+            if "toggleSave" + name in settings.keys():
+                self.saveData.setChecked(settings["toggleSave" + name ])
+            else:
+                self.saveData.setChecked(True)
             
+            
+            graphLayout.addWidget(self.showGraph)
+            graphLayout.addWidget(self.saveData)
+
             self.layout.addItem(graphLayout)
         
         self.tabBox = BatchSavePanel(saveTypes, saveDialogString, settings, name)
@@ -152,7 +153,7 @@ class BatchSaveTab(QtWidgets.QWidget):
         
     def updateGlobals(self, globals):
         self.tabBox.updateGlobals(globals)
-        
+                
 class ExpandingTable(QtWidgets.QTableWidget):
     def __init__(self, name, settings):
         super(ExpandingTable, self).__init__(1, 1)
@@ -172,9 +173,9 @@ class ExpandingTable(QtWidgets.QTableWidget):
         if self.item(self.rowCount() - 1, 0) != None:
             if self.item(self.rowCount() - 1, 0).text() != "":
                 self.insertRow(self.rowCount())
-        if self.item(self.rowCount() - 2, 0) != None:
-            if self.item(self.rowCount() - 2, 0).text() == "":
-                self.removeRow(self.rowCount() - 1)
+            
+        if self.item(self.rowCount() - 2, 0).text() == "":
+            self.removeRow(self.rowCount() - 1)
             
             
     def getSettings(self, name, var, settings):

@@ -596,8 +596,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "plotProperties",
-                "settingsClass" : "PlotSettings"
+                "settingsFile" : "evokedLocalPeak",
+                "settingsClass" : "EvokedLocalPeakSettings"
             }
         },
         "Plot Local Peaks" : {
@@ -617,8 +617,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "plotProperties",
-                "settingsClass" : "PlotSettings"
+                "settingsFile" : "evokedLocalPeak",
+                "settingsClass" : "EvokedLocalPeakSettings"
             }
         },
         "Plot Evoked Times" : {
@@ -638,8 +638,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "plotProperties",
-                "settingsClass" : "PlotSettings"
+                "settingsFile" : "evokedLocalPeak",
+                "settingsClass" : "EvokedLocalPeakSettings"
             }
         },
         "Compare Evokeds" : {
@@ -659,8 +659,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "plotProperties",
-                "settingsClass" : "PlotSettings"
+                "settingsFile" : "evokedLocalPeak",
+                "settingsClass" : "EvokedLocalPeakSettings"
             }
         },
         "Bulk Peak Analysis" : {
@@ -705,12 +705,12 @@
                 "settingsClass" : "BatchAvSignalSettings"
             }
         },    
-        "Pick Evoked Channels" : {
+        "Drop Evoked Channels" : {
             "preset" : "node_default",
-            "file" : "pickChannels.py",
+            "file" : "dropEvokedChannels.py",
             "alternate" : true,
             "position" : "none",
-            "category" : "Pick Channels",
+            "category" : "Drop Channels",
             "toolkit" : "EEG",
             "attributes" : {
                 "Evoked Data" : {
@@ -722,12 +722,12 @@
                 },
                 "Channels" : {
                     "index": -1,
-                    "preset": "attr_preset_1",
+                    "preset": "attr_preset_optional",
                     "plug": false,
                     "socket": true,
                     "type": ["list"] 
                 },
-                "Selected Evoked Data" : {
+                "Selected Data" : {
                     "index": -1,
                     "preset": "attr_preset_1",
                     "plug": true,
@@ -736,7 +736,54 @@
                 }                  
             },
             "settings" : {
+                "settingsFile" : "dropEvokedChannels",
+                "settingsClass" : "DropEvokedChannelsSettings"
             }
+        },
+        "Drop Epoch Channels" : {
+            "preset" : "node_default",
+            "file" : "dropEpochChannels.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Drop Channels",
+            "toolkit" : "EEG",
+            "attributes" : {
+                "Epoch Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["epoch"] 
+                },
+                "Channels" : {
+                    "index": -1,
+                    "preset": "attr_preset_optional",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"] 
+                },
+                "Selected Data" : {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "epoch" 
+                }                  
+            },
+            "settings" : {
+                "settingsFile" : "dropEpochChannels",
+                "settingsClass" : "DropEpochChannelsSettings"
+            }
+        },
+        "Pause" : {
+            "preset" : "node_default",
+            "file" : "pauseTest.py",
+            "alternate" : true,
+            "position" : "none",
+            "category" : "Test",
+            "toolkit" : "EEG",
+            "attributes" : {},
+            "settings" : {}
         }
     }
 }
