@@ -596,8 +596,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "evokedLocalPeak",
-                "settingsClass" : "EvokedLocalPeakSettings"
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
             }
         },
         "Plot Local Peaks" : {
@@ -617,8 +617,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "evokedLocalPeak",
-                "settingsClass" : "EvokedLocalPeakSettings"
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
             }
         },
         "Plot Evoked Times" : {
@@ -638,8 +638,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "evokedLocalPeak",
-                "settingsClass" : "EvokedLocalPeakSettings"
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
             }
         },
         "Compare Evokeds" : {
@@ -659,8 +659,8 @@
                 }
             },
             "settings" : {
-                "settingsFile" : "evokedLocalPeak",
-                "settingsClass" : "EvokedLocalPeakSettings"
+                "settingsFile" : "plotProperties",
+                "settingsClass" : "PlotSettings"
             }
         },
         "Bulk Peak Analysis" : {

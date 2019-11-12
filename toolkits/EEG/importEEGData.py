@@ -12,33 +12,6 @@ class ImportDataSettings(CustomSettings):
         super(ImportDataSettings, self).__init__(parent, settings)
         
         
-class placeholderClass(Node):
-    def __init__(self, name, params = None):
-        super(placeholderClass, self).__init__(name, params)
-        
- 
-        
-    def process(self):
-        
-        epochs = self.args["Epoch Data"]
-        chans = self.parameters["channelValues"]
-        chanNames = epochs.ch_names
-        
-        blacklist = []
-        
-        if "Channel Indexes" in self.args.keys():
-            blacklist = self.args["Channel Indexes"]
-        for chan in chans:
-            c = int(chan)
-            if c < len(chanNames) and c >= 0:
-                blacklist.append(chanNames[c])
-                
-        selectedEpochs = epochs.copy()
-        selectedEpochs.drop_channels(blacklist)
-        
-        return {"Selected Data" : selectedEpochs}
-        
-        
 class importEEGData(Node):
 
     def __init__(self, name, params = None):
