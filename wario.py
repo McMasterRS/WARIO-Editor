@@ -161,12 +161,16 @@ class NodzWindow(QtWidgets.QMainWindow):
     def makeToolkitCall(self, name):
         # Function generator that creates individual function calls for each of the 
         # toolboxes to handle them being enabled/disabled
-        def toolkitCall(self, state):
-            ret = self.nodz.reloadConfig(name, state)
+        nodz = self.nodz
+        toolkitMenu = self.toolkitMenu
+        
+        def toolkitCall(state):
+            ret = nodz.reloadConfig(name, state)
             if ret == False:
-                for tk in self.toolkitMenu.actions():
+                for tk in toolkitMenu.actions():
                     if tk.text() == name:
                         tk.setChecked(True)
+                        
         return toolkitCall    
         
     def buildToolkitMenu(self):

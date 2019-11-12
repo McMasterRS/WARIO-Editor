@@ -322,26 +322,7 @@ class UniqueNameTable(QtWidgets.QTableWidget):
     def updateNames(self):
         self.prevNames = {}
         for row in range(0, self.rowCount()):
-            self.prevNames[row] = self.item(row, 0).text()
-
-# Combobox that lists the types of global variables
-class TypeComboBox(QtWidgets.QComboBox):
-    def __init__(self):
-        super(TypeComboBox, self).__init__()
-        # Custom option must remain last for setEditState to work properly
-        self.types = ["Int", "Float", "String", "Bool", "File", "Custom"]
-        self.addItems(self.types)
-        self.setCurrentIndex(0)
-        self.setEditable(False)
-        self.currentIndexChanged.connect(self.setEditState)
-        
-    # Enables editing if custom box selected
-    def setEditState(self, index):
-        if index == len(self.types) - 1:
-            self.setEditable(True)
-        else:
-            self.setEditable(False)
-        
+            self.prevNames[row] = self.item(row, 0).text()  
         
 class GlobalNodeComboBox(QtWidgets.QComboBox):
     def __init__(self, parentNode, loaded, text):

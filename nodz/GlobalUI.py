@@ -5,6 +5,7 @@ from PyQt5 import QtGui
 from PyQt5 import uic
 import nodz.nodz_utils as utils
 from nodz.customWidgets import *
+from nodz.globalWidgets import *
 
 # Global variable UI
 class GlobalUI(QtWidgets.QWidget):
@@ -65,15 +66,19 @@ class GlobalUI(QtWidgets.QWidget):
         
         for row in range(0, self.table.rowCount()):
             gb = {}
-        
+            
+            widget = self.table.cellWidget(row, 2)
             name = self.table.item(row, 0).text()
             type = self.table.cellWidget(row, 1).currentText()
-            value = self.table.item(row, 2).text()
+            value = widget.getData()
             const = True if self.table.item(row, 3).checkState() == QtCore.Qt.Checked else False
             
+            gb["file"] = widget.file
+            gb["class"] = widget.cls
             gb["type"] = type
             gb["value"] = value
             gb["const"] = const
+            widget.saveProperties(gb)
             globals[name] = gb
             
             self.vars[name] = type
@@ -84,38 +89,59 @@ class GlobalUI(QtWidgets.QWidget):
         
     def loadGlobals(self, globals):
         self.clearTable()
-        for g in globals:
-            self.addRow()
+        for gb in globals:
+            self.addRow(globals[gb])
             row = self.table.rowCount() - 1
             
-            self.table.item(row, 0).setText(g)
+            self.table.item(row, 0).setText(gb)
             
             # Use the type of the global to work out which index to load
-            id = self.table.cellWidget(row, 1).findText(globals[g]["type"])
+            id = self.table.cellWidget(row, 1).findText(globals[gb]["type"])
             if id == -1:
                 self.table.cellWidget(row, 1).setCurrentIndex(len(self.table.cellWidget(row, 1).items) - 1)
-                self.table.cellWidget(row, 1).setCurrentText(globals[g]["type"])
+                self.table.cellWidget(row, 1).setCurrentText(globals[gb]["type"])
             else:
                 self.table.cellWidget(row, 1).setCurrentIndex(id)
                 
-            self.table.item(row, 2).setText(globals[g]["value"])    
+            self.table.cellWidget(row, 2).setData(globals[gb])    
             
-            if globals[g]["const"]:
+            if globals[gb]["const"]:
                 self.table.item(row, 3).setCheckState(QtCore.Qt.Checked)
             else:
                 self.table.item(row, 3).setCheckState(QtCore.Qt.Unchecked)
+                
+    def genNewRowWidget(self, gb):
+        if gb is None:
+            return GlobalFileSelect()#GlobalTextbox()
         
-    def addRow(self):
+        if "file" not in gb.keys():
+            return GlobalTextbox()
+
+        module = importlib.import_module(gb["file"])
+        cls = getattr(module, gb["class"])
+        
+        widget = cls()
+        widget.setData(gb)
+        
+        return widget
+
+    def addRow(self, gb = None, name = None):
     
         row = self.table.rowCount()
         self.table.insertRow(row)
         
-        text = QtWidgets.QTableWidgetItem("Var{0}".format(self.table.varNameCounter))
-        self.table.varNameCounter += 1
-        text.setFlags(QtCore.Qt.ItemIsEnabled)
-        value = QtWidgets.QTableWidgetItem("0")
+        if name is None:
+            name = "Var{0}".format(self.table.varNameCounter)
+            self.table.varNameCounter += 1
         
-        # Defined in nodz/customWidgets.py
+        # Fixes an error when addRow is called by the button
+        if isinstance(gb, bool):
+            gb = None
+        
+        text = QtWidgets.QTableWidgetItem(name)
+        value = self.genNewRowWidget(gb)
+        
+        # Defined in nodz/globalWidgets.py
         combobox = TypeComboBox()
         
         checkbox = QtWidgets.QTableWidgetItem()
@@ -124,7 +150,7 @@ class GlobalUI(QtWidgets.QWidget):
         
         self.table.setItem(row, 0, text)    
         self.table.setCellWidget(row, 1, combobox)
-        self.table.setItem(row, 2, value)
+        self.table.setCellWidget(row, 2, value)
         self.table.setItem(row, 3, checkbox)
         
     def addAutoRow(self, name, gb):
@@ -139,30 +165,19 @@ class GlobalUI(QtWidgets.QWidget):
                     self.table.item(i,3).setFlags(QtCore.Qt.NoItemFlags)
             return
         
-        row = self.table.rowCount()
-        self.table.insertRow(row)
+        self.addRow(gb, name)
+        row = self.table.rowCount() - 1
         
-        text = QtWidgets.QTableWidgetItem(name)
-        text.setFlags(QtCore.Qt.NoItemFlags)
-        value = QtWidgets.QTableWidgetItem(gb["value"])
-        
-        # Defined in nodz/customWidgets.py
-        combobox = TypeComboBox()
-        combobox.setCurrentText(gb["type"])
-        combobox.setEnabled(False)
-        
-        checkbox = QtWidgets.QTableWidgetItem()
-        checkbox.setFlags(QtCore.Qt.NoItemFlags)
+        self.table.item(row,0).setFlags(QtCore.Qt.NoItemFlags)
+        self.table.cellWidget(row,1).setCurrentText(gb["type"])
+        self.table.cellWidget(row,1).setEnabled(False)
+        self.table.item(row,3).setFlags(QtCore.Qt.NoItemFlags)
         
         if gb["const"]:
-            checkbox.setCheckState(QtCore.Qt.Checked)
+            self.table.item(row,3).setCheckState(QtCore.Qt.Checked)
         else:
-            checkbox.setCheckState(QtCore.Qt.Unchecked)
+            self.table.item(row,3).setCheckState(QtCore.Qt.Unchecked)
         
-        self.table.setItem(row, 0, text)    
-        self.table.setCellWidget(row, 1, combobox)
-        self.table.setItem(row, 2, value)
-        self.table.setItem(row, 3, checkbox)
         
         self.genGlobals()
 
