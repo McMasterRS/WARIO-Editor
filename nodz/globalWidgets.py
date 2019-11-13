@@ -1,12 +1,13 @@
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets, QtCore, QtGui
+from nodz.customWidgets import *
 
 # Combobox that lists the types of global variables
 class TypeComboBox(QtWidgets.QComboBox):
     def __init__(self):
         super(TypeComboBox, self).__init__()
         # Custom option must remain last for setEditState to work properly
-        self.types = ["String", "Int", "Float", "Bool", "File", "Folder", "Custom"]
+        self.types = ["String", "Int", "Float", "Bool", "File", "Folder", "List", "Custom"]
         self.addItems(self.types)
         self.setCurrentIndex(0)
         self.setEditable(False)
@@ -41,7 +42,7 @@ class GlobalWindowWidget(QtWidgets.QWidget):
     def saveProperties(self, gb):
         return
         
-        
+      
 class GlobalTextbox(GlobalWindowWidget):
     def __init__(self):
         super(GlobalTextbox, self).__init__()
@@ -99,14 +100,15 @@ class GlobalCheckbox(GlobalWindowWidget):
         self.cls = "GlobalCheckbox"
         self.file = "nodz.globalWidgets"
         
-        self.checkbox = QtWidgets.QCheckbox()
+        self.checkbox = QtWidgets.QCheckBox()
         self.layout.addWidget(self.checkbox)
         
     def getData(self):
         return self.checkbox.isChecked()
         
-    def setData(self):
-        self.setChecked(gb["value"])
+    def setData(self, gb):
+        self.checkbox.setChecked(gb["value"])
+        assert (self.checkbox.isChecked() == gb["value"]), "FUCK"
 
 class GlobalFileSelect(GlobalWindowWidget):
     def __init__(self):
@@ -116,7 +118,6 @@ class GlobalFileSelect(GlobalWindowWidget):
         self.file = "nodz.globalWidgets"
         
         self.fileBox = QtWidgets.QLineEdit()
-        self.fileBox.setFrame(False)
         
         self.saveButton = QtWidgets.QPushButton("Load")
         width = self.saveButton.fontMetrics().boundingRect("Load").width() + 15
@@ -127,7 +128,9 @@ class GlobalFileSelect(GlobalWindowWidget):
         self.layout.addWidget(self.saveButton)
         
     def getFile(self):
-        self.fileBox.setText("")
+        dialog = QtWidgets.QFileDialog.getOpenFileName(self, "Select File")
+        if (dialog[0] != ''):
+            self.fileBox.setText(dialog[0])
         
     def getData(self):
         return(self.fileBox.text())
@@ -141,7 +144,10 @@ class GlobalFolderSelect(GlobalFileSelect):
         self.cls = "GlobalFolderSelect"
         
     def getFile(self):
-        self.fileBox.setText("")
+        dialog = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory")
+        print(dialog)
+        if (dialog != ''):
+            self.fileBox.setText(dialog)
         
 class GlobalListInput(GlobalWindowWidget):
     def __init__(self):
@@ -150,5 +156,45 @@ class GlobalListInput(GlobalWindowWidget):
         self.cls = "GlobalListInput"
         self.file = "nodz.globalWidgets"
         
+        self.openButton = QtWidgets.QPushButton("Edit")
+        self.openButton.clicked.connect(self.openMenu)
+        self.layout.addWidget(self.openButton)
         
+        self.menuWindow = GlobalListWindow()
         
+    def getData(self):
+        return self.menuWindow.getData()
+        
+    def setData(self, gb):
+        self.menuWindow.setData(gb)
+        
+    def openMenu(self):
+        self.menuWindow.show()
+        
+class GlobalListWindow(QtWidgets.QWidget):
+    def __init__(self):
+        super(GlobalListWindow, self).__init__()
+        
+        self.layout = QtWidgets.QVBoxLayout()
+        self.table = ExpandingTable("", {})
+        self.layout.addWidget(self.table)
+        
+        self.setLayout(self.layout)
+        
+    def getData(self):
+        data = []
+
+        for i in range(self.table.rowCount() - 1):
+            data.append(self.table.item(i, 0).text())
+        
+        return data
+        
+    def setData(self, gb):
+        vals = gb["value"]
+        for i in range(len(vals)):
+            self.table.insertRow(self.table.rowCount())
+            self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(vals[i]))
+        
+class GlobalCustomWidget(GlobalTextbox):
+    def __init__(self):
+        super(GlobalCustomWidget, self).__init__()

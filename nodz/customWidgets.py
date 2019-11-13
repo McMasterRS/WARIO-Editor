@@ -173,16 +173,16 @@ class ExpandingTable(QtWidgets.QTableWidget):
         if self.item(self.rowCount() - 1, 0) != None:
             if self.item(self.rowCount() - 1, 0).text() != "":
                 self.insertRow(self.rowCount())
-            
-        if self.item(self.rowCount() - 2, 0).text() == "":
-            self.removeRow(self.rowCount() - 1)
+        if self.item(self.rowCount() - 2, 0) != None:    
+            if self.item(self.rowCount() - 2, 0).text() == "":
+                self.removeRow(self.rowCount() - 1)
             
             
     def getSettings(self, name, var, settings):
     
         varDict = {}
         settingsDict = {}
-    
+        
         for i in range(self.rowCount() - 1):
             settingsDict[i] = self.item(i, 0).text()
             varDict[self.item(i, 0).text()] = i + 1
@@ -353,7 +353,7 @@ class GlobalNodeComboBox(QtWidgets.QComboBox):
                                              plug = plug,
                                              socket = not plug,
                                              preset  = "attr_preset_1",
-                                             dataType = self.globalsList[self.currentText()]["type"])
+                                             dataType = self.globalsList[self.currentText()]["attrType"])
         self.parentNode.update()
         
     def updateGlobals(self, globals):

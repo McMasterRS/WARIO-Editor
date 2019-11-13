@@ -1046,6 +1046,7 @@ class Nodz(QtWidgets.QGraphicsView):
         nodesData = data['NODES']
         nodeIds = nodesData.keys()
 
+
         for nodeId in nodeIds:
             name = nodesData[nodeId]['name']
             nodeType = nodesData[nodeId]['type']
@@ -1092,9 +1093,9 @@ class Nodz(QtWidgets.QGraphicsView):
                                      socket=socket,
                                      dataType=dataType)
 
-        # If custom node, finish initialization
-        if nodeType == "Custom":
-           node.settings.initCustom()
+            # If custom node, finish initialization
+            if nodeType == "Custom":
+                node.settings.initCustom()
 
         # Apply connections data.
         connectionsData = data['CONNECTIONS']
