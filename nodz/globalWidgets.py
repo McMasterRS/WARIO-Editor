@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets, QtCore, QtGui
 from nodz.customWidgets import *
+import importlib
+import inspect
 
 # Combobox that lists the types of global variables
 class TypeComboBox(QtWidgets.QComboBox):
@@ -11,7 +13,7 @@ class TypeComboBox(QtWidgets.QComboBox):
         self.addItems(self.types)
         self.setCurrentIndex(0)
         self.setEditable(False)
-        self.currentIndexChanged.connect(self.setEditState)
+        #self.currentIndexChanged.connect(self.setEditState)
         
     # Enables editing if custom box selected
     def setEditState(self, index):
@@ -39,7 +41,7 @@ class GlobalWindowWidget(QtWidgets.QWidget):
     def setData(self):
         return
         
-    def saveProperties(self, gb):
+    def getProperties(self):
         return
         
       
@@ -108,7 +110,6 @@ class GlobalCheckbox(GlobalWindowWidget):
         
     def setData(self, gb):
         self.checkbox.setChecked(gb["value"])
-        assert (self.checkbox.isChecked() == gb["value"]), "FUCK"
 
 class GlobalFileSelect(GlobalWindowWidget):
     def __init__(self):
@@ -195,6 +196,91 @@ class GlobalListWindow(QtWidgets.QWidget):
             self.table.insertRow(self.table.rowCount())
             self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(vals[i]))
         
-class GlobalCustomWidget(GlobalTextbox):
+class GlobalCustomWidget(GlobalWindowWidget):
     def __init__(self):
         super(GlobalCustomWidget, self).__init__()
+        
+        self.cls = "GlobalCustomWidget"
+        self.file = "nodz.globalWidgets"
+        
+        # "Load" if file hasnt been selected, "Open" if it has
+        self.state = "Load"
+        
+        self.window = []
+        
+        # Widgets for load view
+        self.loadWidget = QtWidgets.QWidget()
+        self.loadLayout = QtWidgets.QHBoxLayout()
+        self.loadLayout.setContentsMargins(0, 0, 0, 0)
+        self.loadLayout.setSpacing(2)
+        self.fileBox = QtWidgets.QLineEdit()
+        self.saveButton = QtWidgets.QPushButton("Load")
+        width = self.saveButton.fontMetrics().boundingRect("Load").width() + 15
+        self.saveButton.setMaximumWidth(width)
+        self.saveButton.clicked.connect(self.getFile)
+        
+        self.loadLayout.addWidget(self.fileBox)
+        self.loadLayout.addWidget(self.saveButton)
+        self.loadWidget.setLayout(self.loadLayout)
+        
+        # Widgets for custom input view
+        self.showWidget = QtWidgets.QWidget()
+        self.showLayout = QtWidgets.QHBoxLayout()
+        self.showLayout.setContentsMargins(0, 0, 0, 0)
+        self.showButton = QtWidgets.QPushButton("Show")
+        self.showButton.clicked.connect(self.showWindow)
+        
+        self.showLayout.addWidget(self.showButton)
+        self.showWidget.setLayout(self.showLayout)
+        
+        self.layout.addWidget(self.loadWidget)
+        self.setLayout(self.layout)
+        
+    def getData(self):
+        if self.state == "Load":
+            return self.fileBox.text()
+        else:
+            return self.window.getData()
+            
+    def setData(self, gb):
+        self.fileBox.setText(gb["value"])
+        if gb["properties"]["state"] == "Open":
+            self.state = "Open"
+            self.swapState(gb["properties"]["class"])
+            self.window.setData(gb)
+            
+    def getProperties(self):
+        if self.state == "Load":
+            return {"state" : "Load"}
+        else:
+            return self.window.getProperties()
+            
+    def getFile(self):
+        f = QtWidgets.QFileDialog.getOpenFileName(filter = "Python Files (*.py)")[0]
+        if f is not "":
+            self.fileBox.setText(f)
+            self.swapState()
+            
+    def showWindow(self):
+        self.window.show()
+    
+    def swapState(self, cls = None):
+        # Load the relevant module
+        spec = importlib.util.spec_from_file_location(name = "Custom", location = self.fileBox.text())
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        
+        if cls is None:
+            # List the classes in the module for the user to choose
+            classList = [m[0] for m in inspect.getmembers(module, inspect.isclass) if m[1].__module__ == 'Custom']
+            
+            cls, ok = QtWidgets.QInputDialog.getItem(self, "Select Class", "Class:", classList, 0, False)
+            if ok is False:
+                return
+        
+        self.window = getattr(module, cls)()
+        self.window.show()
+        self.state = "Open"
+        self.layout.removeWidget(self.loadWidget)
+        self.layout.addWidget(self.showWidget)
+        

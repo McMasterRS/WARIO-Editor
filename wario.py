@@ -4,7 +4,6 @@ import nodz.nodz_main as nodz_main
 from pipeline.RunPipeline import runPipeline
 from nodz.genGraph import generateGraph
 import sys, os, textwrap
-from multiprocessing import Process, Queue
 
 version = "0.0.1"
 

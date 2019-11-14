@@ -76,6 +76,7 @@ class GlobalUI(QtWidgets.QWidget):
             widget = self.table.cellWidget(row, 3)
             value = widget.getData()
             const = True if self.table.item(row, 4).checkState() == QtCore.Qt.Checked else False
+            properties = widget.getProperties()
             
             gb["file"] = widget.file
             gb["class"] = widget.cls
@@ -83,7 +84,7 @@ class GlobalUI(QtWidgets.QWidget):
             gb["type"] = type
             gb["value"] = value
             gb["const"] = const
-            widget.saveProperties(gb)
+            gb["properties"] = properties
             globals[name] = gb
             
             self.vars[name] = type
@@ -99,7 +100,7 @@ class GlobalUI(QtWidgets.QWidget):
             row = self.table.rowCount() - 1
 
             self.table.item(row, 0).setText(gb)
-            self.table.setItem(row, 1, QtWidgets.QTableWidgetItem(globals[gb["type"]]))
+            self.table.setItem(row, 1, QtWidgets.QTableWidgetItem(globals[gb]["type"]))
             combo = self.table.cellWidget(row, 2)
             combo.blockSignals(True)
             # Use the type of the global to work out which index to load
