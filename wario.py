@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
 from pipeline.RunPipeline import runPipeline
 from nodz.genGraph import generateGraph
+from nodz.helpUI import HelpUI
 import sys, os, textwrap
 
 version = "0.0.1"
@@ -210,9 +211,12 @@ class NodzWindow(QtWidgets.QMainWindow):
             QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
             
     def openWiki(self):
-        url = QtCore.QUrl("https://gits.mcmaster.ca/harwood/nodz/wikis/home")
-        if not QtGui.QDesktopServices.openUrl(url):
-            QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
+    
+        self.helpWindow = HelpUI()
+        self.helpWindow.show()
+        #url = QtCore.QUrl("https://gits.mcmaster.ca/harwood/nodz/wikis/home")
+        #if not QtGui.QDesktopServices.openUrl(url):
+        #    QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
             
     def buildHelpMenu(self):
         aboutAct = QtWidgets.QAction(getIcon('SP_MessageBoxQuestion'), "&About", self)
