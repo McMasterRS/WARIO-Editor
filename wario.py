@@ -18,6 +18,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         
         self.threadpool = QtCore.QThreadPool()
         self.runningPipeline = False
+        self.helpWindow = HelpUI()
         
         self.installEventFilter(self)
         
@@ -163,9 +164,11 @@ class NodzWindow(QtWidgets.QMainWindow):
         # toolboxes to handle them being enabled/disabled
         nodz = self.nodz
         toolkitMenu = self.toolkitMenu
+        help = self.helpWindow
         
         def toolkitCall(state):
             ret = nodz.reloadConfig(name, state)
+            help.buildToolkitHelp(nodz.toolkits)
             if ret == False:
                 for tk in toolkitMenu.actions():
                     if tk.text() == name:
@@ -210,21 +213,16 @@ class NodzWindow(QtWidgets.QMainWindow):
         if not QtGui.QDesktopServices.openUrl(url):
             QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
             
-    def openWiki(self):
-    
-        self.helpWindow = HelpUI()
+    def openHelp(self):
         self.helpWindow.show()
-        #url = QtCore.QUrl("https://gits.mcmaster.ca/harwood/nodz/wikis/home")
-        #if not QtGui.QDesktopServices.openUrl(url):
-        #    QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
             
     def buildHelpMenu(self):
         aboutAct = QtWidgets.QAction(getIcon('SP_MessageBoxQuestion'), "&About", self)
         aboutAct.triggered.connect(self.showAbout)   
         repoAct = QtWidgets.QAction(QtGui.QIcon('repo.png'), "&Repository", self)
         repoAct.triggered.connect(self.openRepo)
-        wikiAct = QtWidgets.QAction(QtGui.QIcon('wiki.png'), "&Wiki", self)
-        wikiAct.triggered.connect(self.openWiki)
+        wikiAct = QtWidgets.QAction(QtGui.QIcon('wiki.png'), "&Help", self)
+        wikiAct.triggered.connect(self.openHelp)
         
         self.helpMenu.addAction(aboutAct)
         self.helpMenu.addAction(repoAct)

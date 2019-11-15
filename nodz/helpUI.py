@@ -8,12 +8,10 @@ def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
 
 class HelpUITreeItem(QtWidgets.QTreeWidgetItem):
-    def __init__(self, name):
+    def __init__(self, name, url):
         super(HelpUITreeItem, self).__init__()
         self.setText(0, name)
-        self.url = ""
-        #self.setIcon(0, getIcon("SP_DirIcon"))
-
+        self.url = QtCore.QUrl(QtCore.QFileInfo(url).absoluteFilePath())
 
 class HelpUI(QtWidgets.QWidget):
     def __init__(self):
@@ -21,19 +19,68 @@ class HelpUI(QtWidgets.QWidget):
         self.layout = QtWidgets.QHBoxLayout()
         
         self.treeMenu = QtWidgets.QTreeWidget()
+        self.treeMenu.currentItemChanged.connect(self.updateURL)
+        self.treeMenu.setHeaderHidden(True)
         self.layout.addWidget(self.treeMenu)
         
         self.webView = QtWebEngineWidgets.QWebEngineView()
-        self.webView.setUrl(QtCore.QUrl("file:///C:/Users/mudwayt/Documents/GitHub/nodz/nodz/help/home.html"))
         self.layout.addWidget(self.webView)
         
         self.setLayout(self.layout)
         
-        self.buildTree()
+        self.toolkitList = []
         
-    def buildTree(self):
-        self.treeMenu.setColumnCount(1)
-        self.treeMenu.setHeaderHidden(True)
-        homeItem = HelpUITreeItem("Home")
-        homeItem.addChild(HelpUITreeItem("Test"))
-        self.treeMenu.addTopLevelItem(homeItem) 
+        self.buildTree("./nodz/help/")
+        self.buildTree("./toolkits/default/help/", "Default")
+        
+    def buildTree(self, path, toolkit = None):
+        self.treeMenu.blockSignals(True)        
+        
+        if toolkit is None:
+            treeDepth = -1
+            treeDirectories = []
+        else:
+            treeDepth = 0
+            base = HelpUITreeItem(toolkit + " Toolkit", path + "/default.html")
+            self.treeMenu.addTopLevelItem(base)
+            treeDirectories = [base]
+            self.toolkitList.append(base)
+        
+        for dirpath, dnames, fnames in os.walk(path):
+        
+            for fname in fnames: 
+                if fname == "default.html":
+                    continue
+                item = HelpUITreeItem(fname.split(".")[0], dirpath + "/" + fname)
+                
+                if treeDepth == -1:
+                    self.treeMenu.addTopLevelItem(item)
+                else:
+                    treeDirectories[treeDepth].addChild(item)  
+                        
+            for dname in dnames:
+                if dname[0] == "_":
+                    continue
+                item = HelpUITreeItem(dname.split("/")[-1], dirpath + "/" + dname + "/default.html")
+                treeDirectories.append(item)
+                
+                if treeDepth == -1:
+                    self.treeMenu.addTopLevelItem(item)
+                else:
+                    treeDirectories[treeDepth].addChild(item)  
+                    
+            treeDepth += 1        
+            
+        self.treeMenu.blockSignals(False)
+        
+    def buildToolkitHelp(self, toolkits):
+        # Refresh the toolkits
+        for toolkit in self.toolkitList:
+            self.treeMenu.invisibleRootItem().removeChild(toolkit)
+            
+        for toolkit in toolkits:
+            self.buildTree("./toolkits/" + toolkit + "/help/", toolkit)
+
+        
+    def updateURL(self, current, prev):
+        self.webView.setUrl(current.url)
