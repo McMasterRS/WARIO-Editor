@@ -154,7 +154,7 @@ def _saveData(filePath, data):
                        ensure_ascii=False))
     f.close()
 
-    print("Data successfully saved !")
+    #print("Data successfully saved !")
 
 def _loadData(filePath):
     """
@@ -169,6 +169,5 @@ def _loadData(filePath):
 
     json_file.close()
 
-    print("Data successfully loaded !")
     return j_data
 

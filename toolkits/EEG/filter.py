@@ -1,7 +1,7 @@
 from pipeline.Node import Node
 import mne 
 import numpy as np
-from nodz.customSettings import CustomSettings
+from extensions.customSettings import CustomSettings
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 class FilterSettings(CustomSettings):

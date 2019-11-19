@@ -1,6 +1,6 @@
 from pipeline.Node import Node
-from nodz.customSettings import CustomSettings
-from nodz.customWidgets import BatchSaveTab
+from extensions.customSettings import CustomSettings
+from extensions.customWidgets import BatchSaveTab
 import mne
 import numpy as np
 import matplotlib.pyplot as plt

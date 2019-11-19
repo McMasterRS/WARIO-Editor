@@ -1,8 +1,8 @@
 from pipeline.Node import Node
 import mne
 import pickle
-from nodz.customSettings import CustomSettings
-from nodz.customWidgets import GlobalSaveTabs, saveWidget
+from extensions.customSettings import CustomSettings
+from extensions.customWidgets import GlobalSaveTabs, saveWidget
 import matplotlib.pyplot as plt
 
 from PyQt5 import QtWidgets

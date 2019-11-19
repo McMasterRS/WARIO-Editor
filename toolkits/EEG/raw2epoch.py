@@ -1,6 +1,6 @@
 from pipeline.Node import Node
-from nodz.customSettings import CustomSettings
-from nodz.customWidgets import LinkedCheckbox, ExpandingTable
+from extensions.customSettings import CustomSettings
+from extensions.customWidgets import LinkedCheckbox, ExpandingTable
 import mne
 import numpy as np
 

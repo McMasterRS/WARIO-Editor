@@ -4,8 +4,8 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 import nodz.nodz_utils as utils
-from nodz.customWidgets import *
-from nodz.globalWidgets import *
+from extensions.customWidgets import *
+from extensions.globalWidgets import *
 import importlib
 
 # Global variable UI

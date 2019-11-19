@@ -1,11 +1,11 @@
 from pipeline.Node import Node
-from nodz.customSettings import CustomSettings
+from extensions.customSettings import CustomSettings
 
 import mne
 import numpy as np
 import matplotlib.pyplot as plt
 
-from nodz.customWidgets import LinkedSpinbox, BatchSavePanel, BatchSaveTab
+from extensions.customWidgets import LinkedSpinbox, BatchSavePanel, BatchSaveTab
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore

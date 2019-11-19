@@ -1,5 +1,5 @@
 from pipeline.Node import Node
-from nodz.customSettings import CustomSettings
+from extensions.customSettings import CustomSettings
 import mne
 import numpy as np
 import matplotlib.pyplot as plt

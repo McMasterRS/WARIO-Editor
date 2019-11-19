@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets, QtCore, QtGui
-from nodz.customWidgets import *
+from extensions.customWidgets import *
 import importlib
 import inspect
 
@@ -50,7 +50,7 @@ class GlobalTextbox(GlobalWindowWidget):
         super(GlobalTextbox, self).__init__()
         
         self.cls = "GlobalTextbox"
-        self.file = "nodz.globalWidgets"
+        self.file = "extensions.globalWidgets"
         
         self.textbox = QtWidgets.QLineEdit()
         self.textbox.setFrame(False)
@@ -68,7 +68,7 @@ class GlobalSpinbox(GlobalWindowWidget):
         super(GlobalSpinbox, self).__init__()
         
         self.cls = "GlobalSpinbox"
-        self.file = "nodz.globalWidgets"
+        self.file = "extensions.globalWidgets"
         
         self.spinbox = QtWidgets.QSpinBox()
         self.layout.addWidget(self.spinbox)
@@ -84,7 +84,7 @@ class GlobalDoubleSpinbox(GlobalWindowWidget):
         super(GlobalDoubleSpinbox, self).__init__()
         
         self.cls = "GlobalDoubleSpinbox"
-        self.file = "nodz.globalWidgets"
+        self.file = "extensions.globalWidgets"
         
         self.spinbox = QtWidgets.QDoubleSpinBox()
         self.layout.addWidget(self.spinbox)
@@ -100,7 +100,7 @@ class GlobalCheckbox(GlobalWindowWidget):
         super(GlobalCheckbox, self).__init__()
         
         self.cls = "GlobalCheckbox"
-        self.file = "nodz.globalWidgets"
+        self.file = "extensions.globalWidgets"
         
         self.checkbox = QtWidgets.QCheckBox()
         self.layout.addWidget(self.checkbox)
@@ -116,7 +116,7 @@ class GlobalFileSelect(GlobalWindowWidget):
         super(GlobalFileSelect, self).__init__()
         
         self.cls = "GlobalFileSelect"
-        self.file = "nodz.globalWidgets"
+        self.file = "extensions.globalWidgets"
         
         self.fileBox = QtWidgets.QLineEdit()
         
@@ -143,10 +143,10 @@ class GlobalFolderSelect(GlobalFileSelect):
     def __init__(self):
         super(GlobalFolderSelect, self).__init__()
         self.cls = "GlobalFolderSelect"
+        self.file = "extensions.globalWidgets"
         
     def getFile(self):
         dialog = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory")
-        print(dialog)
         if (dialog != ''):
             self.fileBox.setText(dialog)
         
@@ -155,7 +155,7 @@ class GlobalListInput(GlobalWindowWidget):
         super(GlobalListInput, self).__init__()
         
         self.cls = "GlobalListInput"
-        self.file = "nodz.globalWidgets"
+        self.file = "extensions.globalWidgets"
         
         self.openButton = QtWidgets.QPushButton("Edit")
         self.openButton.clicked.connect(self.openMenu)
@@ -201,7 +201,7 @@ class GlobalCustomWidget(GlobalWindowWidget):
         super(GlobalCustomWidget, self).__init__()
         
         self.cls = "GlobalCustomWidget"
-        self.file = "nodz.globalWidgets"
+        self.file = "extensions.globalWidgets"
         
         # "Load" if file hasnt been selected, "Open" if it has
         self.state = "Load"

@@ -2,8 +2,8 @@ from pipeline.Node import Node
 import mne
 import sys
 
-from nodz.customSettings import CustomSettings
-from nodz.customWidgets import ExpandingTable
+from extensions.customSettings import CustomSettings
+from extensions.customWidgets import ExpandingTable
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 class DropEvokedChannelsSettings(CustomSettings):

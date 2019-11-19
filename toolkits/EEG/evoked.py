@@ -1,6 +1,6 @@
 from pipeline.Node import Node
-from nodz.customSettings import CustomSettings
-from nodz.customWidgets import ExpandingTable
+from extensions.customSettings import CustomSettings
+from extensions.customWidgets import ExpandingTable
 import mne
 
 from PyQt5 import QtWidgets

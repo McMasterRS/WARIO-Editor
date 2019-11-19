@@ -13,10 +13,13 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 import nodz.nodz_utils as utils
-from nodz.customWidgets import *
-from nodz.settingsWindow import *
-from nodz.customSettings import CustomSettings
-from nodz.GlobalUI import GlobalUI
+
+from extensions.customWidgets import *
+from extensions.settingsWindow import *
+from extensions.customSettings import CustomSettings
+from extensions.GlobalUI import GlobalUI
+from extensions.helpUI import HelpUI
+from extensions.toolkitUI import ToolkitUI
 
 defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..\\toolkits\default\config.json')
 
@@ -67,7 +70,11 @@ class Nodz(QtWidgets.QGraphicsView):
         
         # Load nodz configuration.
         self.loadConfig(configPath)
+        self.toolkitUI = ToolkitUI(self)
         self.toolkits = ["default"]
+        
+        # Help menu
+        self.helpUI = HelpUI(self)
         
         # General data.
         self.gridVisToggle = True
@@ -521,6 +528,22 @@ class Nodz(QtWidgets.QGraphicsView):
                 return
             
         sys.exit()
+        
+    def checkToolkitInUse(self, toolkit):
+        nodes = self.scene().nodes.keys()
+        for node in nodes:  
+            if self.scene().nodes[node].toolkit == toolkit:
+                return True
+                
+        return False
+        
+    def openToolkit(self):
+        self.toolkitUI.show()
+        self.toolkitUI.activateWindow()
+        
+    def openHelp(self):
+        self.helpUI.show()
+        self.helpUI.activateWindow()
         
     def openGlobals(self):
         self.globalUI.show()
@@ -1056,7 +1079,11 @@ class Nodz(QtWidgets.QGraphicsView):
             alternate = nodesData[nodeId]['alternate']
             settings = nodesData[nodeId]['settings']
             toolkit = nodesData[nodeId]['toolkit']
-            self.reloadConfig(toolkit, True)
+            
+            # Make sure that the toolkit exists in the toolkit manager
+            if not self.toolkitUI.checkAdded(toolkit):
+                return
+
             if toolkit != "default" and toolkit != "custom":
                 nodeType = toolkit+nodeType
 
@@ -1118,6 +1145,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         # Emit signal.
         self.signal_GraphLoaded.emit()
+        print("Data successfully loaded !")
 
     def createConnection(self, sourceNode, sourceAttr, targetNode, targetAttr):
         """

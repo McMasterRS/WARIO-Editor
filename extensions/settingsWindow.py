@@ -1,6 +1,6 @@
 import nodz.nodz_utils as utils
-from nodz.customWidgets import *
-from nodz.customSettings import *
+from extensions.customWidgets import *
+from extensions.customSettings import *
 
 import json
 import collections

@@ -1,6 +1,6 @@
 from pipeline.Node import Node
-from nodz.customSettings import CustomSettings
-from nodz.customWidgets import LinkedCheckbox, LinkedSpinbox
+from extensions.customSettings import CustomSettings
+from extensions.customWidgets import LinkedCheckbox, LinkedSpinbox
 import mne
 
 from PyQt5 import QtWidgets, QtCore, QtGui

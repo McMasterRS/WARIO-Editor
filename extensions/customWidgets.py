@@ -4,7 +4,25 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 
-
+# Mimics a cell checkbox but is centred
+class CentredCellCheckbox(QtWidgets.QWidget):
+    def __init__(self):
+        super(CentredCellCheckbox, self).__init__()
+        self.checkbox = QtWidgets.QCheckBox("")
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.addWidget(self.checkbox)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(0,0,0,0)
+        self.setLayout(layout)
+        
+    def setChecked(self, state):
+        self.checkbox.setChecked(state)
+        
+    def isChecked(self):
+        return self.checkbox.isChecked()
+        
+    def connect(self, func):
+        self.checkbox.toggled.connect(func)
 
 class GlobalSaveTabs(QtWidgets.QTabWidget):
     def __init__(self, saveTypes, saveDialogString, settings, name = ""):

@@ -3,7 +3,7 @@ import mne
 import numpy as np
 import os
 
-from nodz.customSettings import CustomSettings
+from extensions.customSettings import CustomSettings
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 

@@ -2,8 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
 from pipeline.RunPipeline import runPipeline
-from nodz.genGraph import generateGraph
-from nodz.helpUI import HelpUI
+from extensions.genGraph import generateGraph
 import sys, os, textwrap
 
 version = "0.0.1"
@@ -15,14 +14,22 @@ class NodzWindow(QtWidgets.QMainWindow):
     def __init__(self, nodz):
         QtWidgets.QMainWindow.__init__(self)
         self.nodz = nodz
-        
-        self.threadpool = QtCore.QThreadPool()
-        self.runningPipeline = False
-        self.helpWindow = HelpUI()
+        self.nodz.parent = self
+        #self.threadpool = QtCore.QThreadPool()
+        #self.runningPipeline = False
         
         self.installEventFilter(self)
         
         self.setupWindow()
+        self.loadToolkitSettings()  
+        
+    def loadToolkitSettings(self):
+    
+        file = "./toolkits/toolkitConfig.json"
+        if os.path.exists(file):
+            self.nodz.toolkitUI.loadToolkitSettings()
+        else:
+            self.nodz.toolkitUI.genSettings()
         
     def setupWindow(self):
         self.setWindowTitle("WARIO")
@@ -164,11 +171,10 @@ class NodzWindow(QtWidgets.QMainWindow):
         # toolboxes to handle them being enabled/disabled
         nodz = self.nodz
         toolkitMenu = self.toolkitMenu
-        help = self.helpWindow
         
         def toolkitCall(state):
             ret = nodz.reloadConfig(name, state)
-            help.buildToolkitHelp(nodz.toolkits)
+            nodz.helpUI.buildToolkitHelp(nodz.toolkits)
             if ret == False:
                 for tk in toolkitMenu.actions():
                     if tk.text() == name:
@@ -176,18 +182,14 @@ class NodzWindow(QtWidgets.QMainWindow):
                         
         return toolkitCall    
         
-    def buildToolkitMenu(self):
-    
+    def buildToolkitToggles(self):
         self.toolkitMenu.clear()
         
-        for root, directories, files in os.walk('./toolkits'):
-            for dir in directories:
-                if dir != "default" and dir != "__pycache__":
-                    dirMenu = QtWidgets.QAction(QtGui.QIcon(''), dir, self, checkable=True)
-                    dirMenu.triggered.connect(self.makeToolkitCall(dir))
-                    self.toolkitMenu.addAction(dirMenu)
-            break
-    
+        for tk in self.nodz.toolkitUI.toolkitNames:
+            dirMenu = QtWidgets.QAction(QtGui.QIcon(''), tk, self, checkable=True)
+            dirMenu.triggered.connect(self.makeToolkitCall(tk))
+            self.toolkitMenu.addAction(dirMenu)
+            
         # Check the toolkits that are currently loaded in nodz
         toolkitList = self.nodz.toolkits
         for tk in self.toolkitMenu.actions():
@@ -195,6 +197,14 @@ class NodzWindow(QtWidgets.QMainWindow):
                 tk.setChecked(True)
             else:
                 tk.setChecked(False)
+                
+        self.toolkitMenu.addAction(self.toolkitAct)
+    
+    def buildToolkitMenu(self):
+    
+        self.toolkitAct = QtWidgets.QAction(QtGui.QIcon(''), "Configure", self)
+        self.toolkitAct.triggered.connect(self.nodz.openToolkit)
+        self.buildToolkitToggles()
      
     def showAbout(self):
         abt = QtWidgets.QMessageBox.about(nodz, "About", 
@@ -214,7 +224,7 @@ class NodzWindow(QtWidgets.QMainWindow):
             QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
             
     def openHelp(self):
-        self.helpWindow.show()
+        self.nodz.openHelp()
             
     def buildHelpMenu(self):
         aboutAct = QtWidgets.QAction(getIcon('SP_MessageBoxQuestion'), "&About", self)

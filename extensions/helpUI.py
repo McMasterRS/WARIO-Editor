@@ -14,8 +14,10 @@ class HelpUITreeItem(QtWidgets.QTreeWidgetItem):
         self.url = QtCore.QUrl(QtCore.QFileInfo(url).absoluteFilePath())
 
 class HelpUI(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super(HelpUI, self).__init__()
+        self.parent = parent
+        
         self.layout = QtWidgets.QHBoxLayout()
         
         self.treeMenu = QtWidgets.QTreeWidget()
@@ -30,8 +32,7 @@ class HelpUI(QtWidgets.QWidget):
         
         self.toolkitList = []
         
-        self.buildTree("./nodz/help/")
-        self.buildTree("./toolkits/default/help/", "Default")
+        self.buildTree(os.path.normpath("./help/"))
         
     def buildTree(self, path, toolkit = None):
         self.treeMenu.blockSignals(True)        
@@ -41,7 +42,7 @@ class HelpUI(QtWidgets.QWidget):
             treeDirectories = []
         else:
             treeDepth = 0
-            base = HelpUITreeItem(toolkit + " Toolkit", path + "/default.html")
+            base = HelpUITreeItem(toolkit + " Toolkit", os.path.normpath(path + "/default.html"))
             self.treeMenu.addTopLevelItem(base)
             treeDirectories = [base]
             self.toolkitList.append(base)
@@ -51,7 +52,7 @@ class HelpUI(QtWidgets.QWidget):
             for fname in fnames: 
                 if fname == "default.html":
                     continue
-                item = HelpUITreeItem(fname.split(".")[0], dirpath + "/" + fname)
+                item = HelpUITreeItem(fname.split(".")[0], os.path.normpath(dirpath + "/" + fname))
                 
                 if treeDepth == -1:
                     self.treeMenu.addTopLevelItem(item)
@@ -61,7 +62,7 @@ class HelpUI(QtWidgets.QWidget):
             for dname in dnames:
                 if dname[0] == "_":
                     continue
-                item = HelpUITreeItem(dname.split("/")[-1], dirpath + "/" + dname + "/default.html")
+                item = HelpUITreeItem(dname.split("/")[-1], os.path.normpath(dirpath + "/" + dname + "/default.html"))
                 treeDirectories.append(item)
                 
                 if treeDepth == -1:
@@ -79,7 +80,7 @@ class HelpUI(QtWidgets.QWidget):
             self.treeMenu.invisibleRootItem().removeChild(toolkit)
             
         for toolkit in toolkits:
-            self.buildTree("./toolkits/" + toolkit + "/help/", toolkit)
+            self.buildTree(os.path.normpath(self.parent.toolkitUI.toolkitPaths[toolkit] + "/help/"), toolkit)
 
         
     def updateURL(self, current, prev):
