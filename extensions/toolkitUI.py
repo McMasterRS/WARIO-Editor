@@ -11,6 +11,9 @@ class ToolkitUI(QtWidgets.QWidget):
     def __init__(self, parent):
         super(ToolkitUI, self).__init__()
         self.parent = parent
+        self.resize(800, 300)
+        self.setWindowIcon(self.style().standardIcon(getattr(QtWidgets.QStyle,"SP_TitleBarMenuButton")))
+        self.setWindowTitle("Toolkit Manager")
         
         # Array of names and dict of paths
         self.toolkitNames = []
@@ -88,7 +91,6 @@ class ToolkitUI(QtWidgets.QWidget):
     def loadToolkitSettings(self):
         tks = utils._loadData(os.path.normpath("./toolkits/toolkitConfig.json"))
         for tk in tks:
-            print(tks[tk]["name"])
             self.addRow(tks[tk]["name"], tks[tk]["path"], tks[tk]["show"])
             
         self.reloadToolkits()
@@ -106,6 +108,9 @@ class ToolkitUI(QtWidgets.QWidget):
         
     # Makes sure that the toolkits for loaded files exist and are shown
     def checkAdded(self, toolkit):
+        
+        if toolkit == "custom":
+            return True
         
         for row in range(self.toolkitTable.rowCount()):
             if self.toolkitTable.item(row, 0).text() == toolkit:
@@ -129,7 +134,7 @@ class ToolkitUI(QtWidgets.QWidget):
                 self.toolkitPaths[name] = self.toolkitTable.item(row, 2).text()
             else:
                 # If its not checked but still in use, re-check it which calls this class again
-                if self.parent.checkToolkitInUse(name):
+                if self.parent.reloadConfig(name, True):
                     self.toolkitTable.cellWidget(row, 1).setChecked(True)
                     return
 

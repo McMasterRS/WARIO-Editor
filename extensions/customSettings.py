@@ -42,9 +42,27 @@ class CustomSettings(QtWidgets.QWidget):
     def buildUI(self, settings):
         return
         
+    # Update anything reliant on global vars
     def updateGlobals(self, globals):
         return
         
+    # Used in custom nodes. Returns the node attributes
+    def getAttribs(self):
+        return {"Raw": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": False,
+                    "socket": True,
+                    "type": ["rawEEG"]
+                },
+                "Filtered Raw": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": True,
+                    "socket": False,
+                    "type": "rawEEG"   
+                }}
+    
     # Return the values from each setting type
     def genSettings(self):
         

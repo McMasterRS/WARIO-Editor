@@ -9,13 +9,8 @@
             "toolkit" : "custom",
             "attributes": {},
             "settings": {
-                "custombox" : {
-                        "text" : "Select File",
-                        "type" : "custombox",
-                        "params" : {
-                            "text" : ""
-                        }
-                    }
+                "settingsFile" : "./toolkits/customNode.py",
+                "settingsClass" : "CustomNodeSettings"
             }
         }
     }

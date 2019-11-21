@@ -31,7 +31,6 @@ class GlobalUI(QtWidgets.QWidget):
         self.table.setColumnCount(5)
         
         header = self.table.horizontalHeader()
-        #header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
         header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
         self.table.setHorizontalHeaderLabels(['Variable Name', 'Type', 'Input Method', 'Value', 'Constant'])
@@ -94,10 +93,28 @@ class GlobalUI(QtWidgets.QWidget):
         return globals
         
     def loadGlobals(self, globals):
-        self.clearTable()
+    
+        # Remove all non-toolkit rows
+        for i in range(0, self.table.rowCount()):
+            if self.table.cellWidget(i,2).isEnabled():
+                self.table.removeRow(i)             
+        
         for gb in globals:
-            self.addRow(globals[gb])
-            row = self.table.rowCount() - 1
+            exists = False
+            
+            for i in range(0, self.table.rowCount()):
+                if self.table.item(i,0).text() == gb:
+                    exists = True
+                    row = i
+                    
+                    value = self.genNewRowWidget(globals[gb])
+                    self.table.setCellWidget(row, 3, value)
+                    
+                    break
+                
+            if exists is False:
+                self.addRow(globals[gb])
+                row = self.table.rowCount() - 1
 
             self.table.item(row, 0).setText(gb)
             self.table.setItem(row, 1, QtWidgets.QTableWidgetItem(globals[gb]["type"]))
@@ -116,7 +133,9 @@ class GlobalUI(QtWidgets.QWidget):
             if globals[gb]["const"]:
                 self.table.item(row, 4).setCheckState(QtCore.Qt.Checked)
             else:
-                self.table.item(row, 4).setCheckState(QtCore.Qt.Unchecked)
+                self.table.item(row, 4).setCheckState(QtCore.Qt.Unchecked)      
+            
+            self.table.updateNames()
                 
     def genNewRowWidget(self, gb):
         if gb is None:

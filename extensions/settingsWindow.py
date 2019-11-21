@@ -16,8 +16,7 @@ class SettingsItem(CustomSettings):
 
     def __init__(self, parent, widgets):
         self.nameList = []
-        super(SettingsItem, self).__init__(parent, widgets)
-        
+        super(SettingsItem, self).__init__(parent, widgets)     
         
     # Initialise the custom UI elements 
     def initCustom(self):
@@ -29,14 +28,12 @@ class SettingsItem(CustomSettings):
                     w.buildCustomUI()
         
     # Populate the settings window    
-    def buildUI(self, widgets, custom = False):
+    def buildUI(self, widgets):
         self.layout = QtWidgets.QFormLayout()
-        # If not building the custom node UI add the rename textbox
-        # to the top of the settings menu
-        if custom == False:
-            label = QtWidgets.QLabel("Node Name")
-            widget = self.genWidget("textbox", {'text': self.parent.name})
-            self.layout.insertRow(-1, label, widget)
+        
+        label = QtWidgets.QLabel("Node Name")
+        widget = self.genWidget("textbox", {'text': self.parent.name})
+        self.layout.insertRow(-1, label, widget)
 
         # Loop through all the widgets in the json file and
         # add them to the settings menu
@@ -54,14 +51,6 @@ class SettingsItem(CustomSettings):
             label = QtWidgets.QLabel(widgets[i]["text"])
             widget = self.genWidget(widgets[i]["type"], widgets[i]["params"])
             self.layout.insertRow(-1, label, widget)
-            
-            # Cancel building the UI after a custom node
-            # If loading/duplicating, the generation code in the custom box
-            # handles the rest of the UI generation but we need to make sure
-            # it has the values held in the duplicated/loaded noded
-            if widgets[i]["type"] == "custombox":
-                widget.tempSettings = widgets
-                break
                 
         self.setLayout(self.layout)
                 
@@ -69,14 +58,9 @@ class SettingsItem(CustomSettings):
     # Reset the settings window to basic version
     def resetUI(self, custom = False):
 
-        start = 1
-        if custom:
-            start = 2
-            self.nameList = [self.nameList[0]]
-        else:
-            self.nameList = []
+        self.nameList = []
 
-        while self.layout.rowCount() > start:
+        while self.layout.rowCount() > 1:
             self.layout.removeRow(self.layout.rowCount() - 1)
             
     # Generate the settings row based on its defined widget

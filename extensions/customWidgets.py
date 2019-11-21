@@ -208,8 +208,6 @@ class ExpandingTable(QtWidgets.QTableWidget):
         var[name] = varDict
         settings[name + "Values"] = settingsDict
         
-        
-
 # Spinbox linked to another spinbox so they cant be higher/lower
 class LinkedSpinbox(QtWidgets.QSpinBox):
     def __init__(self):
@@ -311,7 +309,6 @@ class LinkedCheckbox(QtWidgets.QCheckBox):
                 
             settingList[name + "Index"] = self.linkedWidget.currentIndex() 
             
-
 # QTableWidget that forces the first column to be unique
 # Attempts to use the same value twice reverts it to its previous value
 class UniqueNameTable(QtWidgets.QTableWidget):

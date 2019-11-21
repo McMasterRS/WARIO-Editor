@@ -94,8 +94,6 @@ class NodzWindow(QtWidgets.QMainWindow):
                 self.setWindowTitle("WARIO - " + self.nodz.currentFileName)
                 
     def saveRunFile(self):
-        #if not self.runningPipeline:
-            #self.runningPipeline = True
         if self.nodz.currentFileName != "":
             self.nodz.saveGraph(self.nodz.currentFileName)
             runPipeline(self.nodz.currentFileName)
@@ -174,7 +172,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         
         def toolkitCall(state):
             ret = nodz.reloadConfig(name, state)
-            nodz.helpUI.buildToolkitHelp(nodz.toolkits)
+            nodz.helpUI.buildToolkitHelp(nodz.toolkitUI.toolkitNames)
             if ret == False:
                 for tk in toolkitMenu.actions():
                     if tk.text() == name:
@@ -202,12 +200,12 @@ class NodzWindow(QtWidgets.QMainWindow):
     
     def buildToolkitMenu(self):
     
-        self.toolkitAct = QtWidgets.QAction(QtGui.QIcon(''), "Configure", self)
+        self.toolkitAct = QtWidgets.QAction(getIcon('SP_DirIcon'), "Configure", self)
         self.toolkitAct.triggered.connect(self.nodz.openToolkit)
         self.buildToolkitToggles()
      
     def showAbout(self):
-        abt = QtWidgets.QMessageBox.about(nodz, "About", 
+        abt = QtWidgets.QMessageBox.about(self.nodz, "About", 
         textwrap.dedent('''\
             WARIO - Workplace Automation and Research IO
         
@@ -227,11 +225,11 @@ class NodzWindow(QtWidgets.QMainWindow):
         self.nodz.openHelp()
             
     def buildHelpMenu(self):
-        aboutAct = QtWidgets.QAction(getIcon('SP_MessageBoxQuestion'), "&About", self)
+        aboutAct = QtWidgets.QAction(getIcon('SP_TitleBarMenuButton'), "&About", self)
         aboutAct.triggered.connect(self.showAbout)   
-        repoAct = QtWidgets.QAction(QtGui.QIcon('repo.png'), "&Repository", self)
+        repoAct = QtWidgets.QAction(getIcon('SP_MessageBoxInformation'), "&Repository", self)
         repoAct.triggered.connect(self.openRepo)
-        wikiAct = QtWidgets.QAction(QtGui.QIcon('wiki.png'), "&Help", self)
+        wikiAct = QtWidgets.QAction(getIcon('SP_MessageBoxQuestion'), "&Help", self)
         wikiAct.triggered.connect(self.openHelp)
         
         self.helpMenu.addAction(aboutAct)

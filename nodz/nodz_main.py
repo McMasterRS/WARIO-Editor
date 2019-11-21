@@ -153,7 +153,7 @@ class Nodz(QtWidgets.QGraphicsView):
                 nodeCat[nt] = self.config['node_types'][nt]['category']
                 if nodeCat[nt] not in catMenu[nodeTb[nt]]:
                     if nodeCat[nt] == "":
-                            nodeCat[nt] = "Other"
+                        nodeCat[nt] = "Other"
                     catMenu[nodeTb[nt]][nodeCat[nt]] = tbMenu[nodeTb[nt]].addMenu(nodeCat[nt])
                     
                 name = ""
@@ -613,7 +613,7 @@ class Nodz(QtWidgets.QGraphicsView):
         
         for tb in self.toolkits:
             if tb is not "default":
-                path = ".\\toolkits\{0}\config.json".format(tb)
+                path = os.path.normpath(self.toolkitUI.toolkitPaths[tb] + "\config.json")
                 cfg = utils._loadConfig(path)
                 _types = cfg['node_types']
                 types = {}
@@ -690,15 +690,31 @@ class Nodz(QtWidgets.QGraphicsView):
         # Check for name clashes
         if nodeId == None:
             nodeId = uuid.uuid4().hex
+            
+        # Get the toolkit path
+        tkPath = ""
+        if "settingsFile" in settings.keys():
+            if toolkit != "custom":
+                tkPath = os.path.normpath(self.toolkitUI.toolkitPaths[toolkit] + "/" + settings["settingsFile"] + ".py")
+            else:
+                tkPath = os.path.normpath(settings["settingsFile"])
 
         if nodeId in self.scene().nodes.keys():
             print('A node with the same name already exists : {0}'.format(name))
             print('Node creation aborted !')
             return
         else:
-            nodeItem = NodeItem(nodeId=nodeId, name=name, alternate=alternate, preset=preset,
-                                config=self.config, extended_attributes=extended_attributes,
-                                settings=settings, type=type, toolkit=toolkit, globals = self.globals)
+            nodeItem = NodeItem(nodeId=nodeId, 
+                                name=name, 
+                                alternate=alternate, 
+                                preset=preset,
+                                config=self.config, 
+                                extended_attributes=extended_attributes,
+                                settings=settings, 
+                                type=type, 
+                                toolkit=toolkit, 
+                                toolkitPath=tkPath,
+                                globals = self.globals)
 
             # Store node in scene.
             self.scene().nodes[nodeId] = nodeItem
@@ -975,10 +991,16 @@ class Nodz(QtWidgets.QGraphicsView):
             toolkit = nodeInst.toolkit
             variables = nodeInst.variables         
             file = self.config['node_types'][nodeInst.type]['file']
-            if nodeInst.toolkit == 'default' or nodeInst.toolkit == 'custom':
+            
+            if nodeInst.toolkit == 'default':
                 nodeType = nodeInst.type 
             else: 
                 nodeType = nodeInst.type[len(toolkit):]
+                
+            if nodeInst.toolkit == 'custom':
+                nodeType = nodeInst.type
+                file = nodeInst.settingsWindow.customFilePath
+            
             data['NODES'][node] = { 'name': name,
                                     'type': nodeType,
                                     'file': file,
@@ -1058,7 +1080,7 @@ class Nodz(QtWidgets.QGraphicsView):
             return False
            
         # Load global variables
-        if "GLOBALS" in data: 
+        if "GLOBALS" in data.keys(): 
             self.globalUI.loadGlobals(data["GLOBALS"])
         else:
             self.globalUI.clearTable()
@@ -1121,8 +1143,8 @@ class Nodz(QtWidgets.QGraphicsView):
                                      dataType=dataType)
 
             # If custom node, finish initialization
-            if nodeType == "Custom":
-                node.settings.initCustom()
+            #if nodeType == "Custom":
+            #    node.settings.Window.initCustom()
 
         # Apply connections data.
         connectionsData = data['CONNECTIONS']
@@ -1350,7 +1372,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
     """
 
-    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, settings=None, type=None, toolkit=None, globals=None):
+    def __init__(self, nodeId, name, alternate, preset, config, extended_attributes=None, settings=None, type=None, toolkit=None, toolkitPath=None, globals=None):
         """
         Initialize the class.
 
@@ -1402,8 +1424,11 @@ class NodeItem(QtWidgets.QGraphicsItem):
         
         # Load custom settings window
         if "settingsFile" in settings.keys():  
-            module = importlib.import_module("toolkits." + toolkit + "." + settings["settingsFile"])
-            cls = getattr(module, settings["settingsClass"])
+            spec = importlib.util.spec_from_file_location("custom", toolkitPath)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            
+            cls = getattr(mod, settings["settingsClass"])
             self.settingsWindow = cls(self, settings)
             
         # Load default settings window based on JSON
