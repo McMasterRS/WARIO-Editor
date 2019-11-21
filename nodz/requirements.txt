@@ -1,2 +1,2 @@
-#Qt.py
+PyQt5
 six

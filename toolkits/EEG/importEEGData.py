@@ -19,7 +19,7 @@ class importEEGData(Node):
         assert(self.parameters["file"] is not ""), "ERROR: Import Data node has no input file set. Please update the node's settings and re-run"
         
         self.parameters["updateGlobal"] = True
-        self.parameters["files"] = ["C:/Users/mudwayt/Documents/GitHub/nodz/saves/Data/MWEEG_Subject_0.npz",     "C:/Users/mudwayt/Documents/GitHub/nodz/saves/Data/MWEEG_Subject_9.npz"]
+        self.parameters["files"] = ["C:/Users/mudwayt/Documents/GitHub/WARIO/saves/Data/MWEEG_Subject_0.npz",     "C:/Users/mudwayt/Documents/GitHub/WARIO/saves/Data/MWEEG_Subject_9.npz"]
         self.parameters["makeFolders"] = True
 
     def process(self):
