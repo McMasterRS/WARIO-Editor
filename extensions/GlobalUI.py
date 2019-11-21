@@ -27,7 +27,7 @@ class GlobalUI(QtWidgets.QWidget):
         
     def buildUI(self):
     
-        self.table = UniqueNameTable()
+        self.table = UniqueNameTable("Global variables must have unique names")
         self.table.setColumnCount(5)
         
         header = self.table.horizontalHeader()
@@ -120,11 +120,11 @@ class GlobalUI(QtWidgets.QWidget):
             self.table.setItem(row, 1, QtWidgets.QTableWidgetItem(globals[gb]["type"]))
             combo = self.table.cellWidget(row, 2)
             combo.blockSignals(True)
+            
             # Use the type of the global to work out which index to load
             id = combo.findText(globals[gb]["type"])
             if id == -1:
                 combo.setCurrentIndex(len(combo.items) - 1)
-                combo.setCurrentText(globals[gb]["type"])
             else:
                 combo.setCurrentIndex(id)
                 

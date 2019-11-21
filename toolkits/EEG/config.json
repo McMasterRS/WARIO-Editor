@@ -1,21 +1,29 @@
 {   
     "global_variables":{
         "Channel Count" : {
+            "file": "extensions.globalWidgets",
+            "class": "GlobalSpinbox",
             "type"  : "Int",
-            "value" : "32",
+            "value" : 32,
             "const" : false
         },
         "Data Length" : {
+            "file": "extensions.globalWidgets",
+            "class": "GlobalSpinbox",
             "type"  : "Int",
-            "value" : "100",
+            "value" : 100,
             "const" : false
         },
         "Output Folder" : {
+            "file": "extensions.globalWidgets",
+            "class": "GlobalFolderSelect",
             "type"  : "String",
             "value" : "./",
             "const" : false
         },
         "Output Filename" : {
+            "file": "extensions.globalWidgets",
+            "class": "GlobalTextbox",
             "type"  : "String",
             "value" : "data",
             "const" : false

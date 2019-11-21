@@ -312,11 +312,12 @@ class LinkedCheckbox(QtWidgets.QCheckBox):
 # QTableWidget that forces the first column to be unique
 # Attempts to use the same value twice reverts it to its previous value
 class UniqueNameTable(QtWidgets.QTableWidget):
-    def __init__(self):
+    def __init__(self, error):
         super(UniqueNameTable, self).__init__()
         self.cellChanged.connect(self.checkUniqueNames)
         self.prevNames = {}
         self.varNameCounter = 0
+        self.error = error
         
     def checkUniqueNames(self, row, column):
         # if the name row
@@ -330,7 +331,10 @@ class UniqueNameTable(QtWidgets.QTableWidget):
                 # If the name is already in use or is empty
                 if item.text() in self.prevNames.values() or item.text() == "":
                     item.setText(self.prevNames[row])
-                    QtWidgets.QMessageBox.critical(self, "ERROR", "Global variables must have unique names")
+                    QtWidgets.QMessageBox.critical(self, "ERROR", self.error)
+                    
+                # Hook for function that runs when name changs
+                self.changedTextHook(self.prevNames[row])
   
             self.prevNames[row] = item.text()
             
@@ -338,6 +342,9 @@ class UniqueNameTable(QtWidgets.QTableWidget):
         self.prevNames = {}
         for row in range(0, self.rowCount()):
             self.prevNames[row] = self.item(row, 0).text()  
+            
+    def changedTextHook(self, row):
+        return
         
 class GlobalNodeComboBox(QtWidgets.QComboBox):
     def __init__(self, parentNode, loaded, text):

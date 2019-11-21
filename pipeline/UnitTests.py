@@ -76,7 +76,7 @@ class MockEventListenerNode(Node):
     def event_callback(self):
         print("EVENT RECIEVED")
 
-class MockEventTriggerNOde(Node):
+class MockEventTriggerNode(Node):
     def process(self):
         self.events_fired = {
             "MOCK EVENT"

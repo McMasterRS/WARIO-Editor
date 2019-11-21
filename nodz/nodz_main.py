@@ -71,7 +71,7 @@ class Nodz(QtWidgets.QGraphicsView):
         # Load nodz configuration.
         self.loadConfig(configPath)
         self.toolkitUI = ToolkitUI(self)
-        self.toolkits = ["default"]
+        self.toolkits = []
         
         # Help menu
         self.helpUI = HelpUI(self)
@@ -127,6 +127,8 @@ class Nodz(QtWidgets.QGraphicsView):
             self.initMouse = QtGui.QCursor.pos()
             self.setInteractive(False)
         '''
+        
+        # Creates right click new node menu
         if (event.button() == QtCore.Qt.RightButton ):
 
             self.currentState = 'MENU'
@@ -139,35 +141,39 @@ class Nodz(QtWidgets.QGraphicsView):
             nodeCat = dict()
             nodeTb = dict()
             
+            # Loop through nodes currently loaded
             for nt in nodeTypes:
                 nodeTb[nt] = self.config['node_types'][nt]['toolkit']
                 nodeAttr[nt] = self.config['node_types'][nt]
+                
+                # Custom added at the end so can skip for now
                 if nt == "Custom":
                     continue
+                    
+                # If toolkit doesnt exist in menu, add it
                 if nodeTb[nt] not in tbMenu:
                     if nodeTb[nt] == "":
                         nodeTb[nt] = "Other"
                     tbMenu[nodeTb[nt]] = menu.addMenu(nodeTb[nt])
                     catMenu[nodeTb[nt]] = dict()
                     
+                # If category doesnt exist in toolkit, add it
                 nodeCat[nt] = self.config['node_types'][nt]['category']
                 if nodeCat[nt] not in catMenu[nodeTb[nt]]:
                     if nodeCat[nt] == "":
                         nodeCat[nt] = "Other"
                     catMenu[nodeTb[nt]][nodeCat[nt]] = tbMenu[nodeTb[nt]].addMenu(nodeCat[nt])
                     
-                name = ""
-                if nodeTb[nt] == "default":
-                    name = nt
-                else:
-                    name = nt[len(nodeTb[nt]):]
+                # Trim the name from the key by removing the toolkit appended at the start
+                name = nt[len(nodeTb[nt]):]
+                
+                # Add node to menu
                 action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction(name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),settings=self.config['node_types'][nt]["settings"], type=nt, toolkit=nodeTb[nt]))
                 
+            # Add custom node
             menu.addAction('Custom', functools.partial(self.newNode,name='Custom',attrs=self.config['node_types']['Custom'],position=self.mapToScene(event.pos()),settings=self.config['node_types']['Custom']["settings"], type='Custom', toolkit='custom'))
 
             menu.exec_(event.globalPos())
-
-            #super(Nodz, self).contextMenuEvent()
 
         # Drag view
         if (event.button() == QtCore.Qt.LeftButton and
@@ -577,7 +583,7 @@ class Nodz(QtWidgets.QGraphicsView):
         self.config = utils._loadConfig(filePath)
         
         custom = utils._loadConfig(".\\toolkits\custom.json")
-        self.config['node_types'].update(custom['node_types'])
+        self.config['node_types'] = custom['node_types']
         
         for gb in self.config['global_variables'].keys():
             self.globalUI.addAutoRow(gb, self.config['global_variables'][gb])
@@ -612,19 +618,19 @@ class Nodz(QtWidgets.QGraphicsView):
         self.loadConfig(defaultConfigPath)
         
         for tb in self.toolkits:
-            if tb is not "default":
-                path = os.path.normpath(self.toolkitUI.toolkitPaths[tb] + "\config.json")
-                cfg = utils._loadConfig(path)
-                _types = cfg['node_types']
-                types = {}
-                # Rename the types for all nodes to include toolkit
-                # This avoids duplication
-                for key, type in _types.items():
-                    types[tb+key] = type
-                self.config['node_types'].update(types)
-                if 'global_variables' in cfg:
-                    for gb in cfg['global_variables'].keys():
-                        self.globalUI.addAutoRow(gb, cfg['global_variables'][gb])
+            path = os.path.normpath(self.toolkitUI.toolkitPaths[tb] + "\config.json")
+            cfg = utils._loadConfig(path)
+            _types = cfg['node_types']
+            types = {}
+            # Rename the types for all nodes to include toolkit
+            # This avoids duplication
+            for key, type in _types.items():
+                type["toolkit"] = tb
+                types[tb+key] = type
+            self.config['node_types'].update(types)
+            if 'global_variables' in cfg:
+                for gb in cfg['global_variables'].keys():
+                    self.globalUI.addAutoRow(gb, cfg['global_variables'][gb])
         return True
 
 
@@ -992,10 +998,10 @@ class Nodz(QtWidgets.QGraphicsView):
             variables = nodeInst.variables         
             file = self.config['node_types'][nodeInst.type]['file']
             
-            if nodeInst.toolkit == 'default':
-                nodeType = nodeInst.type 
-            else: 
-                nodeType = nodeInst.type[len(toolkit):]
+            #if nodeInst.toolkit == 'default':
+            #    nodeType = nodeInst.type 
+            #else: 
+            nodeType = nodeInst.type[len(toolkit):]
                 
             if nodeInst.toolkit == 'custom':
                 nodeType = nodeInst.type
@@ -1106,7 +1112,7 @@ class Nodz(QtWidgets.QGraphicsView):
             if not self.toolkitUI.checkAdded(toolkit):
                 return
 
-            if toolkit != "default" and toolkit != "custom":
+            if toolkit != "custom":
                 nodeType = toolkit+nodeType
 
             node = self.createNode( nodeId=nodeId,
@@ -1141,10 +1147,6 @@ class Nodz(QtWidgets.QGraphicsView):
                                      plug=plug,
                                      socket=socket,
                                      dataType=dataType)
-
-            # If custom node, finish initialization
-            #if nodeType == "Custom":
-            #    node.settings.Window.initCustom()
 
         # Apply connections data.
         connectionsData = data['CONNECTIONS']

@@ -5,7 +5,7 @@ from pipeline.RunPipeline import runPipeline
 from extensions.genGraph import generateGraph
 import sys, os, textwrap
 
-version = "0.0.1"
+version = "1.0.0"
 
 def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
@@ -232,7 +232,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         wikiAct = QtWidgets.QAction(getIcon('SP_MessageBoxQuestion'), "&Help", self)
         wikiAct.triggered.connect(self.openHelp)
         
-        self.helpMenu.addAction(aboutAct)
+        #self.helpMenu.addAction(aboutAct)
         self.helpMenu.addAction(repoAct)
         self.helpMenu.addAction(wikiAct)
         

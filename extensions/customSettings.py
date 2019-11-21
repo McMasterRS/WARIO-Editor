@@ -48,20 +48,7 @@ class CustomSettings(QtWidgets.QWidget):
         
     # Used in custom nodes. Returns the node attributes
     def getAttribs(self):
-        return {"Raw": {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": False,
-                    "socket": True,
-                    "type": ["rawEEG"]
-                },
-                "Filtered Raw": {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": True,
-                    "socket": False,
-                    "type": "rawEEG"   
-                }}
+        return {}
     
     # Return the values from each setting type
     def genSettings(self):

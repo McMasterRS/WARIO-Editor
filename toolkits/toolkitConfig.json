@@ -2,7 +2,7 @@
     "default": {
         "name": "default",
         "show": true,
-        "path": "toolkits\\default"
+        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\nodz\\toolkits\\default"
     },
     "EEG": {
         "name": "EEG",

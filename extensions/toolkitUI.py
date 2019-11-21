@@ -3,7 +3,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 
 import nodz.nodz_utils as utils
-from extensions.customWidgets import CentredCellCheckbox
+from extensions.customWidgets import CentredCellCheckbox, UniqueNameTable
 
 import os
 
@@ -53,10 +53,21 @@ class ToolkitUI(QtWidgets.QWidget):
         
     # Show prompt to load toolkit and add to table
     def loadToolkit(self):
-        path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory")
+        path = os.path.normpath(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         if (path is not ''):
             if os.path.exists(os.path.normpath(path + "/config.json")):
                 name = os.path.basename(os.path.normpath(path))
+                
+                # Check if theres a matching name or path in the table
+                for row in range(self.toolkitTable.rowCount()):
+                    if self.toolkitTable.item(row, 0).text() == name:
+                        QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit with matching name already exists")
+                        return
+                    
+                    if self.toolkitTable.item(row, 2).text() == path:
+                        QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit with matching path already exists")
+                        return 
+            
                 self.addRow(name, path)
                 self.reloadToolkits()
             else:
@@ -68,12 +79,14 @@ class ToolkitUI(QtWidgets.QWidget):
         self.toolkitTable.insertRow(row)
         
         name = QtWidgets.QTableWidgetItem(toolkitName)
+        name.setFlags(QtCore.Qt.ItemIsEnabled)
         
         show = CentredCellCheckbox()
         show.setChecked(toolkitShow)
         show.connect(self.reloadToolkits)
         
         path = QtWidgets.QTableWidgetItem(toolkitPath)
+        path.setFlags(QtCore.Qt.ItemIsEnabled)
         
         self.toolkitTable.setItem(row, 0, name)
         self.toolkitTable.setCellWidget(row, 1, show)
@@ -134,9 +147,12 @@ class ToolkitUI(QtWidgets.QWidget):
                 self.toolkitPaths[name] = self.toolkitTable.item(row, 2).text()
             else:
                 # If its not checked but still in use, re-check it which calls this class again
-                if self.parent.reloadConfig(name, True):
+                if self.parent.checkToolkitInUse(name):
+                    self.parent.reloadConfig(name, True)
                     self.toolkitTable.cellWidget(row, 1).setChecked(True)
                     return
+                else:
+                    self.parent.reloadConfig(name, False)
 
             # Gather the required save data
             show = self.toolkitTable.cellWidget(row, 1).isChecked()
