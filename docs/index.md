@@ -1,17 +1,12 @@
-# Welcome to MkDocs
+# WARIO - Workflow Automation for Research IO
 
-For full documentation visit [mkdocs.org](https://mkdocs.org).
+A flowchart based data pipeline development suit based on the Nodz library.
 
-## Commands
+## Features
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+* Easy to use flowchart system to create and connect nodes
+* Allows for the development of fully working python pipelines
+* Supports batch processing and bulk data analysis
+* Supports the creation of custom node sets with the built in toolkit system
+* Fully customizable settings UI for all nodes
+* Global variable system that can be accessed by all nodes during runtime
