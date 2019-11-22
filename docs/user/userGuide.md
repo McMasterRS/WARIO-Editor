@@ -29,7 +29,7 @@ All commands marked with a * can also be found in the menu bar
 
 To create a new node, right click on the WARIO interface, select a toolbox and category and click the node you wish to create. The node will appear under where the interface was clicked.
 
-![Animation of creating nodes](../Images/createNewNode.gif)
+![](../Images/createNewNode.gif)
 
 ---
 
@@ -37,15 +37,15 @@ To create a new node, right click on the WARIO interface, select a toolbox and c
 
 Clicking on the circle next to an attribute name and dragging creates a link that can be connected to another node's attribute so long as they are of the same type.
 
-![Animation of connecting nodes](../Images/createConnection.gif)  
+![](../Images/createConnection.gif)  
 
 Attributes who's type do not match appear greyed out 
 
-![Animation of incompatable attributes](../Images/connectionGrey.gif)
+![](../Images/connectionGrey.gif)
 
 You can see what the type of an attribute is by hovering over its connector, showing a tooltip
 
-![Animation showing the tooltip for the attribute](../Images/attribTooltip.gif)
+![](../Images/attribTooltip.gif)
 
 ---
 
