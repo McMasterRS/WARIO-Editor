@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Global Variables - WARIO Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Global Variables";
+    var mkdocs_page_input_path = "user\\globals.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> WARIO Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">User Guide</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../userGuide/">Using WARIO</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../toolkits/">Importing Toolkits</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Global Variables</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#global-variables">Global Variables</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#adding-global-variables">Adding Global Variables</a></li>
+        
+            <li><a class="toctree-l4" href="#toolkit-global-variables">Toolkit Global Variables</a></li>
+        
+            <li><a class="toctree-l4" href="#including-global-variables-in-flowcharts">Including Global Variables In Flowcharts</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../pipeline/">Running The Pipeline</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Developer Guide</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../developer/nodes/">Custom Nodes</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developer/settings/">Custom Settings</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developer/globals/">Custom Global Inputs</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../developer/toolkits/">Building Toolkits</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">WARIO Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>User Guide &raquo;</li>
+        
+      
+    
+    <li>Global Variables</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/McMasterRS/WARIO/edit/master/docs/user/globals.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="global-variables">Global Variables</h1>
+<p>Pipeline-wide custom variables</p>
+<h2 id="adding-global-variables">Adding Global Variables</h2>
+<p>Global variables can be accessed by all nodes during pipeline execution. They are defined in the global variables window, accessible in the Edit menu or by the shortcut given above.  </p>
+<p><img alt="global variables window" src="../../Images/globalWindow.png" /></p>
+<p>The buttons at the bottom can be used to add or remove global variables. Be aware that removing a global variable will remove any connections from nodes using that variable. Each variable has 4 components:</p>
+<ul>
+<li>A Unique name</li>
+<li>The Data type </li>
+<li>An input method selector</li>
+<li>The Data value</li>
+<li>A checkbox to make the variable a constant (un-editable during execution) </li>
+</ul>
+<p><img alt="A row in the global variables window" src="../../Images/globalExample.png" /></p>
+<p>The data type of the variable sets the type of the attribute when used in a get or set node (see below). Global variables with the "File" type can be connected to nodes of any data type. The input method selector allows you to create global variables of various types such as text, integers, floats, file/folder paths and lists. There is also a "Custom" input method option that allows you to import a custom UI to input the global data. See <a href="../../developer/globals/">the developer guide</a> for more information.</p>
+<p>Attempting to use the same name for two variables will revert the modified variable to its original name. Modifying a global variable's name or type will remove all connections so as not to create invalid paths. </p>
+<h2 id="toolkit-global-variables">Toolkit Global Variables</h2>
+<p>Some toolkits include default global variables that are automatically added when the toolkit is enabled. These global variables can only be removed when the toolkit is disabled. Their name, type, input type and constant bool are fixed but the value held by them can be changed. These variables appear greyed out, as seen below.  </p>
+<p><img alt="Example of toolkit-included global variables" src="../../Images/globalToolkits.png" /></p>
+<h2 id="including-global-variables-in-flowcharts">Including Global Variables In Flowcharts</h2>
+<p>You can use global variables in your flowcharts by creating "Get Global" and "Set Global" nodes which retrieve and modify global variables respectively. These are found in the "input" and "output" categories of the default toolbox and function in the same way as any other node, with a setting that allows you to select the global variable for the node. </p>
+<p>Global variables are passed to all nodes when ran so custom nodes can make use of them without requiring the get/set nodes. See <a href="custom-nodes">Custom Nodes</a> for more information.  </p>
+<p><strong>BE AWARE:</strong> There is no guarantee what order the flowchart will be computed other than no node running until all of its input nodes have ran. This means that using the "Set Global" node to make a change to a global variable that another node relies on could result in undefined behavior. </p>
+<p><img alt="Using the global nodes in WARIO" src="../../Images/globalNodes.png" /></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../pipeline/" class="btn btn-neutral float-right" title="Running The Pipeline">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../toolkits/" class="btn btn-neutral" title="Importing Toolkits"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/McMasterRS/WARIO/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../toolkits/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../pipeline/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>
