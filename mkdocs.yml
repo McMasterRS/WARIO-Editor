@@ -15,8 +15,5 @@ nav:
         - Custom Global Inputs: developer/globals.md
         - Building Toolkits: developer/toolkits.md
         
-    #- Pipeline Documentation:
-    #    - Placeholder : null.md
-        
     
 theme: readthedocs

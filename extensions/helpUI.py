@@ -28,7 +28,7 @@ class HelpUI(QtWidgets.QWidget):
         
         self.toolkitList = []
         
-        self.buildTab("./site/", "WARIO")
+        self.buildTab("./docs/_build/html", "WARIO")
         
     
     def buildTab(self, path, toolkit = None):
