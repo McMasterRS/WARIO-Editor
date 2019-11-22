@@ -2,8 +2,6 @@ from PyQt5 import QtWidgets, QtWebEngineWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
-import os
-
 def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
 
@@ -30,9 +28,10 @@ class HelpUI(QtWidgets.QWidget):
         
         self.toolkitList = []
         
-        self.buildTree("./site/", "WARIO")
+        self.buildTab("./site/", "WARIO")
         
-    def buildTree(self, path, toolkit = None):
+    
+    def buildTab(self, path, toolkit = None):
         
         tab = QtWidgets.QWidget()
         tabLayout = QtWidgets.QHBoxLayout()
@@ -56,9 +55,5 @@ class HelpUI(QtWidgets.QWidget):
         for toolkit in self.parent.toolkits:
             if toolkit in existingTabs.keys():
                 self.tabs.addTab(existingTabs[toolkit], toolkit)
-                print("Reusing tab {0}".format(toolkit))
             else:
-                self.buildTree(self.parent.toolkitUI.toolkitPaths[toolkit] + "/site/", toolkit + " toolkit")        
-        
-    def updateURL(self, current, prev):
-        return
+                self.buildTab(self.parent.toolkitUI.toolkitPaths[toolkit] + "/site/", toolkit + " toolkit")           
