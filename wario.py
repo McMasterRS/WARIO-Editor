@@ -172,7 +172,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         
         def toolkitCall(state):
             ret = nodz.reloadConfig(name, state)
-            nodz.helpUI.buildToolkitHelp(nodz.toolkitUI.toolkitNames)
+            nodz.helpUI.buildToolkitHelp()
             if ret == False:
                 for tk in toolkitMenu.actions():
                     if tk.text() == name:
