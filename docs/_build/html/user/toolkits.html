@@ -83,7 +83,11 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="userGuide.html">Using WARIO</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Toolkits</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Toolkits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuring-toolkits">Configuring Toolkits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#activating-toolkits">Activating Toolkits</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="globals.html">Global Variables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Running The Pipeline</a></li>
 </ul>
@@ -159,7 +163,22 @@
             
   <div class="section" id="toolkits">
 <h1>Toolkits<a class="headerlink" href="#toolkits" title="Permalink to this headline">¶</a></h1>
-<p>Toolkits are collections of nodes designed to perform the same or similar tasks</p>
+<p>Toolkits are collections of nodes designed to create pipelines in a specific domain.</p>
+<div class="section" id="configuring-toolkits">
+<h2>Configuring Toolkits<a class="headerlink" href="#configuring-toolkits" title="Permalink to this headline">¶</a></h2>
+<p>The toolkit configuration window (under the Toolkits menu allows the user to add and remove WARIO toolkits as well as control which ones are currently displayed as selectable in the Toolkits menu. The first time WARIO is ran, the directories within WARIO’s “toolkits” folder are automatically loaded into the configuration and set as visible.</p>
+<p><img alt="../_images/toolkitsWindow.png" src="../_images/toolkitsWindow.png" /></p>
+<p>To add new toolkits, click the “Add Toolkits” button to open a directory prompt where you can select the directory that contains the toolkit’s “config.json” file.</p>
+<p>Only toolkits with the “Display” checkbox checked show under the toolkits menu.</p>
+<p><img alt="../_images/visibleToolkits.png" src="../_images/visibleToolkits.png" /></p>
+</div>
+<div class="section" id="activating-toolkits">
+<h2>Activating Toolkits<a class="headerlink" href="#activating-toolkits" title="Permalink to this headline">¶</a></h2>
+<p>By default, only the custom node is activated</p>
+<p>Clicking the toolkits listed under the Toolkits menu sets them either active (checked) or inactive (unchecked). Whena activated, the nodes included in the toolkit can be added to the flowchart. The user cannot set a toolkit inactive after using one of its nodes in the pipeline.</p>
+<p><img alt="../_images/activatedToolkits.gif" src="../_images/activatedToolkits.gif" /></p>
+<p>Upon activating a toolkit, the matching documentation (if included) is added as a new tab in the help window.</p>
+</div>
 </div>
 
 

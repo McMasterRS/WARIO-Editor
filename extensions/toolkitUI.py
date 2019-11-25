@@ -114,7 +114,7 @@ class ToolkitUI(QtWidgets.QWidget):
         for root, directories, files in os.walk(os.path.normpath('./toolkits')):
             for dir in directories:
                 if dir != "__pycache__":
-                    self.addRow(dir, os.path.normpath("./toolkits/" + dir))
+                    self.addRow(dir, os.path.abspath("./toolkits/" + dir))
             break
                 
         self.reloadToolkits()

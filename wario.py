@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
-from pipeline.RunPipeline import runPipeline
+from RunPipeline import runPipeline
 from extensions.genGraph import generateGraph
 import sys, os, textwrap
 

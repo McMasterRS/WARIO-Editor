@@ -7,7 +7,7 @@
 WARIO - Workflow Automation for Research IO
 ===========================================
 
-A flowchart based data pipeline development suit based on the Nodz library.
+A flowchart based data pipeline development suit with a visual interface based on an expanded version of the Nodz library.
 
 .. image:: Images/WARIO_example.png
 

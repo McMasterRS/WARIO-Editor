@@ -37,7 +37,7 @@ To create a new node, right click on the WARIO interface, select a toolbox and c
 
 Clicking on the circle next to an attribute name and dragging creates a link that can be connected to another node's attribute so long as they are of the same type.
 
-![](../Images/createConnection.gif)  
+![](../Images/createConnection.gif)
 
 Attributes who's type do not match appear greyed out 
 
@@ -51,3 +51,7 @@ You can see what the type of an attribute is by hovering over its connector, sho
 
 ## Custom Nodes
 To create a custom node, right click on the flowchart interface and select "Custom Node". This node will initially have no attributes. The settings menu for this node allows you to import a node, along with its settings window (which must be defined in the same file). This will populate the attributes of the node and replace the default settings window with that defined for the custom node. For more information on how to create custom nodes, see [the developer guide](../developer/nodes.md)
+
+## Example Pipeline Construction
+
+![](../Images/EEGExample.gif)
