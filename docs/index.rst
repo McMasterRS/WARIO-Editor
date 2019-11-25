@@ -21,6 +21,15 @@ Features
 * Fully customizable settings UI for all nodes
 * Global variable system that can be accessed by all nodes during runtime
 
+Documentation Requirements
+--------------------------
+
+```
+sphinx  
+sphinx_rtd_theme  
+sphinx-markdown-tables  
+```
+
 .. toctree::
    :hidden: 
    :maxdepth: 2
@@ -43,7 +52,8 @@ Features
    
 .. toctree::
    :hidden:
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Default Nodes
+   :glob:
    
-   nodes/*
+   nodes/utility.rst
