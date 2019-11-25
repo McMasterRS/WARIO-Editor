@@ -14,7 +14,7 @@ A flowchart based data pipeline development suit based on the [Nodz](https://git
 
 ## Documentation
 
-Documentation is hosted on (readthedocs)[https://wario.readthedocs.io/en/latest/] and a local version is accessible from the help menu within WARIO
+Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/) and a local version is accessible from the help menu within WARIO
 
 ## Prerequisites
 ```
