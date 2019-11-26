@@ -1,4 +1,7 @@
 {
+    
+    "name" : "default",
+    "docs" : "",
     "global_variables":{},
 
     "node_types":{

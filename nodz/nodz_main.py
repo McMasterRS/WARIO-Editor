@@ -976,6 +976,8 @@ class Nodz(QtWidgets.QGraphicsView):
         """
         data = dict()
 
+        data["TOOLKITS"] = self.toolkitUI.toolkitPaths
+
         # Store nodes data.
         data['NODES'] = dict()
 
