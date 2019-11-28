@@ -178,6 +178,7 @@
   <div class="section" id="custom-nodes">
 <h1>Custom Nodes<a class="headerlink" href="#custom-nodes" title="Permalink to this headline">¶</a></h1>
 <p>Custom nodes require two core components to function, the Node class and the Settings class.</p>
+<hr class="docutils" />
 <div class="section" id="the-node-class">
 <h2>The Node Class<a class="headerlink" href="#the-node-class" title="Permalink to this headline">¶</a></h2>
 <p>All custom nodes must inheret from the Node class stored in the Pipeline folder. The name of the node class must match the name of the file it is contained within.</p>
@@ -243,6 +244,7 @@
 <p>Global variables can be modified as a part of any node’s “process” function, but attempting to modify a global variable marked as constant will cause an error, resulting in the pipeline execution aborting.</p>
 </div>
 </div>
+<hr class="docutils" />
 <div class="section" id="the-settings-class">
 <h2>The Settings Class<a class="headerlink" href="#the-settings-class" title="Permalink to this headline">¶</a></h2>
 <p>The settings class works in much the same way as described in the <a class="reference external" href="#">Custom Settings</a> page with one small addition. As the node’s attributes arent being pulled from a config file, a dict describing them must be included in the settings class inside the “getAttribs” function. Attributes are defined in the same format as described in <a class="reference external" href="#">Building Toolkits</a>. An example of the getAttribs function is shown below</p>
@@ -263,6 +265,7 @@
 </pre></div>
 </div>
 </div>
+<hr class="docutils" />
 <div class="section" id="example-nodes">
 <h2>Example Nodes:<a class="headerlink" href="#example-nodes" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1-list-merger-with-settings">

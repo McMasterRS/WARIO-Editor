@@ -356,7 +356,7 @@
 </div>
 <div class="section" id="custom-widgets">
 <h2>Custom Widgets<a class="headerlink" href="#custom-widgets" title="Permalink to this headline">¶</a></h2>
-<p>Sometimes, its easier to create a custom widget object that inherets from a PyQt widget that can be reused for multiple nodes. Several of these have been developed for WARIO and can be found in the <code class="docutils literal notranslate"><span class="pre">extensions.customWidgets</span></code> file in the WARIO directory. Below are some of the more useful ones.</p>
+<p>Sometimes, its easier to create an overloaded PyQt widget class that can be reused for multiple nodes. Several of these have been developed for WARIO and can be found in the <code class="docutils literal notranslate"><span class="pre">extensions.customWidgets</span></code> file in the WARIO directory. Below are some of the more widely useful ones.</p>
 <div class="section" id="savewidget-loadwidget">
 <h3>saveWidget/loadWidget<a class="headerlink" href="#savewidget-loadwidget" title="Permalink to this headline">¶</a></h3>
 <p>Shows a textbox with a button that opens a dialog allowing save/load locations to be set respectively. Can be passed a string that sets the dialog filter.</p>
@@ -406,7 +406,7 @@
 </div>
 <div class="section" id="expandingtable">
 <h3>ExpandingTable<a class="headerlink" href="#expandingtable" title="Permalink to this headline">¶</a></h3>
-<p>This creates a 1 column table that automatically expands when a value is inserted into the final row. It also shrinks whenever the final row is emptied. As with the LinkedCheckbox widget, this widget has a <code class="docutils literal notranslate"><span class="pre">getSettings</span></code> function that allows for the values stored in the table to be extracted with a single line. The key for these settings is the name passed to the init and getSettings functions (which must be identical)</p>
+<p>This creates a 1 column table that automatically expands when a value is inserted into the final row. It also shrinks whenever the final row is emptied. As with the LinkedCheckbox widget, this widget has a <code class="docutils literal notranslate"><span class="pre">getSettings</span></code> function that allows for the values stored in the table to be extracted with a single line. The key for these variables is the name passed to the init and getSettings functions (which must be identical)</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># In self.buildUI</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">ExpandingTable</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
     

@@ -190,7 +190,7 @@ The default version of this class is as follows
 
 ## Custom Widgets
 
-Sometimes, its easier to create a custom widget object that inherets from a PyQt widget that can be reused for multiple nodes. Several of these have been developed for WARIO and can be found in the ```extensions.customWidgets``` file in the WARIO directory. Below are some of the more useful ones.
+Sometimes, its easier to create an overloaded PyQt widget class that can be reused for multiple nodes. Several of these have been developed for WARIO and can be found in the ```extensions.customWidgets``` file in the WARIO directory. Below are some of the more widely useful ones.
 
 ### saveWidget/loadWidget
 
@@ -250,7 +250,7 @@ The LinkedSpinbox widget will force the spinbox values to be no closer than 1 fr
 
 ### ExpandingTable
 
-This creates a 1 column table that automatically expands when a value is inserted into the final row. It also shrinks whenever the final row is emptied. As with the LinkedCheckbox widget, this widget has a ```getSettings``` function that allows for the values stored in the table to be extracted with a single line. The key for these settings is the name passed to the init and getSettings functions (which must be identical)
+This creates a 1 column table that automatically expands when a value is inserted into the final row. It also shrinks whenever the final row is emptied. As with the LinkedCheckbox widget, this widget has a ```getSettings``` function that allows for the values stored in the table to be extracted with a single line. The key for these variables is the name passed to the init and getSettings functions (which must be identical)
 
 ```python3
     # In self.buildUI

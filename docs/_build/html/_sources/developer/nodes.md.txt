@@ -2,6 +2,8 @@
 
 Custom nodes require two core components to function, the Node class and the Settings class.
 
+--------------------------------------
+
 ## The Node Class
 
 All custom nodes must inheret from the Node class stored in the Pipeline folder. The name of the node class must match the name of the file it is contained within.
@@ -55,6 +57,7 @@ Global variables are assigned to the node before the "process" function call and
 
 Global variables can be modified as a part of any node's "process" function, but attempting to modify a global variable marked as constant will cause an error, resulting in the pipeline execution aborting.
 
+--------------------------------------
 
 ## The Settings Class
 
@@ -76,6 +79,7 @@ The settings class works in much the same way as described in the [Custom Settin
                 
         return attribs
 ```
+--------------------------------------
 
 ## Example Nodes:
 
