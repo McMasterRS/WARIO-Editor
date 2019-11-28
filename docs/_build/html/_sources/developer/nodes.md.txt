@@ -4,7 +4,7 @@ Custom nodes require two core components to function, the Node class and the Set
 
 ## The Node Class
 
-All custom nodes must inheret from the Node class stored in the Pipeline folder. 
+All custom nodes must inheret from the Node class stored in the Pipeline folder. The name of the node class must match the name of the file it is contained within.
 
 ```python3
 from pipeline.Node import Node
@@ -77,7 +77,7 @@ The settings class works in much the same way as described in the [Custom Settin
         return attribs
 ```
 
-## Example nodes:
+## Example Nodes:
 
 ### Example 1: List merger with settings
 

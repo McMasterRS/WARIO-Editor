@@ -412,7 +412,7 @@ class GlobalNodeComboBox(QtWidgets.QComboBox):
         
 # Loadbox widget with file dialog
 class loadWidget(QtWidgets.QHBoxLayout):
-    def __init__(self, parent):
+    def __init__(self, parent, types = "All files (*.*)"):
         super(loadWidget, self).__init__()
         self.parent = parent
         self.textbox = QtWidgets.QLineEdit()
@@ -429,7 +429,7 @@ class loadWidget(QtWidgets.QHBoxLayout):
         
         
 class saveWidget(loadWidget):
-    def __init__(self, parent, types):
+    def __init__(self, parent, types = "All files (*.*)"):
         super(saveWidget, self).__init__(parent)
         self.button.clicked.disconnect()
         self.button.clicked.connect(self.saveFile)

@@ -97,7 +97,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#the-settings-class">The Settings Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-nodes">Example nodes:</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example-nodes">Example Nodes:</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example-1-list-merger-with-settings">Example 1: List merger with settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example-2-batch-processing-node-class">Example 2: Batch processing node class</a></li>
 </ul>
@@ -180,7 +180,7 @@
 <p>Custom nodes require two core components to function, the Node class and the Settings class.</p>
 <div class="section" id="the-node-class">
 <h2>The Node Class<a class="headerlink" href="#the-node-class" title="Permalink to this headline">¶</a></h2>
-<p>All custom nodes must inheret from the Node class stored in the Pipeline folder.</p>
+<p>All custom nodes must inheret from the Node class stored in the Pipeline folder. The name of the node class must match the name of the file it is contained within.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pipeline.Node</span> <span class="k">import</span> <span class="n">Node</span>
 </pre></div>
 </div>
@@ -264,7 +264,7 @@
 </div>
 </div>
 <div class="section" id="example-nodes">
-<h2>Example nodes:<a class="headerlink" href="#example-nodes" title="Permalink to this headline">¶</a></h2>
+<h2>Example Nodes:<a class="headerlink" href="#example-nodes" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="example-1-list-merger-with-settings">
 <h3>Example 1: List merger with settings<a class="headerlink" href="#example-1-list-merger-with-settings" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pipeline.Node</span> <span class="k">import</span> <span class="n">Node</span>
