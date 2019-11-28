@@ -52,7 +52,7 @@ sphinx-markdown-tables
    
 .. toctree::
    :hidden:
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Default Nodes
    :glob:
    
