@@ -2,8 +2,6 @@ from PyQt5 import QtWidgets, QtWebEngineWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
-import os
-
 def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
 
@@ -16,72 +14,46 @@ class HelpUITreeItem(QtWidgets.QTreeWidgetItem):
 class HelpUI(QtWidgets.QWidget):
     def __init__(self, parent):
         super(HelpUI, self).__init__()
+        
         self.parent = parent
+        self.resize(1100, 700)
+        
+        self.loadedTabs = []
         
         self.layout = QtWidgets.QHBoxLayout()
         
-        self.treeMenu = QtWidgets.QTreeWidget()
-        self.treeMenu.currentItemChanged.connect(self.updateURL)
-        self.treeMenu.setHeaderHidden(True)
-        self.layout.addWidget(self.treeMenu)
-        
-        self.webView = QtWebEngineWidgets.QWebEngineView()
-        self.layout.addWidget(self.webView)
-        
+        self.tabs = QtWidgets.QTabWidget()
+        self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
         
         self.toolkitList = []
         
-        self.buildTree(os.path.normpath("./help/"))
+        self.buildTab("./site/", "WARIO")
         
-    def buildTree(self, path, toolkit = None):
-        self.treeMenu.blockSignals(True)        
+    
+    def buildTab(self, path, toolkit = None):
         
-        if toolkit is None:
-            treeDepth = -1
-            treeDirectories = []
-        else:
-            treeDepth = 0
-            base = HelpUITreeItem(toolkit + " Toolkit", os.path.normpath(path + "/default.html"))
-            self.treeMenu.addTopLevelItem(base)
-            treeDirectories = [base]
-            self.toolkitList.append(base)
+        tab = QtWidgets.QWidget()
+        tabLayout = QtWidgets.QHBoxLayout()
+        tab.setLayout(tabLayout)
         
-        for dirpath, dnames, fnames in os.walk(path):
+        tabWebView = QtWebEngineWidgets.QWebEngineView()
+        tabLayout.addWidget(tabWebView)
+        tabWebView.setUrl(QtCore.QUrl(QtCore.QFileInfo(path + "/index.html").absoluteFilePath()))
+        self.tabs.addTab(tab, toolkit)
         
-            for fname in fnames: 
-                if fname == "default.html":
-                    continue
-                item = HelpUITreeItem(fname.split(".")[0], os.path.normpath(dirpath + "/" + fname))
-                
-                if treeDepth == -1:
-                    self.treeMenu.addTopLevelItem(item)
-                else:
-                    treeDirectories[treeDepth].addChild(item)  
-                        
-            for dname in dnames:
-                if dname[0] == "_":
-                    continue
-                item = HelpUITreeItem(dname.split("/")[-1], os.path.normpath(dirpath + "/" + dname + "/default.html"))
-                treeDirectories.append(item)
-                
-                if treeDepth == -1:
-                    self.treeMenu.addTopLevelItem(item)
-                else:
-                    treeDirectories[treeDepth].addChild(item)  
-                    
-            treeDepth += 1        
+    def buildToolkitHelp(self):
+        
+        existingTabs = {}
+        
+        for i in range(1, self.tabs.count()):
+            existingTabs[self.tabs.tabText(i)] = self.tabs.widget(i)
             
-        self.treeMenu.blockSignals(False)
-        
-    def buildToolkitHelp(self, toolkits):
-        # Refresh the toolkits
-        for toolkit in self.toolkitList:
-            self.treeMenu.invisibleRootItem().removeChild(toolkit)
+        while self.tabs.count() > 1:
+            self.tabs.removeTab(1)
             
-        for toolkit in toolkits:
-            self.buildTree(os.path.normpath(self.parent.toolkitUI.toolkitPaths[toolkit] + "/help/"), toolkit)
-
-        
-    def updateURL(self, current, prev):
-        self.webView.setUrl(current.url)
+        for toolkit in self.parent.toolkits:
+            if toolkit in existingTabs.keys():
+                self.tabs.addTab(existingTabs[toolkit], toolkit)
+            else:
+                self.buildTab(self.parent.toolkitUI.toolkitPaths[toolkit] + "/site/", toolkit + " toolkit")           

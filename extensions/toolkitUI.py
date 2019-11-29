@@ -161,7 +161,7 @@ class ToolkitUI(QtWidgets.QWidget):
         
         # Update the base UI
         self.parent.parent.buildToolkitToggles()
-        self.parent.helpUI.buildToolkitHelp(self.toolkitNames)
+        self.parent.helpUI.buildToolkitHelp()
         
         # Save the config file
         utils._saveData(filePath=os.path.normpath("./toolkits/toolkitConfig.json"), data=data)
