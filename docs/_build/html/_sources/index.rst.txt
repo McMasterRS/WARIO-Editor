@@ -1,9 +1,3 @@
-.. WARIO Documentation documentation master file, created by
-   sphinx-quickstart on Fri Nov 22 15:37:45 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-   
-   
 WARIO - Workflow Automation for Research IO
 ===========================================
 
@@ -24,11 +18,9 @@ Features
 Documentation Requirements
 --------------------------
 
-```
-sphinx  
-sphinx_rtd_theme  
-sphinx-markdown-tables  
-```
+* sphinx  
+* sphinx_rtd_theme  
+* sphinx-markdown-tables  
 
 .. toctree::
    :hidden: 
@@ -49,11 +41,3 @@ sphinx-markdown-tables
    developer/settings
    developer/globals
    developer/toolkits
-   
-.. toctree::
-   :hidden:
-   :maxdepth: 2
-   :caption: Default Nodes
-   :glob:
-   
-   nodes/utility.rst

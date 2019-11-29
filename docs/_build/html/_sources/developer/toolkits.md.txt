@@ -187,8 +187,3 @@ Combining these parameters gives us the combined config.json file shown here:
 Toolkits should come with documentation in HTML format, stored within the toolkit's directory. This documentation is accessable as a tab in the WARIO help window when the toolkit is activated.
 
 It is recommended to use tools such as [Read The Docs](https://readthedocs.org/) that can host documentation created with libraries like [sphinx](https://www.sphinx-doc.org/en/master/index.html) or [mkdocs](https://www.mkdocs.org/) stored within a github repository. This allows for the creation of synchronized online and offline documentation.
-
-
-
-
-    
