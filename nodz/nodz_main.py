@@ -21,7 +21,7 @@ from extensions.GlobalUI import GlobalUI
 from extensions.helpUI import HelpUI
 from extensions.toolkitUI import ToolkitUI
 
-defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..\\toolkits\default\config.json')
+defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.\\config.json')
 
 class Nodz(QtWidgets.QGraphicsView):
 
@@ -584,9 +584,6 @@ class Nodz(QtWidgets.QGraphicsView):
         
         custom = utils._loadConfig(".\\toolkits\custom.json")
         self.config['node_types'] = custom['node_types']
-        
-        for gb in self.config['global_variables'].keys():
-            self.globalUI.addAutoRow(gb, self.config['global_variables'][gb])
 
     def reloadConfig(self, name = "", state = False):
         """ 
@@ -978,6 +975,8 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         data = dict()
+
+        data["TOOLKITS"] = self.toolkitUI.toolkitPaths
 
         # Store nodes data.
         data['NODES'] = dict()

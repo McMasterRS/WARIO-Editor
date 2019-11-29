@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
-from pipeline.RunPipeline import runPipeline
+from RunPipeline import runPipeline
 from extensions.genGraph import generateGraph
 import sys, os, textwrap
 
@@ -217,7 +217,7 @@ class NodzWindow(QtWidgets.QMainWindow):
             '''.format(version)))
     
     def openRepo(self):
-        url = QtCore.QUrl("https://gits.mcmaster.ca/harwood/nodz")
+        url = QtCore.QUrl("https://github.com/McMasterRS/WARIO")
         if not QtGui.QDesktopServices.openUrl(url):
             QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
             

@@ -2,7 +2,7 @@
 
 A flowchart based data pipeline development suit based on the [Nodz](https://github.com/LeGoffLoic/Nodz) library.
 
-![Wario Example](https://github.com/McMasterRS/WARIO/blob/master/wiki/Images/WARIO_example.png)
+![Wario Example](https://github.com/McMasterRS/WARIO/blob/master/docs/Images/WARIO_example.png)
 
 ## Features
 * Easy to use flowchart system to create and connect nodes
@@ -12,11 +12,9 @@ A flowchart based data pipeline development suit based on the [Nodz](https://git
 * Fully customizable settings UI for all nodes
 * Global variable system that can be accessed by all nodes during runtime
 
-## User Guide
-Coming soon
+## Documentation
 
-## Developer Guide
-Coming Soon
+Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/) and a local version is accessible from the help menu within WARIO
 
 ## Prerequisites
 ```

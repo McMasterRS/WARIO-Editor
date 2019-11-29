@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Running The Pipeline &mdash; WARIO 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Custom Nodes" href="../developer/nodes.html" />
+    <link rel="prev" title="Global Variables" href="globals.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> WARIO
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="userGuide.html">Using WARIO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolkits.html">Toolkits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="globals.html">Global Variables</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Running The Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-a-new-pipeline">Running A New Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-an-existing-pipeline">Running An Existing Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-pipelines-without-wario">Running Pipelines Without WARIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#current-pipeline-limitations">Current Pipeline Limitations</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developer/nodes.html">Custom Nodes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer/settings.html">Custom Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer/globals.html">Custom Global Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer/toolkits.html">Building Toolkits</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Default Nodes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../nodes/utility.html">Utility Nodes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WARIO</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Running The Pipeline</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/user/pipeline.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="running-the-pipeline">
+<h1>Running The Pipeline<a class="headerlink" href="#running-the-pipeline" title="Permalink to this headline">¶</a></h1>
+<p>On completing a flowchart, it can be sent to the built-in pipeline code to be executed.</p>
+<div class="section" id="running-a-new-pipeline">
+<h2>Running A New Pipeline<a class="headerlink" href="#running-a-new-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>When nodes exist in the flowchart window but the flowchart has yet to be saved, WARIO will prompt the user to save before moving on to the pipeline execution step. Once the file has been saved at least once, this prompt will be skipped until the flowchart has been cleared.</p>
+<p>With the file saved, the file is passed to the pipeline execution code and the output of the code will be displayed in the command prompt used to run WARIO. Any plots generated by nodes from libraries such as matplotlib are displayed as standard but are only interactable once the pipeline has completed execution. These plots remain fully interactive until they or WARIO are closed.</p>
+</div>
+<div class="section" id="running-an-existing-pipeline">
+<h2>Running An Existing Pipeline<a class="headerlink" href="#running-an-existing-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>If the user attempts to run a pipeline with no file loaded and no nodes placed in the flowchart interface, WARIO will prompt them to open a compatable JSON file to be executed. The pipeline will also be loaded into the flowchart interface and can additional runs can be performed without the load prompt in an identical manner as described for the new pipeline.</p>
+</div>
+<div class="section" id="running-pipelines-without-wario">
+<h2>Running Pipelines Without WARIO<a class="headerlink" href="#running-pipelines-without-wario" title="Permalink to this headline">¶</a></h2>
+<p>The pipeline code can be ran without requiring WARIO by using the RunPipeline.py file included in the main WARIO directory. The same file is used by WARIO itself when executing pipelines so the output should be identical, with the exception of plots which can only be viewed interactively when the pipeline is executed from within WARIO.</p>
+<p>To use this file, run the command</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>    python RunPipeline.py <span class="s2">&quot;file\goes\here.json&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="current-pipeline-limitations">
+<h2>Current Pipeline Limitations<a class="headerlink" href="#current-pipeline-limitations" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Pipeline does not currently support pausing or blocking nodes</li>
+<li>Pipeline is single threaded and runs in the same thread as the interface</li>
+<li>File locations must be redefined if a pipeline save file is transferred between computers unless the absolute file path for all set save and load locations are identical between the two computers</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../developer/nodes.html" class="btn btn-neutral float-right" title="Custom Nodes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="globals.html" class="btn btn-neutral float-left" title="Global Variables" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, McMaster University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -56,7 +56,7 @@ class ToolkitUI(QtWidgets.QWidget):
         path = os.path.normpath(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         if (path is not ''):
             if os.path.exists(os.path.normpath(path + "/config.json")):
-                name = os.path.basename(os.path.normpath(path))
+                name = utils._loadData(os.path.normpath(path + "/config.json"))["name"]
                 
                 # Check if theres a matching name or path in the table
                 for row in range(self.toolkitTable.rowCount()):
@@ -114,7 +114,8 @@ class ToolkitUI(QtWidgets.QWidget):
         for root, directories, files in os.walk(os.path.normpath('./toolkits')):
             for dir in directories:
                 if dir != "__pycache__":
-                    self.addRow(dir, os.path.normpath("./toolkits/" + dir))
+                    configData = utils._loadData(os.path.abspath("./toolkits/" + dir + "config.json"))
+                    self.addRow(configData["name"], os.path.abspath("./toolkits/" + dir))
             break
                 
         self.reloadToolkits()

@@ -18,17 +18,22 @@ class NodzInterface():
 
         nodes_mapping = {}
         nodes = []
+        toolkits = {}
         connections = []
         global_vars = {}
 
         with open(file_location, 'r') as f:
             data = json.load(f)
+            
+            if "TOOLKITS" in data:
+                for toolkit in data["TOOLKITS"]:
+                    toolkits[toolkit] = data["TOOLKITS"][toolkit]
 
             if "NODES" in data:
                 for node_id in data["NODES"]:
                     node = data["NODES"][node_id]
                     class_name = node["file"].split('.')[0] # extract the name of the class stored here as XXXX.py
-                    NodeFactory.import_node(node["type"], node["toolkit"], class_name) # uses the Nodefactory to do the import logic, this also registers it with the factory for creating new versions
+                    NodeFactory.import_node(node["type"], toolkits[node["toolkit"]], class_name, True) # uses the Nodefactory to do the import logic, this also registers it with the factory for creating new versions
                     node_instance = NodeFactory.create_node(node_id, node["type"], node["variables"]) # Create a new instance of this node
                     node_instance.args = {**node['variables']} # Copies the variables into the node as default arguments/configurations
                     nodes.append([node_id, node_instance]) # Compact the id and instance for access later

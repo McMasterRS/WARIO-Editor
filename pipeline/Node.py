@@ -1,4 +1,3 @@
-from pipeline.NodeFactory import NodeFactory
 ###################################################################################################
 # Node/Task
 # + Abstract node for handling the running of a discrete task in a workflow
