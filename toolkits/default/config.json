@@ -1,8 +1,7 @@
 {
-    
     "name" : "default",
     "docs" : "",
-    "global_variables":{},
+    "global_variables" : {},
 
     "node_types":{
         "Get Global": {
