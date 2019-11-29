@@ -427,6 +427,14 @@ class loadWidget(QtWidgets.QHBoxLayout):
             self.textbox.setText(f)
         self.parent.genSettings()
         
+    def loadSettings(self, settings):
+        if "filename" in settings.keys()
+            self.textbox.setText(settings["filename"])
+    
+    def genSettings(self, settings, vars):
+        settings["filename"] = self.textbox.text()
+        vars["filename"] = self.textbox.text()
+        
         
 class saveWidget(loadWidget):
     def __init__(self, parent, types = "All files (*.*)"):

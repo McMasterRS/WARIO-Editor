@@ -56,4 +56,4 @@ class HelpUI(QtWidgets.QWidget):
             if toolkit in existingTabs.keys():
                 self.tabs.addTab(existingTabs[toolkit], toolkit)
             else:
-                self.buildTab(self.parent.toolkitUI.toolkitPaths[toolkit] + "/site/", toolkit + " toolkit")           
+                self.buildTab(self.parent.toolkitUI.toolkitPaths[toolkit] + "/docs/", toolkit + " toolkit")           
