@@ -2,11 +2,13 @@
     "default": {
         "name": "default",
         "show": true,
-        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\default"
+        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\default",
+        "docs": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\default\\docs\\_build\\html"
     },
     "EEG": {
         "name": "EEG",
         "show": true,
-        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\EEG-Toolkit"
+        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\EEG-Toolkit",
+        "docs": "C:\\Users\\mudwayt\\Documents\\GitHub\\EEG-Toolkit\\docs\\build\\html"
     }
 }

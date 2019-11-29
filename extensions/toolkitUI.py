@@ -18,6 +18,7 @@ class ToolkitUI(QtWidgets.QWidget):
         # Array of names and dict of paths
         self.toolkitNames = []
         self.toolkitPaths = {}
+        self.toolkitDocs = {}
 
         self.buildUI()
         self.setLayout(self.layout)
@@ -105,7 +106,7 @@ class ToolkitUI(QtWidgets.QWidget):
         tks = utils._loadData(os.path.normpath("./toolkits/toolkitConfig.json"))
         for tk in tks:
             self.addRow(tks[tk]["name"], tks[tk]["path"], tks[tk]["show"])
-            
+            self.toolkitDocs[tks[tk]["name"]] = tks[tk]["docs"]
         self.reloadToolkits()
             
         
@@ -116,6 +117,7 @@ class ToolkitUI(QtWidgets.QWidget):
                 if dir != "__pycache__":
                     configData = utils._loadData(os.path.abspath("./toolkits/" + dir + "config.json"))
                     self.addRow(configData["name"], os.path.abspath("./toolkits/" + dir))
+                    self.toolkitDocs[configData["name"]] = configData["docs"]
             break
                 
         self.reloadToolkits()
@@ -158,7 +160,8 @@ class ToolkitUI(QtWidgets.QWidget):
             # Gather the required save data
             show = self.toolkitTable.cellWidget(row, 1).isChecked()
             path = os.path.normpath(self.toolkitTable.item(row, 2).text())
-            data[name] = {"name" : name, "show" : show, "path" : path}
+            docs = os.path.join(path, self.toolkitDocs[name])
+            data[name] = {"name" : name, "show" : show, "path" : path, "docs" : docs}
         
         # Update the base UI
         self.parent.parent.buildToolkitToggles()
