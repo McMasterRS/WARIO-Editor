@@ -1,0 +1,12 @@
+{
+    "default": {
+        "name": "default",
+        "show": true,
+        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\default"
+    },
+    "EEG": {
+        "name": "EEG",
+        "show": true,
+        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\EEG"
+    }
+}

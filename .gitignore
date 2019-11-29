@@ -1,4 +1,5 @@
 __pycache__
 *.pyc
 saves
-*toolkitConfig.json
+toolkitConfig.json
+
