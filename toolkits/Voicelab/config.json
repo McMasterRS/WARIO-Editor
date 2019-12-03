@@ -1,3 +1,5 @@
 {
+    "name" : "Voicelab",
+    "docs" : "./",
     "node_types" : {}
 }

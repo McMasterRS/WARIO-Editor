@@ -30,7 +30,7 @@ class GlobalSaveTabs(QtWidgets.QTabWidget):
         self.globalName = ""
         self.globalFolder = ""
         self.name = name
-    
+        
         self.globalTab = QtWidgets.QWidget()
         self.globalLayout = QtWidgets.QFormLayout()
         self.customTab = QtWidgets.QWidget()
@@ -117,12 +117,13 @@ class BatchSaveTab(QtWidgets.QWidget):
         self.type = type
         
         self.layout = QtWidgets.QVBoxLayout()
-        
+
         if type == "data":
             saveTypes = ["NPZ"] 
             saveDialogString = "Numpy File (*.npz)"
+            self.tabBox = BatchSavePanel(saveTypes, saveDialogString, settings, name)
             
-            self.saveData = QtWidgets.QCheckBox("Save Data")
+            self.saveData = LinkedCheckbox("Save Data", self.tabBox)
             if "toggleSave" + name in settings.keys():
                 self.saveData.setChecked(settings["toggleSave" + name])
             else:
@@ -132,6 +133,7 @@ class BatchSaveTab(QtWidgets.QWidget):
         elif type == "graph":
             saveTypes = ["PNG", "PDF", "PKL"]
             saveDialogString = "PNG image (*.png);; PDF (*.pdf);; Pickle (*.pkl)"
+            self.tabBox = BatchSavePanel(saveTypes, saveDialogString, settings, name)
             
             graphLayout = QtWidgets.QHBoxLayout()
             
@@ -141,7 +143,7 @@ class BatchSaveTab(QtWidgets.QWidget):
             else:
                 self.showGraph.setChecked(True)
             
-            self.saveData = QtWidgets.QCheckBox("Save Graph")
+            self.saveData = LinkedCheckbox("Save Graph", self.tabBox)
             if "toggleSave" + name in settings.keys():
                 self.saveData.setChecked(settings["toggleSave" + name ])
             else:
@@ -153,7 +155,6 @@ class BatchSaveTab(QtWidgets.QWidget):
 
             self.layout.addItem(graphLayout)
         
-        self.tabBox = BatchSavePanel(saveTypes, saveDialogString, settings, name)
         self.layout.addWidget(self.tabBox)
         
         self.setLayout(self.layout)
