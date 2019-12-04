@@ -57,7 +57,29 @@ class ToolkitUI(QtWidgets.QWidget):
         path = os.path.normpath(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         if (path is not ''):
             if os.path.exists(os.path.normpath(path + "/config.json")):
-                name = utils._loadData(os.path.normpath(path + "/config.json"))["name"]
+                data = utils._loadData(os.path.normpath(path + "/config.json"))
+                
+                
+                # Data Validation
+                if "name" not in data.keys():
+                    QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit config file does not contain 'name' parameter")
+                    return
+                elif "name" == "":
+                    QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit name cannot be an empty string")
+                    return
+                    
+                if "docs" not in data.keys():
+                    QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit config file does not contain 'docs' parameter")
+                    return
+                    
+                if "node_types" not in data.keys():
+                    QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit config file contains no nodes")
+                    return
+                if len(data["node_types"]) == 0:
+                    QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit config file contains no nodes")
+                    return
+                    
+                name = data["name"]
                 
                 # Check if theres a matching name or path in the table
                 for row in range(self.toolkitTable.rowCount()):
