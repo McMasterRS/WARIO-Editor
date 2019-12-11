@@ -416,6 +416,8 @@ class loadWidget(QtWidgets.QHBoxLayout):
     def __init__(self, parent, types = "All files (*.*)"):
         super(loadWidget, self).__init__()
         self.parent = parent
+        self.setSpacing(5)
+        
         self.textbox = QtWidgets.QLineEdit()
         self.button = QtWidgets.QPushButton("Browse")
         self.button.clicked.connect(self.loadFile)
@@ -426,7 +428,6 @@ class loadWidget(QtWidgets.QHBoxLayout):
         f = QtWidgets.QFileDialog.getOpenFileName()[0]
         if f is not "":
             self.textbox.setText(f)
-        self.parent.genSettings()
         
     def loadSettings(self, settings):
         if "filename" in settings.keys():

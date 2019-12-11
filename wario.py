@@ -98,7 +98,11 @@ class NodzWindow(QtWidgets.QMainWindow):
             self.nodz.saveGraph(self.nodz.currentFileName)
             runPipeline(self.nodz.currentFileName)
         else:
-            self.loadFile()
+            if len(self.nodz.scene().nodes) != 0:
+                self.saveFile()
+            else:
+                self.loadFile()
+                
             if self.nodz.currentFileName != "":
                 runPipeline(self.nodz.currentFileName)
         

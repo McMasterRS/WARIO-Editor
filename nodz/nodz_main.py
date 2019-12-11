@@ -1163,6 +1163,7 @@ class Nodz(QtWidgets.QGraphicsView):
                                   targetNode, targetAttr)          
         
         self.scene().update()
+        self.helpUI.buildToolkitHelp()
         
         self.currentFileName = filePath
 

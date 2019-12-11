@@ -95,6 +95,9 @@ class GlobalUI(QtWidgets.QWidget):
     def loadGlobals(self, globals):
     
         # Remove all non-toolkit rows
+        if self.table.rowCount() == 0:
+            return
+        
         for i in range(0, self.table.rowCount()):
             if self.table.cellWidget(i,2).isEnabled():
                 self.table.removeRow(i)             

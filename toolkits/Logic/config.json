@@ -1,0 +1,284 @@
+{
+    "name" : "Logic",
+    "docs" : "",
+    "node_types" : {
+        "2 bit input" : {
+            "preset" : "node_default",
+            "file" : "twoBitIn.py",
+            "alternate" : true,
+            "category" : "Input",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "Out 1" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                },
+                "Out 2" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {
+                "settingsFile" : "twoBitIn",
+                "settingsClass" : "InputSettings2b"
+            }
+        },
+        "4 bit input" : {
+            "preset" : "node_default",
+            "file" : "fourBitIn.py",
+            "alternate" : true,
+            "category" : "Input",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "Out 1" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                },
+                "Out 2" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                },
+                "Out 3" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                },
+                "Out 4" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {
+                "settingsFile" : "fourBitIn",
+                "settingsClass" : "InputSettings"
+            }
+        },
+        "Not" : {
+            "preset" : "node_default",
+            "file" : "notNode.py",
+            "alternate" : true,
+            "category" : "Gates",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "In" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "Out" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {}
+        },
+        "And" : {
+            "preset" : "node_default",
+            "file" : "andNode.py",
+            "alternate" : true,
+            "category" : "Gates",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "In 1" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "In 2" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "Out" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {}
+        },
+        "Or" : {
+            "preset" : "node_default",
+            "file" : "orNode.py",
+            "alternate" : true,
+            "category" : "Gates",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "In 1" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "In 2" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "Out" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {}
+        },
+        "Xor" : {
+            "preset" : "node_default",
+            "file" : "xorNode.py",
+            "alternate" : true,
+            "category" : "Gates",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "In 1" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "In 2" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "Out" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {}
+        },
+        "NXor" : {
+            "preset" : "node_default",
+            "file" : "nxorNode.py",
+            "alternate" : true,
+            "category" : "Gates",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "In 1" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "In 2" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "Out" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : true,
+                    "socket" : false,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {}
+        },
+        "4 Bit Print" : {
+            "preset" : "node_default",
+            "file" : "printNode.py",
+            "alternate" : true,
+            "category" : "Output",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "In 1" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "In 2" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "In 3" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "In 4" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {}    
+        },
+        "2 Bit Print" : {
+            "preset" : "node_default",
+            "file" : "printNode.py",
+            "alternate" : true,
+            "category" : "Output",
+            "toolkit" : "Logic",
+            "attributes" : {
+                "In 1" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                },
+                "In 2" : {
+                    "index" : -1,
+                    "preset" : "attr_preset_1",
+                    "plug" : false,
+                    "socket" : true,
+                    "type" : "bit"
+                }
+            },
+            "settings" : {}    
+        }
+    }
+}

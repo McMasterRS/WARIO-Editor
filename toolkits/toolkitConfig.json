@@ -4,5 +4,17 @@
         "show": true,
         "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\default",
         "docs": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\default\\docs\\_build\\html"
+    },
+    "EEG": {
+        "name": "EEG",
+        "show": true,
+        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\EEG-Toolkit",
+        "docs": "C:\\Users\\mudwayt\\Documents\\GitHub\\EEG-Toolkit\\./docs/build/html"
+    },
+    "Logic": {
+        "name": "Logic",
+        "show": true,
+        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\Logic",
+        "docs": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\Logic\\"
     }
 }

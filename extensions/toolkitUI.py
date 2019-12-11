@@ -57,14 +57,13 @@ class ToolkitUI(QtWidgets.QWidget):
         path = os.path.normpath(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         if (path is not ''):
             if os.path.exists(os.path.normpath(path + "/config.json")):
-                data = utils._loadData(os.path.normpath(path + "/config.json"))
-                
+                data = utils._loadData(os.path.normpath(path + "/config.json"))     
                 
                 # Data Validation
                 if "name" not in data.keys():
                     QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit config file does not contain 'name' parameter")
                     return
-                elif "name" == "":
+                elif data["name"] == "":
                     QtWidgets.QMessageBox.warning(self, "Warning", "Toolkit name cannot be an empty string")
                     return
                     
@@ -92,6 +91,7 @@ class ToolkitUI(QtWidgets.QWidget):
                         return 
             
                 self.addRow(name, path)
+                self.toolkitDocs[name] = data["docs"]
                 self.reloadToolkits()
             else:
                 QtWidgets.QMessageBox.warning(self, "Warning", "Cannot find config file in selected folder")
