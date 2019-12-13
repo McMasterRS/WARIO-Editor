@@ -22,14 +22,15 @@ Each global variable has 5 parameters:
 
 | Parameter | Description | 
 | :--- | :--- | 
-| file | File containing global variable widget | 
+| file | File containing global variable widget relative to the toolkit root folder | 
 | class | Class of global variable widget | 
+| toolkit | name of the toolkit holding the widget class |
 | type | Attribute type of the global variable | 
 | value | Default value | 
 | properties | Properties of the widget (For custom widgets only) |
 | const | Enables or disables constant value during pipeline runtime | 
 
-To use the pre-made global variable widgets, set the file to default ```extensions.globalWidgets``` and the class to one of the below:
+To use the pre-made global variable widgets, set the file to ```extensions.globalWidgets```, the toolkit to "wario", and the class to one of the below:
 
 | Widget Name | Description | 
 | :--- | :--- | 
@@ -49,8 +50,9 @@ An example global variable is shown below:
 {
     "global_variables": {
         "Output Folder" : {
-            "file": "extensions.globalWidgets",
-            "class": "GlobalFolderSelect",
+            "file" : "extensions.globalWidgets",
+            "class" : "GlobalFolderSelect",
+            "toolkit" : "wario",
             "type"  : "String",
             "value" : "./",
             "properties" : {},
@@ -69,11 +71,8 @@ These parameters tell WARIO how to render the node and give details on the locat
 
 | Parameter | Description | 
 | :--- | :--- | 
-| preset | The rendering preset of the node. "node_default" is the primary one used but others <br>are listed in nodz/config.json | 
 | file | The location of the file containing the node's code, relative to the toolkit root directory | 
-| alternate | Set to "true" if the colour of the attribute should alternate each row | 
-| category | The category that the node will be listed under in the right-click new node menu | 
-| toolkit | The toolkit that the node is contained in | 
+| category | The category that the node will be listed under in the right-click new node menu |  
 
 ### Node Attributes
 
@@ -81,11 +80,9 @@ Attributes allow for connections to be made between nodes, so long as the attrib
 
 | Parameter | Description | 
 | :--- | :--- | 
-| index | The index of the attributes position on the node. Set to -1 if you want them to be built in <br>the order they're listed | 
-| preset | Rendering preset of the attribute. Default is "node_default" | 
-| plug | Set to true if the attribute is an output, otherwise false | 
-| socket | Set to true if the attribute is an input, otherwise false | 
+| connection | Sets the connection type of the attribute. Valid options are "input" or "output |
 | type | The attribute type. Only attributes with matching types can be connected | 
+| preset | OPTIONAL - Sets the visual style of the attribute. Options are given in ./nodz/config.json |
 
 
 ### Node Settings
@@ -103,24 +100,15 @@ The settings parameter contains the file and class of the settings window that i
 {
     "node_types": {
         "Example Node" : {
-            "preset" : "node_default",
             "file" : "exampleNode.py",
-            "alternate" : true,
             "category" : "Examples",
-            "toolkit" : "Example",
             "attributes" : {
                 "Input Attribute" : {
-                    "index" : -1,
-                    "preset" : "attr_preset_1",
-                    "plug" : false,
-                    "socket" : true,
+                    "connection" : "input",
                     "type" : "string"
                 },
                 "Output Attribute" : {
-                    "index" : -1,
-                    "preset" : "attr_preset_1",
-                    "plug" : true,
-                    "socket" : false,
+                    "connection" : "output",
                     "type" : "string"
                 }
             },
@@ -142,8 +130,9 @@ Combining these parameters gives us the combined config.json file shown here:
     "docs" : "./docs",
     "global_variables": {
         "Output Folder" : {
-            "file": "extensions.globalWidgets",
-            "class": "GlobalFolderSelect",
+            "file" : "extensions.globalWidgets",
+            "class" : "GlobalFolderSelect",
+            "toolkit" : "wario",
             "type"  : "String",
             "value" : "./",
             "properties" : {},
@@ -152,24 +141,15 @@ Combining these parameters gives us the combined config.json file shown here:
     },
     "node_types": {
         "Example Node" : {
-            "preset" : "node_default",
             "file" : "exampleNode.py",
-            "alternate" : true,
             "category" : "Examples",
-            "toolkit" : "Example",
             "attributes" : {
                 "Input Attribute" : {
-                    "index" : -1,
-                    "preset" : "attr_preset_1",
-                    "plug" : false,
-                    "socket" : true,
+                    "connection" : "input",
                     "type" : "string"
                 },
                 "Output Attribute" : {
-                    "index" : -1,
-                    "preset" : "attr_preset_1",
-                    "plug" : true,
-                    "socket" : false,
+                    "connection" : "output",
                     "type" : "string"
                 }
             },

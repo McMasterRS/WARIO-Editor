@@ -7,6 +7,7 @@ import nodz.nodz_utils as utils
 from extensions.customWidgets import *
 from extensions.globalWidgets import *
 import importlib
+import os
 
 # Global variable UI
 class GlobalUI(QtWidgets.QWidget):
@@ -147,7 +148,24 @@ class GlobalUI(QtWidgets.QWidget):
         if "file" not in gb.keys():
             return GlobalTextbox()
 
-        module = importlib.import_module(gb["file"])
+        # See where the class is stored. Defaults to the WARIO directory
+        if "toolkit" not in gb.keys():
+            file = gb["file"]
+            module = importlib.import_module(file)
+        else:
+            # Default location
+            if gb["toolkit"] == "wario":
+                file = gb["file"]
+                module = importlib.import_module(file)
+            else:
+                # Custom toolkit UI location
+                toolkit = self.parent.toolkitUI.toolkitPaths[gb["toolkit"]]
+                file = os.path.join(toolkit, gb["file"])
+                spec = importlib.util.spec_from_file_location(name = "Custom", location = file)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+
+        
         cls = getattr(module, gb["class"])
         
         widget = cls()

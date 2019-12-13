@@ -1,14 +1,21 @@
 {
     "name" : "default",
     "docs" : "",
-    "global_variables" : {},
+    "global_variables" : {
+        "Test" : {
+            "fileLoc" : "default",
+            "file": "test.py",
+            "class": "GlobalTextbox",
+            "type"  : "String",
+            "value" : "./",
+            "const" : false
+        }
+    },
 
     "node_types":{
         "Get Global": {
-            "preset": "node_default",
             "file": "getGlobal.py",
             "category": "Input",
-            "toolkit" : "default",
             "attributes": {},
             "settings": {
                 "global" : {
@@ -384,18 +391,11 @@
             "settings": {}
         },
         "Merge Lists": {
-            "preset": "node_default",
             "file": "mergeLists",
-            "alternate": true,
-            "position": "none",
             "category": "Utility",
-            "toolkit" : "default",
             "attributes" : {
                 "List 1": {
-                    "index": -1,
-                    "preset": "attr_preset_1",
-                    "plug": false,
-                    "socket": true,
+                    "connection" : "input",
                     "type": ["list"]
                 },
                 "List 2": {

@@ -1,6 +1,6 @@
 from graphviz import Digraph
 import os, json
-#os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
+os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 
 def generateGraph(file_location, save_location):
 

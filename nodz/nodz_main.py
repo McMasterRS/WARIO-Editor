@@ -623,6 +623,9 @@ class Nodz(QtWidgets.QGraphicsView):
             # This avoids duplication
             for key, type in _types.items():
                 type["toolkit"] = tb
+                # Load default preset if one not stated
+                if "preset" not in type.keys():
+                    type["preset"] = "node_default"
                 types[tb+key] = type
             self.config['node_types'].update(types)
             if 'global_variables' in cfg:
@@ -1050,7 +1053,29 @@ class Nodz(QtWidgets.QGraphicsView):
         node = self.createNode(name=name,preset=attrs['preset'],position=position, settings = settings, type = type, toolkit = toolkit)
 
         for attr in attrs['attributes']:
-            self.createAttribute(node,name=attr,index=attrs['attributes'][attr]['index'],preset=attrs['attributes'][attr]['preset'],plug=attrs['attributes'][attr]['plug'],socket=attrs['attributes'][attr]['socket'],dataType=attrs['attributes'][attr]['type'])
+        
+            # Parse the more dev-friendly attribute properties for custom toolkits
+            if 'connection' in attrs['attributes'][attr].keys():
+                if attrs['attributes'][attr]['connection'] == "input":
+                    attrs['attributes'][attr]['plug'] = False
+                    attrs['attributes'][attr]['socket'] = True
+                elif attrs['attributes'][attr]['connection'] == "output":
+                    attrs['attributes'][attr]['plug'] = True
+                    attrs['attributes'][attr]['socket'] = False
+                    
+            # Set default for preset
+            if 'preset' in attrs['attributes'][attr].keys():
+                preset = attrs['attributes'][attr]['preset']
+            else:
+                preset = "attr_preset_1"
+                
+            # Set default for index
+            if 'index' in attrs['attributes'][attr].keys():
+                index = attrs['attributes'][attr]['index']
+            else:
+                index = -1
+                
+            self.createAttribute(node,name=attr,index=index,preset=preset,plug=attrs['attributes'][attr]['plug'],socket=attrs['attributes'][attr]['socket'],dataType=attrs['attributes'][attr]['type'])
             
         return node
 

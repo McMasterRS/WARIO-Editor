@@ -196,11 +196,15 @@
 <tbody>
 <tr>
 <td align="left">file</td>
-<td align="left">File containing global variable widget</td>
+<td align="left">File containing global variable widget relative to the toolkit root folder</td>
 </tr>
 <tr>
 <td align="left">class</td>
 <td align="left">Class of global variable widget</td>
+</tr>
+<tr>
+<td align="left">toolkit</td>
+<td align="left">name of the toolkit holding the widget class</td>
 </tr>
 <tr>
 <td align="left">type</td>
@@ -219,7 +223,7 @@
 <td align="left">Enables or disables constant value during pipeline runtime</td>
 </tr>
 </tbody>
-</table><p>To use the pre-made global variable widgets, set the file to default <code class="docutils literal notranslate"><span class="pre">extensions.globalWidgets</span></code> and the class to one of the below:</p>
+</table><p>To use the pre-made global variable widgets, set the file to <code class="docutils literal notranslate"><span class="pre">extensions.globalWidgets</span></code>, the toolkit to “wario”, and the class to one of the below:</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -262,8 +266,9 @@
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="nt">&quot;global_variables&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;Output Folder&quot;</span> <span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;extensions.globalWidgets&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;GlobalFolderSelect&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;file&quot;</span> <span class="p">:</span> <span class="s2">&quot;extensions.globalWidgets&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;GlobalFolderSelect&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;toolkit&quot;</span> <span class="p">:</span> <span class="s2">&quot;wario&quot;</span><span class="p">,</span>
             <span class="nt">&quot;type&quot;</span>  <span class="p">:</span> <span class="s2">&quot;String&quot;</span><span class="p">,</span>
             <span class="nt">&quot;value&quot;</span> <span class="p">:</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span>
             <span class="nt">&quot;properties&quot;</span> <span class="p">:</span> <span class="p">{},</span>
@@ -288,24 +293,12 @@
 </thead>
 <tbody>
 <tr>
-<td align="left">preset</td>
-<td align="left">The rendering preset of the node. "node_default" is the primary one used but others <br>are listed in nodz/config.json</td>
-</tr>
-<tr>
 <td align="left">file</td>
 <td align="left">The location of the file containing the node's code, relative to the toolkit root directory</td>
 </tr>
 <tr>
-<td align="left">alternate</td>
-<td align="left">Set to "true" if the colour of the attribute should alternate each row</td>
-</tr>
-<tr>
 <td align="left">category</td>
 <td align="left">The category that the node will be listed under in the right-click new node menu</td>
-</tr>
-<tr>
-<td align="left">toolkit</td>
-<td align="left">The toolkit that the node is contained in</td>
 </tr>
 </tbody>
 </table></div>
@@ -321,24 +314,16 @@
 </thead>
 <tbody>
 <tr>
-<td align="left">index</td>
-<td align="left">The index of the attributes position on the node. Set to -1 if you want them to be built in <br>the order they're listed</td>
-</tr>
-<tr>
-<td align="left">preset</td>
-<td align="left">Rendering preset of the attribute. Default is "node_default"</td>
-</tr>
-<tr>
-<td align="left">plug</td>
-<td align="left">Set to true if the attribute is an output, otherwise false</td>
-</tr>
-<tr>
-<td align="left">socket</td>
-<td align="left">Set to true if the attribute is an input, otherwise false</td>
+<td align="left">connection</td>
+<td align="left">Sets the connection type of the attribute. Valid options are "input" or "output</td>
 </tr>
 <tr>
 <td align="left">type</td>
 <td align="left">The attribute type. Only attributes with matching types can be connected</td>
+</tr>
+<tr>
+<td align="left">preset</td>
+<td align="left">OPTIONAL - Sets the visual style of the attribute. Options are given in ./nodz/config.json</td>
 </tr>
 </tbody>
 </table></div>
@@ -368,24 +353,15 @@
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="nt">&quot;node_types&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;Example Node&quot;</span> <span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;preset&quot;</span> <span class="p">:</span> <span class="s2">&quot;node_default&quot;</span><span class="p">,</span>
             <span class="nt">&quot;file&quot;</span> <span class="p">:</span> <span class="s2">&quot;exampleNode.py&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;alternate&quot;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
             <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;Examples&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;toolkit&quot;</span> <span class="p">:</span> <span class="s2">&quot;Example&quot;</span><span class="p">,</span>
             <span class="nt">&quot;attributes&quot;</span> <span class="p">:</span> <span class="p">{</span>
                 <span class="nt">&quot;Input Attribute&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;index&quot;</span> <span class="p">:</span> <span class="mi">-1</span><span class="p">,</span>
-                    <span class="nt">&quot;preset&quot;</span> <span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;plug&quot;</span> <span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-                    <span class="nt">&quot;socket&quot;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="nt">&quot;connection&quot;</span> <span class="p">:</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span>
                     <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;Output Attribute&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;index&quot;</span> <span class="p">:</span> <span class="mi">-1</span><span class="p">,</span>
-                    <span class="nt">&quot;preset&quot;</span> <span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;plug&quot;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-                    <span class="nt">&quot;socket&quot;</span> <span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                    <span class="nt">&quot;connection&quot;</span> <span class="p">:</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span>
                     <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span>
                 <span class="p">}</span>
             <span class="p">},</span>
@@ -407,8 +383,9 @@
     <span class="nt">&quot;docs&quot;</span> <span class="p">:</span> <span class="s2">&quot;./docs&quot;</span><span class="p">,</span>
     <span class="nt">&quot;global_variables&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;Output Folder&quot;</span> <span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;extensions.globalWidgets&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;GlobalFolderSelect&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;file&quot;</span> <span class="p">:</span> <span class="s2">&quot;extensions.globalWidgets&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;GlobalFolderSelect&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;toolkit&quot;</span> <span class="p">:</span> <span class="s2">&quot;wario&quot;</span><span class="p">,</span>
             <span class="nt">&quot;type&quot;</span>  <span class="p">:</span> <span class="s2">&quot;String&quot;</span><span class="p">,</span>
             <span class="nt">&quot;value&quot;</span> <span class="p">:</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span>
             <span class="nt">&quot;properties&quot;</span> <span class="p">:</span> <span class="p">{},</span>
@@ -417,24 +394,15 @@
     <span class="p">},</span>
     <span class="nt">&quot;node_types&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;Example Node&quot;</span> <span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;preset&quot;</span> <span class="p">:</span> <span class="s2">&quot;node_default&quot;</span><span class="p">,</span>
             <span class="nt">&quot;file&quot;</span> <span class="p">:</span> <span class="s2">&quot;exampleNode.py&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;alternate&quot;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
             <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;Examples&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;toolkit&quot;</span> <span class="p">:</span> <span class="s2">&quot;Example&quot;</span><span class="p">,</span>
             <span class="nt">&quot;attributes&quot;</span> <span class="p">:</span> <span class="p">{</span>
                 <span class="nt">&quot;Input Attribute&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;index&quot;</span> <span class="p">:</span> <span class="mi">-1</span><span class="p">,</span>
-                    <span class="nt">&quot;preset&quot;</span> <span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;plug&quot;</span> <span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-                    <span class="nt">&quot;socket&quot;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                    <span class="nt">&quot;connection&quot;</span> <span class="p">:</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span>
                     <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;Output Attribute&quot;</span> <span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;index&quot;</span> <span class="p">:</span> <span class="mi">-1</span><span class="p">,</span>
-                    <span class="nt">&quot;preset&quot;</span> <span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;plug&quot;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-                    <span class="nt">&quot;socket&quot;</span> <span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                    <span class="nt">&quot;connection&quot;</span> <span class="p">:</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span>
                     <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span>
                 <span class="p">}</span>
             <span class="p">},</span>
