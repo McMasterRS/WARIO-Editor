@@ -32,6 +32,8 @@ class GlobalWindowWidget(QtWidgets.QWidget):
         self.layout.setSpacing(2)
         self.setLayout(self.layout)
         
+        self.toolkit = "wario"
+        
         self.cls = []
         self.file = []
         
@@ -61,7 +63,7 @@ class GlobalTextbox(GlobalWindowWidget):
         return self.textbox.text()
         
     def setData(self, gb):
-        self.textbox.setText(gb["value"])   
+        self.textbox.setText(gb["value"]) 
         
 class GlobalSpinbox(GlobalWindowWidget):
     def __init__(self):

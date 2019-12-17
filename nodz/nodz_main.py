@@ -1109,13 +1109,8 @@ class Nodz(QtWidgets.QGraphicsView):
             print('Load aborted !')
             return False
            
-        # Load global variables
-        if "GLOBALS" in data.keys(): 
-            self.globalUI.loadGlobals(data["GLOBALS"])
-        else:
-            self.globalUI.clearTable()
-            
-        self.globalUI.genGlobals()
+
+        self.globalUI.clearTable()
 
         # Apply nodes data.
         nodesData = data['NODES']
@@ -1186,6 +1181,11 @@ class Nodz(QtWidgets.QGraphicsView):
 
             self.createConnection(sourceNode, sourceAttr,
                                   targetNode, targetAttr)          
+        
+        # Load global variables
+        if "GLOBALS" in data.keys(): 
+            self.globalUI.loadGlobals(data["GLOBALS"])
+        self.globalUI.genGlobals()
         
         self.scene().update()
         self.helpUI.buildToolkitHelp()

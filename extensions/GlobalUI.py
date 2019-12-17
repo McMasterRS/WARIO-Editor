@@ -80,6 +80,7 @@ class GlobalUI(QtWidgets.QWidget):
             
             gb["file"] = widget.file
             gb["class"] = widget.cls
+            gb["toolkit"] = widget.toolkit
             gb["attrType"] = attrType
             gb["type"] = type
             gb["value"] = value
@@ -95,14 +96,15 @@ class GlobalUI(QtWidgets.QWidget):
         
     def loadGlobals(self, globals):
     
-        # Remove all non-toolkit rows
         if self.table.rowCount() == 0:
             return
-        
+            
+        # Remove all non-toolkit rows
         for i in range(0, self.table.rowCount()):
             if self.table.cellWidget(i,2).isEnabled():
                 self.table.removeRow(i)             
         
+        # Add and fill all global variables
         for gb in globals:
             exists = False
             
@@ -233,7 +235,7 @@ class GlobalUI(QtWidgets.QWidget):
         
         
     def addAutoRow(self, name, gb):
-        
+
         # If the variable already exists then make it unremoveable
         if name in self.table.prevNames.values():
             for i in range(0, self.table.rowCount()):

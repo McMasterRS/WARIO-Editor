@@ -3,7 +3,7 @@
     "docs" : "",
     "global_variables" : {
         "Test" : {
-            "fileLoc" : "default",
+            "toolkit" : "default",
             "file": "test.py",
             "class": "GlobalTextbox",
             "type"  : "String",

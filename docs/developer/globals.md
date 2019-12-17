@@ -83,7 +83,7 @@ class ExampleGlobalWidget(GlobalWidgetWindow):
 
 More complex interfaces  may require more data to initialize than is used by the code to operate on the global variables. When this is the case, we can define additional properties through the ```getProperties``` function. These properties are stored in the "properties" key in the global variable's dict and can be access in the ```setData``` function.
 
-To use this function, return a dict containing any relevant data. Be aware that this function is called when a new instance of the interface is created and therefore the list of properties must be checked to make sure they contain the relevant keys.
+To use this function, return a dict containing any relevant data. Be aware that this function is called when a new instance of the interface is created and therefore the list of properties must be checked to make sure they contain the relevant keys. 
 
 ```python3
     def getProperties(self):
@@ -98,3 +98,5 @@ To use this function, return a dict containing any relevant data. Be aware that 
         if "mode" in gb["properties"].keys():
             self.modeCombo.setCurrentIndex(gb["properties"]["mode"])
 ```
+
+Note that this also requires ```"properties" : {}``` to be added to the global variable's JSON data when creating a custom toolkit.
