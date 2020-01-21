@@ -30,6 +30,9 @@ class ThreadHandler(QtWidgets.QWidget):
         
     def startPipeline(self, file):
         # Build temporary files
+        if os.path.exists("./wariotmp"):
+            shutil.rmtree("./wariotmp/")
+        
         os.makedirs("./wariotmp/plots/")
         os.makedirs("./wariotmp/imgs/")
     
