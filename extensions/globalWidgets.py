@@ -197,6 +197,58 @@ class GlobalListWindow(QtWidgets.QWidget):
         for i in range(len(vals)):
             self.table.insertRow(self.table.rowCount())
             self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(vals[i]))
+            
+class GlobalTwoColumnListInput(GlobalListInput):
+    def __init__(self):
+        super(GlobalTwoColumnListInput, self).__init__()
+        
+        self.cls = "GlobalTwoColumnListInput"
+        self.menuWindow = GlobalTableWindow(2)      
+
+    def setData(self, gb):
+        self.menuWindow.setData(gb)
+        self.menuWindow.table.setHorizontalHeaderLabels(gb["properties"]["headers"])
+        
+    def getProperties(self):
+        headers = []
+        for i in range(self.menuWindow.table.columnCount()):
+            if self.menuWindow.table.horizontalHeaderItem(i) != None:
+                headers.append(self.menuWindow.table.horizontalHeaderItem(i).text())
+        return {"headers" : headers}
+            
+class GlobalTableWindow(QtWidgets.QWidget):
+    def __init__(self, columns):
+        super(GlobalTableWindow, self).__init__()
+        
+        self.layout = QtWidgets.QVBoxLayout()
+        self.table = ExpandingTable("", {})
+        self.table.setColumnCount(columns)
+        self.layout.addWidget(self.table)
+        
+        self.setLayout(self.layout)
+        
+    def getData(self):
+        data = []
+        
+        for i in range(self.table.rowCount() - 1):
+            rowData = []
+            
+            for j in range(self.table.columnCount()):
+                rowData.append(self.table.item(i, j).text())
+                
+            data.append(rowData)
+        
+        return data
+        
+    def setData(self, gb):
+        vals = gb["value"]
+        self.table.blockSignals(True)
+        for i, row in enumerate(vals):
+            self.table.insertRow(self.table.rowCount())
+            for j, val in enumerate(row):
+                self.table.setItem(i, j, QtWidgets.QTableWidgetItem(val))
+        self.table.blockSignals(False)
+            
         
 class GlobalCustomWidget(GlobalWindowWidget):
     def __init__(self):

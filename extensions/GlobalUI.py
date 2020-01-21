@@ -118,30 +118,30 @@ class GlobalUI(QtWidgets.QWidget):
                     
                     break
                 
-            if exists is False:
+            if exists == False:
                 self.addRow(globals[gb])
                 row = self.table.rowCount() - 1
 
-            self.table.item(row, 0).setText(gb)
-            self.table.setItem(row, 1, QtWidgets.QTableWidgetItem(globals[gb]["type"]))
-            combo = self.table.cellWidget(row, 2)
-            combo.blockSignals(True)
-            
-            # Use the type of the global to work out which index to load
-            id = combo.findText(globals[gb]["type"])
-            if id == -1:
-                combo.setCurrentIndex(len(combo.items) - 1)
-            else:
-                combo.setCurrentIndex(id)
+                self.table.item(row, 0).setText(gb)
+                self.table.setItem(row, 1, QtWidgets.QTableWidgetItem(globals[gb]["type"]))
+                combo = self.table.cellWidget(row, 2)
+                combo.blockSignals(True)
                 
-            combo.blockSignals(False)
-                            
-            if globals[gb]["const"]:
-                self.table.item(row, 4).setCheckState(QtCore.Qt.Checked)
-            else:
-                self.table.item(row, 4).setCheckState(QtCore.Qt.Unchecked)      
-            
-            self.table.updateNames()
+                # Use the type of the global to work out which index to load
+                id = combo.findText(globals[gb]["type"])
+                if id == -1:
+                    combo.setCurrentIndex(len(combo.items) - 1)
+                else:
+                    combo.setCurrentIndex(id)
+                    
+                combo.blockSignals(False)
+                                
+                if globals[gb]["const"]:
+                    self.table.item(row, 4).setCheckState(QtCore.Qt.Checked)
+                else:
+                    self.table.item(row, 4).setCheckState(QtCore.Qt.Unchecked)      
+                
+                self.table.updateNames()
                 
     def genNewRowWidget(self, gb):
         if gb is None:
@@ -281,4 +281,6 @@ class GlobalUI(QtWidgets.QWidget):
     def clearTable(self):
         while self.table.rowCount() > 0:
             self.table.removeRow(0)
+            
+        self.table.prevNames = {}
             

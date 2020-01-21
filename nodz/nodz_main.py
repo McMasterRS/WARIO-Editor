@@ -1109,13 +1109,13 @@ class Nodz(QtWidgets.QGraphicsView):
             print('Load aborted !')
             return False
            
-
+           
+        self.toolkits = []
         self.globalUI.clearTable()
 
         # Apply nodes data.
         nodesData = data['NODES']
         nodeIds = nodesData.keys()
-
 
         for nodeId in nodeIds:
             name = nodesData[nodeId]['name']

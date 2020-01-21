@@ -16,5 +16,11 @@
         "show": true,
         "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\Logic",
         "docs": "C:\\Users\\mudwayt\\Documents\\GitHub\\WARIO\\toolkits\\Logic\\"
+    },
+    "Pong": {
+        "name": "Pong",
+        "show": true,
+        "path": "C:\\Users\\mudwayt\\Documents\\GitHub\\Pong",
+        "docs": "C:\\Users\\mudwayt\\Documents\\GitHub\\Pong\\./docs/"
     }
 }

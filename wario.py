@@ -1,9 +1,11 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
-from RunPipeline import runPipeline
+from RunPipeline import ThreadHandler
 from extensions.genGraph import generateGraph
 import sys, os, textwrap
+
+import subprocess
 
 version = "1.0.0"
 
@@ -15,8 +17,8 @@ class NodzWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         self.nodz = nodz
         self.nodz.parent = self
-        #self.threadpool = QtCore.QThreadPool()
-        #self.runningPipeline = False
+        
+        self.handler = ThreadHandler()
         
         self.installEventFilter(self)
         
@@ -96,16 +98,19 @@ class NodzWindow(QtWidgets.QMainWindow):
     def saveRunFile(self):
         if self.nodz.currentFileName != "":
             self.nodz.saveGraph(self.nodz.currentFileName)
-            runPipeline(self.nodz.currentFileName)
         else:
             if len(self.nodz.scene().nodes) != 0:
                 self.saveFile()
             else:
                 self.loadFile()
                 
-            if self.nodz.currentFileName != "":
-                runPipeline(self.nodz.currentFileName)
-        
+        if self.nodz.currentFileName != "":
+            
+            self.handler.show()
+            self.handler.startPipeline(self.nodz.currentFileName)
+            #self.pipeline = subprocess.Popen(["python", "RunPipeline.py", self.nodz.currentFileName])
+            #runPipeline(self.nodz.currentFileName)
+            
     def plotGraph(self):
         if self.nodz.currentFileName == "":
             self.loadFile()

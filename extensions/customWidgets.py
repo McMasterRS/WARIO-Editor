@@ -73,6 +73,10 @@ class GlobalSaveTabs(QtWidgets.QTabWidget):
             self.setCurrentIndex(settings["currentTab" + name])
     
     def updateGlobals(self, globals):
+        if "Output Filename" not in globals.keys():
+            return
+        if "Output Folder" not in globals.keys():
+            return
         self.globalName = globals["Output Filename"]["value"]
         self.globalFolder = globals["Output Folder"]["value"]
         
@@ -109,7 +113,7 @@ class BatchSavePanel(GlobalSaveTabs):
             vars["saveGraph" + self.name] = self.saveLoc.textbox.text()
 
 class BatchSaveTab(QtWidgets.QWidget):
-    def __init__(self, name, type, settings):
+    def __init__(self, name, type, settings, pkl = True):
     
         super(BatchSaveTab, self).__init__()
         
@@ -131,8 +135,12 @@ class BatchSaveTab(QtWidgets.QWidget):
             self.layout.addWidget(self.saveData)
             
         elif type == "graph":
-            saveTypes = ["PNG", "PDF", "PKL"]
-            saveDialogString = "PNG image (*.png);; PDF (*.pdf);; Pickle (*.pkl)"
+            if pkl == True:
+                saveTypes = ["PNG", "PDF", "PKL"]
+                saveDialogString = "PNG image (*.png);; PDF (*.pdf);; Pickle (*.pkl)"
+            else:
+                saveTypes = ["PNG", "PDF"]
+                saveDialogString = "PNG image (*.png);; PDF (*.pdf)"
             self.tabBox = BatchSavePanel(saveTypes, saveDialogString, settings, name)
             
             graphLayout = QtWidgets.QHBoxLayout()
@@ -181,6 +189,7 @@ class ExpandingTable(QtWidgets.QTableWidget):
         
         header = self.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.setHorizontalHeaderLabels(["data"])
         
         if name + "Values" in settings.keys():
             for i in range(len(settings[name + "Values"])):
