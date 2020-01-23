@@ -1,6 +1,9 @@
 from pipeline.NodeFactory import NodeFactory
 from pipeline.NodzInterface import NodzInterface
 from pipeline.Pipeline import Pipeline
+from pipeline.SignalHandler import SignalHandler
+from pipeline.PipelineThread import PipelineThread
+
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets
 import traceback
@@ -8,27 +11,24 @@ import sys, os, shutil
 import pickle
 import matplotlib.pyplot as plt
 import matplotlib.image as pltimg
-from queue import Queue
 
 import threading
 
-def runPipeline(file):
-    
-    handler = ThreadHandler(file)
-    handler.show()
-    handler.startPipeline()
-    
-
 class ThreadHandler(QtWidgets.QWidget):
-    def __init__(self):
+    pipelineComplete = pyqtSignal(bool)
+    
+    def __init__(self, signals = None):
         QtWidgets.QWidget.__init__(self)
         
         # Pipeline running variables
-        self.queue = Queue()
-        self.thread = PipelineThread(self.queue)
-        self.thread.pipelineComplete.connect(self.showPlots)
+        self.signals = signals
+        self.signals.end.connect(self.finishRun)
+        self.pipelineComplete.connect(self.showPlots)
         
     def startPipeline(self, file):
+    
+        self.thread = PipelineThread(file, self.signals)
+        
         # Build temporary files
         if os.path.exists("./wariotmp"):
             shutil.rmtree("./wariotmp/")
@@ -38,12 +38,18 @@ class ThreadHandler(QtWidgets.QWidget):
     
         self.thread.file = file
         self.thread.start()
+        
+    # Swap from Blinker signal to PyQt5 signal to preserve
+    # plots after thread dies.
+    def finishRun(self, sender):    
+        self.pipelineComplete.emit(True)
 
     def showPlots(self, val):
+        # Show the plots
         for f in os.listdir("./wariotmp/plots/"):
             p = pickle.load(open("./wariotmp/plots/" + f, 'rb'))
             p.show()
-            
+        # Show the images as plots
         for f in os.listdir("./wariotmp/imgs"):
             fig = plt.figure()
             img = pltimg.imread("./wariotmp/imgs/"+f)
@@ -55,44 +61,6 @@ class ThreadHandler(QtWidgets.QWidget):
         # Clean up temp files
         shutil.rmtree("./wariotmp/")
 
-
-class PipelineThread(QThread):
-    pipelineComplete = pyqtSignal(bool)
-
-    def __init__(self, queue):
-        QThread.__init__(self)
-        
-        self.queue = queue
-        self.file = []
-
-        
-    def run(self):
-        
-        try:
-            # Extract relevant info from the JSON
-            nodes, connections, globals = NodzInterface.load(self.file)
-
-            # Build the pipeline graph
-            pipeline = Pipeline(global_vars = globals)
-
-            for node in nodes:
-                pipeline.add(node[1])
-                
-            for conn in connections:
-                pipeline.connect(parent = conn[0], child = conn[1])
-
-            pipeline.start()
-            
-        # Catches any runtime errors and prints to console
-        # Lets you debug the pipeline nodes if they crash
-        except Exception:
-            traceback.print_exc()
-            
-        self.pipelineComplete.emit(True)
-        
-    def updateUI(self):
-        return
-     
 if __name__ == "__main__":
 
     runPipeline(sys.argv[1])

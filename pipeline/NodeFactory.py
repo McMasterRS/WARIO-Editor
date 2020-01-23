@@ -24,7 +24,7 @@ class NodeFactory():
     # Create Node (Class Method) : Returns a new instance of the specifed node
     ###############################################################################################
     @classmethod
-    def create_node(cls, node_id, type_id, variables):
+    def create_node(cls, node_id, type_id, variables, name):
         """ create a new node based on type id """
         node = cls.registered_nodes[type_id](node_id, variables)
         return node

@@ -13,6 +13,7 @@ class Node():
     def __init__(self, node_id=None, vars=None):
         """ Initialize Node """
         self.node_id = node_id  # identifier for the node
+        self.name = ""          # Node name (Used for signals)
         self.ready = {}         # Flags for each argument, all true indicates the node should run
         self.state = {}         # Variables local to the node, set internally by itself. Persits
         self.args = {}          # Variables local to the node, set externally by it's parents

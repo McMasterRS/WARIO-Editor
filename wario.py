@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
 from RunPipeline import ThreadHandler
+from pipeline.SignalHandler import SignalHandler
 from extensions.genGraph import generateGraph
 import sys, os, textwrap
 
@@ -9,16 +9,25 @@ import subprocess
 
 version = "1.0.0"
 
+class WARIOSignalHandler(SignalHandler):
+    def __init__(self, nodz):
+        SignalHandler.__init__(self)
+        self.start.connect(nodz.initializeNodeEvent)
+        self.nodeStart.connect(nodz.activateNodeEvent)
+        self.nodeComplete.connect(nodz.completeNodeEvent)
+
+
 def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
-
+    
 class NodzWindow(QtWidgets.QMainWindow):
     def __init__(self, nodz):
         QtWidgets.QMainWindow.__init__(self)
         self.nodz = nodz
         self.nodz.parent = self
         
-        self.handler = ThreadHandler()
+        self.signals = WARIOSignalHandler(self.nodz)
+        self.handler = ThreadHandler(self.signals)
         
         self.installEventFilter(self)
         

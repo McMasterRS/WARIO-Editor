@@ -388,6 +388,35 @@ class Nodz(QtWidgets.QGraphicsView):
         if event.key() in self.pressedKeys:
             self.pressedKeys.remove(event.key())
 
+    def initializeNodeEvent(self, sender):
+        nodes = self.scene().nodes.keys()
+        for n in nodes:
+            node = self.scene().nodes[n]
+            node.nodePreset = "node_preset_initialized"
+            node._createStyle(self.scene().views()[0].config)
+            node.update()
+
+    def activateNodeEvent(self, sender, **kw):
+        nodeID = kw["name"]
+        nodes = self.scene().nodes.keys()
+        for n in nodes:
+            node = self.scene().nodes[n]
+            if node.nodeId == nodeID:
+                
+                node.nodePreset = "node_preset_activated"
+                node._createStyle(self.scene().views()[0].config)
+                node.update()
+        
+    def completeNodeEvent(self, sender, **kw):
+        nodeID = kw["name"]
+        nodes = self.scene().nodes.keys()
+        for n in nodes:
+            node = self.scene().nodes[n]
+            if node.nodeId == nodeID:
+                node.nodePreset = "node_preset_completed"
+                node._createStyle(self.scene().views()[0].config)
+                node.update()
+                
     def _initRubberband(self, position):
         """
         Initialize the rubber band at the given position.
@@ -994,7 +1023,7 @@ class Nodz(QtWidgets.QGraphicsView):
             nodeInst.settingsWindow.genSettings()
             
             name = nodeInst.name
-            preset = nodeInst.nodePreset
+            preset = "node_default"
             nodeAlternate = nodeInst.alternate
             toolkit = nodeInst.toolkit
             variables = nodeInst.variables         
