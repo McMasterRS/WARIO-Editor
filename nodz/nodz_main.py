@@ -55,7 +55,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
     signal_KeyPressed = QtCore.pyqtSignal(object)
     signal_Dropped = QtCore.pyqtSignal(object)
-
+    
     def __init__(self, parent, configPath=defaultConfigPath):
         """
         Initialize the graphics view.

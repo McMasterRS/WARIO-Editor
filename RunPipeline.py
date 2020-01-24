@@ -1,33 +1,32 @@
-from pipeline.NodeFactory import NodeFactory
-from pipeline.NodzInterface import NodzInterface
-from pipeline.Pipeline import Pipeline
-from pipeline.SignalHandler import SignalHandler
 from pipeline.PipelineThread import PipelineThread
 
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets
-import traceback
+from blinker import signal
 import sys, os, shutil
 import pickle
+
 import matplotlib.pyplot as plt
 import matplotlib.image as pltimg
 
-import threading
+def runPipeline(file):
+    threadhandler = ThreadHandler()
+    threadhandler.show()
+    threadhandler.startPipeline(file)
 
 class ThreadHandler(QtWidgets.QWidget):
     pipelineComplete = pyqtSignal(bool)
     
-    def __init__(self, signals = None):
+    def __init__(self):
         QtWidgets.QWidget.__init__(self)
         
         # Pipeline running variables
-        self.signals = signals
-        self.signals.end.connect(self.finishRun)
+        signal('end').connect(self.finishRun)
         self.pipelineComplete.connect(self.showPlots)
         
     def startPipeline(self, file):
     
-        self.thread = PipelineThread(file, self.signals)
+        self.thread = PipelineThread(file)
         
         # Build temporary files
         if os.path.exists("./wariotmp"):

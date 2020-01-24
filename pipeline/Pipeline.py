@@ -1,5 +1,5 @@
 from pipeline.Node import Node
-from pipeline.SignalHandler import SignalHandler
+from blinker import signal
 
 ###################################################################################################
 # Pipeline:
@@ -24,8 +24,6 @@ class Pipeline():
         self.roots = roots if roots is not None else {}
         # Variables that are optionally shared accross nodes and batches/runs/passes
         self.global_vars = global_vars if global_vars is not None else {}
-        # Signals
-        self.signals = SignalHandler()
         # 
         self.event_callbacks = {}
         #
@@ -96,13 +94,13 @@ class Pipeline():
         if len(self.roots) > 0:
             results = False
             while results == False:
-                self.signals.start.send(self)
+                signal('start').send(self)
                 results = self.run_pass(True)
         
         for node in self.nodes:
             node.end()
 
-        self.signals.end.send(self)
+        signal('end').send(self)
         print("############################ Finishing ############################")
         
         return results
@@ -144,11 +142,11 @@ class Pipeline():
 
         if all(node.ready.values()):
             
-            self.signals.nodeStart.send(self, name = node.node_id)
+            signal('node start').send(self, name = node.node_id)
             node.global_vars = self.global_vars
             results[node] = node.process()
             self.global_vars = node.global_vars
-            self.signals.nodeComplete.send(self, name = node.node_id)
+            signal('node complete').send(self, name = node.node_id)
 
             if len(node.events_fired) > 0:
                 for event_id in node.events_fired:

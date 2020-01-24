@@ -8,10 +8,9 @@ import threading
 
 class PipelineThread(threading.Thread):
 
-    def __init__(self, file, signals = None):
+    def __init__(self, file):
         threading.Thread.__init__(self)
         self.file = file
-        self.signals = signals
 
     def run(self):  
         try:
@@ -26,9 +25,6 @@ class PipelineThread(threading.Thread):
                 
             for conn in connections:
                 pipeline.connect(parent = conn[0], child = conn[1])
-                
-            if self.signals is not None:
-                pipeline.signals = self.signals
 
             pipeline.start()
             

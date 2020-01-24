@@ -4,18 +4,11 @@ from RunPipeline import ThreadHandler
 from pipeline.SignalHandler import SignalHandler
 from extensions.genGraph import generateGraph
 import sys, os, textwrap
+from blinker import signal
 
 import subprocess
 
 version = "1.0.0"
-
-class WARIOSignalHandler(SignalHandler):
-    def __init__(self, nodz):
-        SignalHandler.__init__(self)
-        self.start.connect(nodz.initializeNodeEvent)
-        self.nodeStart.connect(nodz.activateNodeEvent)
-        self.nodeComplete.connect(nodz.completeNodeEvent)
-
 
 def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
@@ -25,13 +18,13 @@ class NodzWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         self.nodz = nodz
         self.nodz.parent = self
-        
-        self.signals = WARIOSignalHandler(self.nodz)
-        self.handler = ThreadHandler(self.signals)
+
+        self.handler = ThreadHandler()
         
         self.installEventFilter(self)
         
         self.setupWindow()
+        self.setupSignals()
         self.loadToolkitSettings()  
         
     def loadToolkitSettings(self):
@@ -41,6 +34,11 @@ class NodzWindow(QtWidgets.QMainWindow):
             self.nodz.toolkitUI.loadToolkitSettings()
         else:
             self.nodz.toolkitUI.genSettings()
+        
+    def setupSignals(self):
+        signal('start').connect(self.nodz.initializeNodeEvent)
+        signal('node start').connect(self.nodz.activateNodeEvent)
+        signal('node complete').connect(self.nodz.completeNodeEvent)
         
     def setupWindow(self):
         self.setWindowTitle("WARIO")
