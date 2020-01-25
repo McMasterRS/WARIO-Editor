@@ -1,8 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
 from RunPipeline import ThreadHandler
-from pipeline.SignalHandler import SignalHandler
-from extensions.genGraph import generateGraph
+from extensions.GenGraph import generateGraph
 import sys, os, textwrap
 from blinker import signal
 
