@@ -99,7 +99,7 @@ class NodzWindow(QtWidgets.QMainWindow):
                 else:
                     tk.setChecked(False)
                     
-                self.setWindowTitle("WARIO - " + self.nodz.currentFileName)
+                self.setWindowTitle("WARIO Designer - " + self.nodz.currentFileName)
                 
     def saveRunFile(self):
         if self.nodz.currentFileName != "":
@@ -114,8 +114,6 @@ class NodzWindow(QtWidgets.QMainWindow):
             
             #self.handler.show()
             self.handler.startPipeline(self.nodz.currentFileName)
-            #self.pipeline = subprocess.Popen(["python", "RunPipeline.py", self.nodz.currentFileName])
-            #runPipeline(self.nodz.currentFileName)
             
     def plotGraph(self):
         if self.nodz.currentFileName == "":

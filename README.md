@@ -19,8 +19,7 @@ Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/
 
 ## Prerequisites
 ```
-- Python3
+- Python 3
 - PyQt5
-- Six
 - Blinker
 ```
