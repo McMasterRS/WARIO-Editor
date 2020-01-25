@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtWebEngineWidgets
 from PyQt5 import QtCore
-from PyQt5 import QtGui
+
+import os
 
 def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
@@ -28,7 +29,7 @@ class HelpUI(QtWidgets.QWidget):
         
         self.toolkitList = []
         
-        self.buildTab("./docs/_build/html", "WARIO")
+        self.buildTab(os.path.dirname(os.path.realpath(__file__)) + "/../docs/_build/html", "WARIO")
         
     
     def buildTab(self, path, toolkit = None):
@@ -39,7 +40,7 @@ class HelpUI(QtWidgets.QWidget):
         
         tabWebView = QtWebEngineWidgets.QWebEngineView()
         tabLayout.addWidget(tabWebView)
-        tabWebView.setUrl(QtCore.QUrl(QtCore.QFileInfo(path + "/index.html").absoluteFilePath()))
+        tabWebView.setUrl(QtCore.QUrl.fromLocalFile(os.path.abspath(path + "/index.html")))
         self.tabs.addTab(tab, toolkit)
         
     def buildToolkitHelp(self):

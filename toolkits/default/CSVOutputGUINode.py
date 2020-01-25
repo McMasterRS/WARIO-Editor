@@ -1,5 +1,5 @@
 import csv
-from pipeline.Node import Node
+from wario import Node
 from pipeline.FileWidget import FileWidget
 
 class CSVOutputGUINode(Node):

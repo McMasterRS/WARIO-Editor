@@ -1,4 +1,4 @@
-from pipeline.Node import InputNode
+from wario import Node
 
 ###################################################################################################
 #

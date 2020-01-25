@@ -1,4 +1,4 @@
-from pipeline.PipelineThread import PipelineThread
+from wario import PipelineThread
 
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets

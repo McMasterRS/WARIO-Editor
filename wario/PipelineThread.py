@@ -1,6 +1,6 @@
-from .NodeFactory import NodeFactory
-from .NodzInterface import NodzInterface
-from .Pipeline import Pipeline
+from .pipeline.NodeFactory import NodeFactory
+from .pipeline.JsonInterface import JsonInterface
+from .pipeline.Pipeline import Pipeline
 from blinker import signal
 
 import traceback
@@ -15,7 +15,7 @@ class PipelineThread(threading.Thread):
     def run(self):  
         try:
             # Extract relevant info from the JSON
-            nodes, connections, globals = NodzInterface.load(self.file)
+            nodes, connections, globals = JsonInterface.load(self.file)
 
             # Build the pipeline graph
             pipeline = Pipeline(global_vars = globals)

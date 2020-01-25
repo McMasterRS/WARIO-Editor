@@ -1,8 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
 from RunPipeline import ThreadHandler
-from pipeline.SignalHandler import SignalHandler
-from extensions.genGraph import generateGraph
+from extensions.GenGraph import generateGraph
 import sys, os, textwrap
 from blinker import signal
 
@@ -29,7 +28,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         
     def loadToolkitSettings(self):
     
-        file = "./toolkits/toolkitConfig.json"
+        file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "toolkits\\toolkitConfig.json")
         if os.path.exists(file):
             self.nodz.toolkitUI.loadToolkitSettings()
         else:
@@ -113,7 +112,7 @@ class NodzWindow(QtWidgets.QMainWindow):
                 
         if self.nodz.currentFileName != "":
             
-            self.handler.show()
+            #self.handler.show()
             self.handler.startPipeline(self.nodz.currentFileName)
             #self.pipeline = subprocess.Popen(["python", "RunPipeline.py", self.nodz.currentFileName])
             #runPipeline(self.nodz.currentFileName)

@@ -1,25 +1,20 @@
 import os
 import json
-import six
 import functools
 import sys
 import uuid
 import importlib
-import collections
 
-from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
-from PyQt5 import uic
+
 import nodz.nodz_utils as utils
 
-from extensions.customWidgets import *
-from extensions.settingsWindow import *
-from extensions.customSettings import CustomSettings
+from extensions.settingsWindow import SettingsItem
 from extensions.GlobalUI import GlobalUI
-from extensions.helpUI import HelpUI
-from extensions.toolkitUI import ToolkitUI
+from extensions.HelpUI import HelpUI
+from extensions.ToolkitUI import ToolkitUI
 
 defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.\\config.json')
 
@@ -610,8 +605,8 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         self.config = utils._loadConfig(filePath)
-        
-        custom = utils._loadConfig(".\\toolkits\custom.json")
+        customFile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..\\toolkits\custom.json")
+        custom = utils._loadConfig(customFile)
         self.config['node_types'] = custom['node_types']
 
     def reloadConfig(self, name = "", state = False):
@@ -1185,7 +1180,7 @@ class Nodz(QtWidgets.QGraphicsView):
                 dataType = attrData['dataType']
 
                 # un-serialize data type if needed
-                if (isinstance(dataType, six.text_type) and dataType.find('<') == 0):
+                if (isinstance(dataType, str) and dataType.find('<') == 0):
                     dataType = eval(str(dataType.split('\'')[1]))
 
                 self.createAttribute(node=node,
@@ -1467,7 +1462,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.plugs = dict()
         self.sockets = dict()
         
-        self.settings = collections.OrderedDict()
+        self.settings = {}
         self.variables = dict()
 
         # Extended attributes

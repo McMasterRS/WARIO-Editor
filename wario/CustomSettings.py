@@ -1,10 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-import random
-
 class CustomSettings(QtWidgets.QWidget):
     
     def __init__(self, parent, settings):

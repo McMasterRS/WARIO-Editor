@@ -1,5 +1,5 @@
-from pipeline.Node import Node
-from extensions.customSettings import CustomSettings
+from wario import Node
+from wario import CustomSettings
 from PyQt5 import QtWidgets
 
 class InputSettings(CustomSettings):

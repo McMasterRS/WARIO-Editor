@@ -1,4 +1,4 @@
-from extensions.customSettings import CustomSettings
+from wario import CustomSettings
 import importlib
 import inspect
 

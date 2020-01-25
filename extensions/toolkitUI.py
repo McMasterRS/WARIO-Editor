@@ -1,9 +1,8 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
-from PyQt5 import QtGui
 
 import nodz.nodz_utils as utils
-from extensions.customWidgets import CentredCellCheckbox, UniqueNameTable
+from wario.CustomWidgets import CentredCellCheckbox, UniqueNameTable
 
 import os
 
@@ -125,7 +124,8 @@ class ToolkitUI(QtWidgets.QWidget):
         
     # If a settings json exists, loads it and sets up the table
     def loadToolkitSettings(self):
-        tks = utils._loadData(os.path.normpath("./toolkits/toolkitConfig.json"))
+        tksFile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..\\toolkits\\toolkitConfig.json")
+        tks = utils._loadData(tksFile)
         for tk in tks:
             self.addRow(tks[tk]["name"], tks[tk]["path"], tks[tk]["show"])
             self.toolkitDocs[tks[tk]["name"]] = tks[tk]["docs"]
@@ -134,11 +134,12 @@ class ToolkitUI(QtWidgets.QWidget):
         
     # Generates the initial json file based on the toolkits available in the WARIO root folder
     def genSettings(self):
-        for root, directories, files in os.walk(os.path.normpath('./toolkits')):
+        base = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../toolkits"))
+        for root, directories, files in os.walk(base):
             for dir in directories:
                 if dir != "__pycache__":
-                    configData = utils._loadData(os.path.abspath("./toolkits/" + dir + "config.json"))
-                    self.addRow(configData["name"], os.path.abspath("./toolkits/" + dir))
+                    configData = utils._loadData(os.path.join(base, dir, "config.json"))
+                    self.addRow(configData["name"], os.path.join(base, dir))
                     self.toolkitDocs[configData["name"]] = configData["docs"]
             break
                 
@@ -182,7 +183,7 @@ class ToolkitUI(QtWidgets.QWidget):
             # Gather the required save data
             show = self.toolkitTable.cellWidget(row, 1).isChecked()
             path = os.path.normpath(self.toolkitTable.item(row, 2).text())
-            docs = os.path.join(path, self.toolkitDocs[name])
+            docs = os.path.normpath(os.path.join(path, self.toolkitDocs[name]))
             data[name] = {"name" : name, "show" : show, "path" : path, "docs" : docs}
         
         # Update the base UI
@@ -190,6 +191,7 @@ class ToolkitUI(QtWidgets.QWidget):
         self.parent.helpUI.buildToolkitHelp()
         
         # Save the config file
-        utils._saveData(filePath=os.path.normpath("./toolkits/toolkitConfig.json"), data=data)
+        filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..\\toolkits\\toolkitConfig.json")
+        utils._saveData(filePath=filepath, data=data)
         
     

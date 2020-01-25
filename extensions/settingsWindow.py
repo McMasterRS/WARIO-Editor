@@ -1,15 +1,8 @@
-import nodz.nodz_utils as utils
-from extensions.customWidgets import *
-from extensions.customSettings import *
+from wario.CustomWidgets import *
+from wario.CustomSettings import *
 
-import json
 import collections
-
-from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import uic
 
 # Window that displays node settings
 class SettingsItem(CustomSettings):
