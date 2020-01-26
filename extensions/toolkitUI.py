@@ -137,7 +137,7 @@ class ToolkitUI(QtWidgets.QWidget):
         for root, directories, files in os.walk(os.path.normpath('./toolkits')):
             for dir in directories:
                 if dir != "__pycache__":
-                    configData = utils._loadData(os.path.abspath("./toolkits/" + dir + "config.json"))
+                    configData = utils._loadData(os.path.abspath("./toolkits/" + dir + "/config.json"))
                     self.addRow(configData["name"], os.path.abspath("./toolkits/" + dir))
                     self.toolkitDocs[configData["name"]] = configData["docs"]
             break
