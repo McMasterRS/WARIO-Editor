@@ -11,7 +11,7 @@ from PyQt5 import QtGui
 
 import nodz.nodz_utils as utils
 
-from extensions.settingsWindow import SettingsItem
+from extensions.SettingsWindow import SettingsItem
 from extensions.GlobalUI import GlobalUI
 from extensions.HelpUI import HelpUI
 from extensions.ToolkitUI import ToolkitUI

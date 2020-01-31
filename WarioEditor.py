@@ -112,7 +112,7 @@ class NodzWindow(QtWidgets.QMainWindow):
                 
         if self.nodz.currentFileName != "":
             
-            #self.handler.show()
+            self.handler.show()
             self.handler.startPipeline(self.nodz.currentFileName)
             
     def plotGraph(self):
