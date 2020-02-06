@@ -3,20 +3,38 @@ from wario import PipelineThread
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from PyQt5 import uic
 from blinker import signal
 import sys, os, shutil
 import pickle
 
 import matplotlib.pyplot as plt
 import matplotlib.image as pltimg
+import matplotlib
+matplotlib.use('Qt5Agg')
+from matplotlib.backends.backend_qt5agg import FigureCanvas     
 
 import mne
 import numpy as np
+
+from extensions.WalkTree import WalkTree
+
+#############################################
+## Currently designed to go with the EEG   ##
+## toolkit. Will replace with generic      ##
+## version once this one is working.       ##
+#############################################
 
 def runPipeline(file):
     threadhandler = ThreadHandler()
     threadhandler.show()
     threadhandler.startPipeline(file)
+    
+    
+class TreeItem(QtWidgets.QTreeWidgetItem):
+    def __init__(self, parent, name, file):
+        super(TreeItem, self).__init__(parent, name)
+        self.file = file
 
 class ThreadHandler(QtWidgets.QWidget):
     pipelineComplete = pyqtSignal(bool)
@@ -29,16 +47,20 @@ class ThreadHandler(QtWidgets.QWidget):
         signal("crash").connect(self.updateCrash)
         self.pipelineComplete.connect(self.showPlots) 
         
-        self.layout = QtWidgets.QFormLayout()
-        lb = QtWidgets.QLabel("Pipeline Status")
-        self.lbStatus = QtWidgets.QLabel("")
-        self.layout.addRow(lb, self.lbStatus)
+        uic.loadUi('eegWindow.ui', self)
+        self.treeItem = {}
         
-        self.setLayout(self.layout)
+        #self.layout = QtWidgets.QFormLayout()
+        #lb = QtWidgets.QLabel("Pipeline Status")
+        self.lbStatus = QtWidgets.QLabel("")
+        #self.layout.addRow(lb, self.lbStatus)
+        
+        #self.setLayout(self.layout)
         
     def startPipeline(self, file):
     
         self.thread = PipelineThread(file)
+        walk = WalkTree(file)
         
         # Build temporary files
         if os.path.exists("./wariotmp"):
@@ -68,13 +90,17 @@ class ThreadHandler(QtWidgets.QWidget):
         self.pipelineComplete.emit(True)
 
     def showPlots(self, val):
+        
         # Show the plots
-        for f in os.listdir("./wariotmp/plots/"):
+        for f in os.listdir("./wariotmp/plots/"): 
             p = pickle.load(open("./wariotmp/plots/" + f, 'rb'))
+            self.treeItem[p["ID"]] = TreeItem(self.treeWidget, [p["name"]], f)
+            self.treeWidget.addTopLevelItem(self.treeItem[p["ID"]])
             if p["type"] == "show":
                 p["data"].show()
                 
             elif p["type"] == "raw":
+            
                 plot = p["data"].plot(show = False, scalings = 'auto')
                 plot.show()
                 

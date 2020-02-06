@@ -21,5 +21,6 @@ Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/
 ```
 - Python 3
 - PyQt5
+- QtWebEngineWidgets
 - Blinker
 ```

@@ -5,6 +5,7 @@ from extensions.GenGraph import generateGraph
 import sys, os, textwrap
 from blinker import signal
 
+
 import subprocess
 
 version = "1.0.0"
@@ -28,7 +29,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         
     def loadToolkitSettings(self):
     
-        file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "toolkits\\toolkitConfig.json")
+        file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "toolkits", "toolkitConfig.json")
         if os.path.exists(file):
             self.nodz.toolkitUI.loadToolkitSettings()
         else:

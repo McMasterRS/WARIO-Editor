@@ -16,7 +16,7 @@ from extensions.GlobalUI import GlobalUI
 from extensions.HelpUI import HelpUI
 from extensions.ToolkitUI import ToolkitUI
 
-defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.\\config.json')
+defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
 
 class Nodz(QtWidgets.QGraphicsView):
 
@@ -605,7 +605,7 @@ class Nodz(QtWidgets.QGraphicsView):
 
         """
         self.config = utils._loadConfig(filePath)
-        customFile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..\\toolkits\custom.json")
+        customFile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "toolkits", "custom.json")
         custom = utils._loadConfig(customFile)
         self.config['node_types'] = custom['node_types']
 
@@ -639,7 +639,7 @@ class Nodz(QtWidgets.QGraphicsView):
         self.loadConfig(defaultConfigPath)
         
         for tb in self.toolkits:
-            path = os.path.normpath(self.toolkitUI.toolkitPaths[tb] + "\config.json")
+            path = os.path.normpath(os.path.join(self.toolkitUI.toolkitPaths[tb], "config.json"))
             cfg = utils._loadConfig(path)
             _types = cfg['node_types']
             types = {}
@@ -725,7 +725,7 @@ class Nodz(QtWidgets.QGraphicsView):
         tkPath = ""
         if "settingsFile" in settings.keys():
             if toolkit != "custom":
-                tkPath = os.path.normpath(self.toolkitUI.toolkitPaths[toolkit] + "/" + settings["settingsFile"] + ".py")
+                tkPath = os.path.normpath(os.path.join(self.toolkitUI.toolkitPaths[toolkit], settings["settingsFile"] + ".py"))
             else:
                 tkPath = os.path.normpath(settings["settingsFile"])
 

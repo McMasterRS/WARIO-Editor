@@ -29,7 +29,7 @@ class HelpUI(QtWidgets.QWidget):
         
         self.toolkitList = []
         
-        self.buildTab(os.path.dirname(os.path.realpath(__file__)) + "/../docs/_build/html", "WARIO")
+        self.buildTab(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "docs","_build", "html"), "WARIO")
         
     
     def buildTab(self, path, toolkit = None):
@@ -40,7 +40,7 @@ class HelpUI(QtWidgets.QWidget):
         
         tabWebView = QtWebEngineWidgets.QWebEngineView()
         tabLayout.addWidget(tabWebView)
-        tabWebView.setUrl(QtCore.QUrl.fromLocalFile(os.path.abspath(path + "/index.html")))
+        tabWebView.setUrl(QtCore.QUrl.fromLocalFile(os.path.join(path, "index.html")))
         self.tabs.addTab(tab, toolkit)
         
     def buildToolkitHelp(self):

@@ -53,10 +53,10 @@ class ToolkitUI(QtWidgets.QWidget):
         
     # Show prompt to load toolkit and add to table
     def loadToolkit(self):
-        path = os.path.normpath(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
+        path = os.path.abspath(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         if (path is not ''):
-            if os.path.exists(os.path.normpath(path + "/config.json")):
-                data = utils._loadData(os.path.normpath(path + "/config.json"))     
+            if os.path.exists(os.path.join(path,"config.json")):
+                data = utils._loadData(os.path.join(path, "config.json"))     
                 
                 # Data Validation
                 if "name" not in data.keys():
@@ -124,7 +124,7 @@ class ToolkitUI(QtWidgets.QWidget):
         
     # If a settings json exists, loads it and sets up the table
     def loadToolkitSettings(self):
-        tksFile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..\\toolkits\\toolkitConfig.json")
+        tksFile = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "toolkits", "toolkitConfig.json")
         tks = utils._loadData(tksFile)
         for tk in tks:
             self.addRow(tks[tk]["name"], tks[tk]["path"], tks[tk]["show"])
@@ -134,7 +134,7 @@ class ToolkitUI(QtWidgets.QWidget):
         
     # Generates the initial json file based on the toolkits available in the WARIO root folder
     def genSettings(self):
-        base = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../toolkits"))
+        base = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "toolkits"))
         for root, directories, files in os.walk(base):
             for dir in directories:
                 if dir != "__pycache__":
@@ -191,7 +191,7 @@ class ToolkitUI(QtWidgets.QWidget):
         self.parent.helpUI.buildToolkitHelp()
         
         # Save the config file
-        filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..\\toolkits\\toolkitConfig.json")
+        filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "toolkits", "toolkitConfig.json")
         utils._saveData(filePath=filepath, data=data)
         
     
