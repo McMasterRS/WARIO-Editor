@@ -218,7 +218,7 @@
             },
             "settings" : {}
         },
-        "4 Bit Print" : {
+        "4 Bit Output" : {
             "preset" : "node_default",
             "file" : "printNode.py",
             "alternate" : true,
@@ -256,7 +256,7 @@
             },
             "settings" : {}    
         },
-        "2 Bit Print" : {
+        "2 Bit Output" : {
             "preset" : "node_default",
             "file" : "printNode.py",
             "alternate" : true,

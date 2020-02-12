@@ -1,4 +1,4 @@
-from pipeline.Node import Node
+from wario import Node
 
 class intAdder(Node):
     def __init__(self, name, params):

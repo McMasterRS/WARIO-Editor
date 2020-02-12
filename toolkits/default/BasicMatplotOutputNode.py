@@ -1,4 +1,4 @@
-from pipeline.Node import Node
+from wario import Node
 import matplotlib.pyplot as plt
 
 class BasicMatplotOutputNode(Node):

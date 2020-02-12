@@ -1,5 +1,4 @@
-from pipeline.Node import Node
-
+from wario import Node
 import csv
 
 class importCSV(Node):
