@@ -8,16 +8,14 @@ from blinker import signal
 import sys, os, shutil
 import pickle
 
-import matplotlib.pyplot as plt
-import matplotlib.image as pltimg
 import matplotlib
 matplotlib.use('Qt5Agg')
-from matplotlib.backends.backend_qt5agg import FigureCanvas     
+import matplotlib.pyplot as plt
 
 import mne
 import numpy as np
 
-from extensions.WalkTree import WalkTree
+from extensions.WalkTree import WalkTree, TreeItem
 
 #############################################
 ## Currently designed to go with the EEG   ##
@@ -30,11 +28,8 @@ def runPipeline(file):
     threadhandler.show()
     threadhandler.startPipeline(file)
     
-    
-class TreeItem(QtWidgets.QTreeWidgetItem):
-    def __init__(self, parent, name, file):
-        super(TreeItem, self).__init__(parent, name)
-        self.file = file
+def getIcon(str):
+    return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
 
 class ThreadHandler(QtWidgets.QWidget):
     pipelineComplete = pyqtSignal(bool)
@@ -48,25 +43,22 @@ class ThreadHandler(QtWidgets.QWidget):
         self.pipelineComplete.connect(self.showPlots) 
         
         uic.loadUi('eegWindow.ui', self)
+        self.treeWidget.itemClicked.connect(self.showPlot)
         self.treeItem = {}
-        
-        #self.layout = QtWidgets.QFormLayout()
-        #lb = QtWidgets.QLabel("Pipeline Status")
-        self.lbStatus = QtWidgets.QLabel("")
-        #self.layout.addRow(lb, self.lbStatus)
-        
-        #self.setLayout(self.layout)
+        self.walk = {}
+        self.currentPlot = None
         
     def startPipeline(self, file):
     
         self.thread = PipelineThread(file)
-        walk = WalkTree(file)
-        
+        self.walk = WalkTree(file)
+        self.treeWidget.clear()
+
         # Build temporary files
         if os.path.exists("./wariotmp"):
             shutil.rmtree("./wariotmp/")
         
-        os.makedirs("./wariotmp/plots/")
+        os.makedirs("./wariotmp")
     
         self.thread.file = file
         self.lbStatus.setText("Running")
@@ -88,48 +80,80 @@ class ThreadHandler(QtWidgets.QWidget):
         self.lbStatus.setText("Complete")
         self.updatePalette("#00FF00")
         self.pipelineComplete.emit(True)
-
-    def showPlots(self, val):
+    
+    def showPlot(self, item, column):
         
-        # Show the plots
-        for f in os.listdir("./wariotmp/plots/"): 
-            p = pickle.load(open("./wariotmp/plots/" + f, 'rb'))
-            self.treeItem[p["ID"]] = TreeItem(self.treeWidget, [p["name"]], f)
-            self.treeWidget.addTopLevelItem(self.treeItem[p["ID"]])
-            if p["type"] == "show":
-                p["data"].show()
-                
-            elif p["type"] == "raw":
+        if item.file is None:
+            return
             
-                plot = p["data"].plot(show = False, scalings = 'auto')
-                plot.show()
-                
-            elif p["type"] == "sources":
-                plot = p["ica"].plot_sources(p["data"], show = False)
-                plot.show()
-                
-            elif p["type"] == "customTimes":
-                evoked = p["data"]
-                max = evoked.times[-1]
-                chName, latency, amplitude = evoked.get_peak(return_amplitude = True)
-                fig = evoked.plot_joint(title = "Event ID {0}".format(evoked.comment),
-                      times=np.arange(max / 10.0, max, max / 10.0), show = False)
-                fig.show()
-                              
-            elif p["type"] == "localPeak":
-                evoked = p["data"]
-                chName, latency, amplitude = evoked.get_peak(return_amplitude = True)
-                fig = evoked.plot_joint(title = "Local Peaks for event ID {0}".format(evoked.comment), show = False)
-                fig.show()
-                
-            elif p["type"] == "peak":
-                evoked = p["data"]
-                chName, latency, amplitude = evoked.get_peak(return_amplitude = True)
-                fig = evoked.plot_joint(title = "Peak for event ID {0}".format(evoked.comment), times=latency, show = False)
-                fig.show()
+        f = pickle.load(open(item.file, 'rb'))
+        
+        if self.currentPlot is not None:
+            plt.close('all')
             
-        # Clean up temp files
-        shutil.rmtree("./wariotmp/")
+        if f["type"] == "show":
+            self.currentPlot = f["data"]
+            self.currentPlot.show()
+        elif f["type"] == "showMulti":
+            for d in f["data"]:
+                d.show()
+            self.currentPlot = f["data"]
+        elif f["type"] == "raw":
+            self.currentPlot = f["data"].plot(show = False, scalings = 'auto')
+            self.currentPlot.set_size_inches(8, 6)
+            self.currentPlot.show()
+        elif f["type"] == "sources":
+            self.currentPlot = f["ica"].plot_sources(f["data"], show = False)
+            self.currentPlot.show()
+        elif f["type"] == "customTimes":
+            evoked = f["data"]
+            max = evoked.times[-1]
+            chName, latency, amplitude = evoked.get_peak(return_amplitude = True)
+            self.currentPlot = evoked.plot_joint(title = "Event ID {0}".format(evoked.comment),
+                  times=np.arange(max / 10.0, max, max / 10.0), show = False)
+            self.currentPlot.show()             
+        elif f["type"] == "localPeak":
+            evoked = f["data"]
+            chName, latency, amplitude = evoked.get_peak(return_amplitude = True)
+            self.currentPlot = evoked.plot_joint(title = "Local Peaks for event ID {0}".format(evoked.comment), show = False)
+            self.currentPlot.show()
+            
+        elif f["type"] == "peak":
+            evoked = f["data"]
+            chName, latency, amplitude = evoked.get_peak(return_amplitude = True)
+            self.currentPlot = evoked.plot_joint(title = "Peak for event ID {0}".format(evoked.comment), times=latency, show = False)
+            self.currentPlot.show()
+                
+    def showPlots(self, val):
+
+        # Walk through the tree and build the base layout for each output
+        for root, directories, files in os.walk(os.path.join(".", "wariotmp")):
+            for dir in directories:
+                dirRoot = TreeItem(self.treeWidget, [dir], None)
+                self.treeItem[dir] = self.walk.buildWidget(dirRoot)
+        
+                # Add the plots for each output
+                for f in os.listdir(os.path.join(".", "wariotmp", dir)): 
+                    splitName = f.split(".")
+                    node = splitName[0]
+                    if len(splitName) == 1:
+                        self.treeItem[dir][node].file = os.path.join(".", "wariotmp", dir, f)
+                        self.treeItem[dir][node].setIcon(0, getIcon("SP_FileDialogContentsView"))
+                    else:
+                        self.treeItem[dir][f] = TreeItem(self.treeItem[dir][node], [splitName[1]], None)
+                        self.treeItem[dir][f].file = os.path.join(".", "wariotmp", dir, f)
+                        self.treeItem[dir][f].setIcon(0, getIcon("SP_FileDialogContentsView"))
+            
+        for f in os.listdir(os.path.join(".", "wariotmp")): 
+            if os.path.isdir(os.path.join(".", "wariotmp", f)):
+                continue
+                
+            if "bulk" not in self.treeItem.keys():
+                self.treeItem["bulk"] = TreeItem(self.treeWidget, ["Bulk Results"], None)
+                
+            item = TreeItem(self.treeItem["bulk"], [f], None)
+            item.file = os.path.join(".", "wariotmp", f)
+            item.setIcon(0, getIcon("SP_FileDialogContentsView"))
 
 if __name__ == "__main__":
 

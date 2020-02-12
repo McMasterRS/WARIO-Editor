@@ -1,19 +1,29 @@
 import json
+from PyQt5 import QtWidgets
+
+class TreeItem(QtWidgets.QTreeWidgetItem):
+    def __init__(self, parent, name, file):
+        super(TreeItem, self).__init__(parent, name)
+        self.file = file
 
 class WalkTree():
     def __init__(self, data):
     
-        self.nodes = []
+        self.nodes = {}
         self.connections = []
         self.tree = {}
+        self.maxDepth = 0
         
         with open(data, 'r') as f:
             # load data
             data = json.load(f) 
             if "NODES" in data:
-                self.nodes = list(data["NODES"].keys())
+                nodeKeys = list(data["NODES"].keys())
+                for key in nodeKeys:
+                    self.nodes[key] = data["NODES"][key]["name"]
+                
             
-            # trims attribute names off connections
+            # trim attribute names off connections
             if "CONNECTIONS" in data:
                 self.connections = [[c.split(".")[0] for c in conn] for conn in data["CONNECTIONS"]]
 
@@ -37,4 +47,21 @@ class WalkTree():
             
         for con in self.connections:
             if con[0] == node:
+                if depth + 1 > self.maxDepth:
+                    self.maxDepth = depth + 1
                 self.walkTree(con[1], node, depth + 1)
+                
+    def buildWidget(self, widget):
+        itemList = {}
+        for i in range(0, self.maxDepth+1):
+            for node in self.tree:
+                if self.tree[node]["depth"] == i:
+                
+                    if i == 0:
+                        parent = widget
+                    else:
+                        parent = itemList[self.tree[node]["parent"]]
+                        
+                    itemList[node] = TreeItem(parent, [self.nodes[node]], None)
+                    
+        return itemList

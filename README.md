@@ -24,3 +24,7 @@ Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/
 - QtWebEngineWidgets
 - Blinker
 ```
+
+REQUIRES THE USE OF THE TEST WARIO LIBRARY
+To install, use the command
+``` python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps wario
