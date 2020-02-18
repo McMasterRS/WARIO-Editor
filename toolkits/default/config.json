@@ -2,14 +2,6 @@
     "name" : "default",
     "docs" : "",
     "global_variables" : {
-        "Test" : {
-            "toolkit" : "default",
-            "file": "test.py",
-            "class": "GlobalTextbox",
-            "type"  : "String",
-            "value" : "./",
-            "const" : false
-        }
     },
 
     "node_types":{

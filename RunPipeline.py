@@ -7,12 +7,6 @@ from PyQt5 import uic
 from blinker import signal
 import sys, os, shutil
 
-#############################################
-## Currently designed to go with the EEG   ##
-## toolkit. Will replace with generic      ##
-## version once this one is working.       ##
-#############################################
-
 def runPipeline(file):
     threadhandler = ThreadHandler()
     threadhandler.show()

@@ -2,13 +2,13 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import nodz.nodz_main as nodz_main
 from RunPipeline import ThreadHandler
 from extensions.GenGraph import generateGraph
-import sys, os, textwrap
+from extensions.WarioSettings import WarioSettings
+import sys, os, textwrap, importlib
 from blinker import signal
-
 
 import subprocess
 
-version = "1.0.0"
+version = "0.1.0"
 
 def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
@@ -19,7 +19,8 @@ class NodzWindow(QtWidgets.QMainWindow):
         self.nodz = nodz
         self.nodz.parent = self
 
-        self.handler = ThreadHandler()
+        self.handler = []
+        self.settings = WarioSettings()
         
         self.installEventFilter(self)
         
@@ -41,7 +42,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         signal('node complete').connect(self.nodz.completeNodeEvent)
         
     def setupWindow(self):
-        self.setWindowTitle("WARIO")
+        self.setWindowTitle("WARIO Editor")
         self.setCentralWidget(self.nodz)
         self.setWindowIcon(getIcon("SP_TitleBarMenuButton"))
         self.setStyleSheet("""QMenuBar {
@@ -83,11 +84,12 @@ class NodzWindow(QtWidgets.QMainWindow):
     def clearGraph(self):
         self.nodz.clearGraph()
         self.nodz.currentFileName = ""
+        self.setWindowTitle("WARIO Editor")
         
     def saveFile(self):
         self.nodz.saveGraphDialog()
         if self.nodz.currentFileName != "":
-            self.setWindowTitle("WARIO - " + self.nodz.currentFileName)
+            self.setWindowTitle("WARIO Editor - " + self.nodz.currentFileName)
             
     def loadFile(self):
         self.nodz.loadGraphDialog()
@@ -100,7 +102,7 @@ class NodzWindow(QtWidgets.QMainWindow):
                 else:
                     tk.setChecked(False)
                     
-                self.setWindowTitle("WARIO Designer - " + self.nodz.currentFileName)
+                self.setWindowTitle("WARIO Editor - " + self.nodz.currentFileName)
                 
     def saveRunFile(self):
         if self.nodz.currentFileName != "":
@@ -112,9 +114,17 @@ class NodzWindow(QtWidgets.QMainWindow):
                 self.loadFile()
                 
         if self.nodz.currentFileName != "":
-            
-            self.handler.show()
-            self.handler.startPipeline(self.nodz.currentFileName)
+            if self.settings.rbDefault.isChecked():
+                self.handler = ThreadHandler()
+                self.handler.show()
+                self.handler.startPipeline(self.nodz.currentFileName)
+            else:
+                spec = importlib.util.spec_from_file_location("handler", self.settings.tbDisplay.text())
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                cls = getattr(mod, "getHandler")
+                self.handler = cls(self.nodz.currentFileName)
+
             
     def plotGraph(self):
         if self.nodz.currentFileName == "":
@@ -171,12 +181,21 @@ class NodzWindow(QtWidgets.QMainWindow):
     
     def buildEditMenu(self):
     
-        globalAct = QtWidgets.QAction(getIcon('SP_ComputerIcon'), "&Global Settings", self)
+        globalAct = QtWidgets.QAction(getIcon('SP_ComputerIcon'), "&Global Variables", self)
         globalAct.setShortcut("Ctrl+G")
-        globalAct.setStatusTip("Open global settings window")   
+        globalAct.setStatusTip("Open global variables window")   
         globalAct.triggered.connect(self.nodz.openGlobals)
+        
+        settingsAct = QtWidgets.QAction(getIcon('SP_FileDialogDetailedView'), "WARIO &Settings", self)
+        settingsAct.setShortcut("Ctrl+T")
+        settingsAct.setStatusTip("Open WARIO settings window")
+        settingsAct.triggered.connect(self.openSettings)
 
+        self.editMenu.addAction(settingsAct)
         self.editMenu.addAction(globalAct)
+        
+    def openSettings(self):
+        self.settings.show()
         
     def makeToolkitCall(self, name):
         # Function generator that creates individual function calls for each of the 
@@ -231,7 +250,7 @@ class NodzWindow(QtWidgets.QMainWindow):
             '''.format(version)))
     
     def openRepo(self):
-        url = QtCore.QUrl("https://github.com/McMasterRS/WARIO")
+        url = QtCore.QUrl("https://github.com/McMasterRS/WARIO-Editor")
         if not QtGui.QDesktopServices.openUrl(url):
             QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
             

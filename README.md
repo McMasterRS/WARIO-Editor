@@ -2,7 +2,7 @@
 
 A flowchart based data pipeline development suit with an interface extended from the [Nodz](https://github.com/LeGoffLoic/Nodz) library.
 
-![Wario Example](https://github.com/McMasterRS/WARIO/blob/master/docs/Images/WARIO_example.png)
+![Wario Example](https://github.com/McMasterRS/WARIO-Editor/blob/master/docs/Images/WARIO_example.png)
 
 ## Features
 * Easy to use flowchart system to create and connect nodes
@@ -21,8 +21,10 @@ Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/
 ```
 - Python 3
 - PyQt5
-- QtWebEngineWidgets
+- PyQtWebEngine
 - Blinker
+- Graphviz
+- Wario
 ```
 
 REQUIRES THE USE OF THE TEST WARIO LIBRARY
