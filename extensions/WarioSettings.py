@@ -8,7 +8,7 @@ class WarioSettings(QtWidgets.QWidget):
         self.installEventFilter(self)
 
         uic.loadUi(os.path.join(os.path.dirname(os.path.realpath(__file__)),"WarioSettings.ui"), self)
-        self.file = os.path.join(os.path.dirname(os.path.realpath(__file__)),"..", "config.json")
+        self.file = os.path.join(os.path.dirname(os.path.realpath(__file__)),"..", "editorConfig.json")
         
         self.rbCustom.toggled.connect(self.toggleActive)
         self.btLoadDisplay.clicked.connect(self.loadDisplay)
