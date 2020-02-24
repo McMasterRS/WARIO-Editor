@@ -87,6 +87,12 @@ class NodzWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("WARIO Editor")
         
     def saveFile(self):
+        if self.nodz.currentFileName != "":
+            self.nodz.saveGraph(self.nodz.currentFileName)
+        else:
+            self.saveAsFile()
+        
+    def saveAsFile(self):
         self.nodz.saveGraphDialog()
         if self.nodz.currentFileName != "":
             self.setWindowTitle("WARIO Editor - " + self.nodz.currentFileName)
@@ -105,11 +111,11 @@ class NodzWindow(QtWidgets.QMainWindow):
                 self.setWindowTitle("WARIO Editor - " + self.nodz.currentFileName)
                 
     def saveRunFile(self):
-        if self.nodz.currentFileName != "":
+        if self.nodz.currentFileName != "" and not self.settings.cbSavePrompt.isChecked():
             self.nodz.saveGraph(self.nodz.currentFileName)
         else:
             if len(self.nodz.scene().nodes) != 0:
-                self.saveFile()
+                self.saveAsFile()
             else:
                 self.loadFile()
                 
@@ -149,8 +155,13 @@ class NodzWindow(QtWidgets.QMainWindow):
         saveAct.setStatusTip("Save Flowchart")
         saveAct.triggered.connect(self.saveFile)
         
+        # Save As
+        saveAsAct = QtWidgets.QAction(getIcon('SP_DialogSaveButton'), "Save &As", self)
+        saveAsAct.setStatusTip("Save Flowchart as new file")
+        saveAsAct.triggered.connect(self.saveAsFile)
+        
         # Run
-        saveRunAct = QtWidgets.QAction(getIcon('SP_DriveHDIcon'), "Run", self)
+        saveRunAct = QtWidgets.QAction(getIcon('SP_DriveHDIcon'), "&Run", self)
         saveRunAct.setShortcut("Ctrl+R")
         saveRunAct.setStatusTip("Save flowchart and run")
         saveRunAct.triggered.connect(self.saveRunFile)
@@ -174,6 +185,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         # Link to menu
         self.fileMenu.addAction(clearAct)
         self.fileMenu.addAction(saveAct)  
+        self.fileMenu.addAction(saveAsAct)
         self.fileMenu.addAction(loadAct)
         self.fileMenu.addAction(saveRunAct)
         self.fileMenu.addAction(graphAct)    
@@ -186,9 +198,9 @@ class NodzWindow(QtWidgets.QMainWindow):
         globalAct.setStatusTip("Open global variables window")   
         globalAct.triggered.connect(self.nodz.openGlobals)
         
-        settingsAct = QtWidgets.QAction(getIcon('SP_FileDialogDetailedView'), "WARIO &Settings", self)
-        settingsAct.setShortcut("Ctrl+T")
-        settingsAct.setStatusTip("Open WARIO settings window")
+        settingsAct = QtWidgets.QAction(getIcon('SP_FileDialogDetailedView'), "WARIO &Preferences", self)
+        settingsAct.setShortcut("Ctrl+P")
+        settingsAct.setStatusTip("Open WARIO Preferences Window")
         settingsAct.triggered.connect(self.openSettings)
 
         self.editMenu.addAction(settingsAct)
@@ -230,12 +242,13 @@ class NodzWindow(QtWidgets.QMainWindow):
                 tk.setChecked(False)
                 
         self.toolkitMenu.addAction(self.toolkitAct)
-    
+
     def buildToolkitMenu(self):
     
-        self.toolkitAct = QtWidgets.QAction(getIcon('SP_DirIcon'), "Configure", self)
+        self.toolkitAct = QtWidgets.QAction(getIcon('SP_DirIcon'), "Manage", self)
         self.toolkitAct.triggered.connect(self.nodz.openToolkit)
         self.buildToolkitToggles()
+        
      
     def showAbout(self):
         abt = QtWidgets.QMessageBox.about(self.nodz, "About", 

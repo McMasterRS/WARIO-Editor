@@ -50,6 +50,7 @@ class WarioSettings(QtWidgets.QWidget):
             data = json.load(file)
         
             self.cbThreadless.setChecked(data["threadless"])
+            self.cbSavePrompt.setChecked(data["savePrompt"])
             self.rbDefault.setChecked(data["rbDefault"])
             self.rbCustom.setChecked(data["rbCustom"])
             self.tbDisplay.setText(data["tbDisplay"])
@@ -64,6 +65,7 @@ class WarioSettings(QtWidgets.QWidget):
         data = {}
         
         data["threadless"] = self.cbThreadless.isChecked()
+        data["savePrompt"] = self.cbSavePrompt.isChecked()
         data["rbDefault"] = self.rbDefault.isChecked()
         data["rbCustom"] = self.rbCustom.isChecked()
         data["tbDisplay"] = self.tbDisplay.text()

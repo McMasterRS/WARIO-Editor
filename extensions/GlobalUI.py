@@ -17,7 +17,7 @@ class GlobalUI(QtWidgets.QWidget):
         self.setLayout(self.layout)
         self.resize(700, 300)
         self.setWindowIcon(self.style().standardIcon(getattr(QtWidgets.QStyle,"SP_TitleBarMenuButton")))
-        self.setWindowTitle("Global Settings")
+        self.setWindowTitle("Global Variables")
         
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.installEventFilter(self)

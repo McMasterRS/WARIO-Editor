@@ -8,7 +8,7 @@ When nodes exist in the flowchart window but the flowchart has yet to be saved, 
 
 With the file saved, the file is passed to the pipeline execution code and the output of the code will be displayed in the command prompt used to run WARIO. 
 
-Unless threadless mode is enabled, the pipeline is ran on a seperate thread. This means that you can continue to interact with the flowchart as normal, but changes made will not affect the pipeline run in progress. Threadless mode is used for running pipelines that require matplotlib but dont have any dedicated handler for the plots that can allow them to be shown while running in a seperate thread (e.g. the EEG toolkit)
+Unless threadless mode (currently in development) is enabled, the pipeline is ran on a seperate thread. This means that you can continue to interact with the flowchart as normal, but changes made will not affect the pipeline run in progress. Threadless mode is used for running pipelines that require matplotlib but dont have any dedicated handler for the plots that can allow them to be shown while running in a seperate thread (e.g. the EEG toolkit)
 
 The nodes in the pipeline will change colour to signify their current status based on the following colour key:
 
@@ -33,6 +33,10 @@ To use this file, run the command
 ```bash
     python RunPipeline.py "file\goes\here.json"
 ```
+
+## Selecting A Frontend
+
+The WARIO editor supports custom frontend code and the current frontend can be selected on the Wario Settings window (ctrl+T)
 
 ## Current Pipeline Limitations
 
