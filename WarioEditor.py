@@ -19,7 +19,7 @@ class NodzWindow(QtWidgets.QMainWindow):
         self.nodz = nodz
         self.nodz.parent = self
 
-        self.handler = []
+        self.handler = None
         self.settings = WarioSettings()
         
         self.installEventFilter(self)
@@ -111,6 +111,11 @@ class NodzWindow(QtWidgets.QMainWindow):
                 self.setWindowTitle("WARIO Editor - " + self.nodz.currentFileName)
                 
     def saveRunFile(self):
+        
+        if self.handler is not None:
+            if self.handler.running == True:
+                return
+    
         if self.nodz.currentFileName != "" and not self.settings.cbSavePrompt.isChecked():
             self.nodz.saveGraph(self.nodz.currentFileName)
         else:

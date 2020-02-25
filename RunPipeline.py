@@ -18,6 +18,8 @@ class ThreadHandler(QtWidgets.QWidget):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
         
+        self.running = False
+        
         # Pipeline running variables
         signal("end").connect(self.finishRun)
         signal("crash").connect(self.updateCrash)
@@ -42,6 +44,8 @@ class ThreadHandler(QtWidgets.QWidget):
         self.thread.file = file
         self.lbStatus.setText("Running")
         self.updatePalette("#0000FF")
+        
+        self.running = True
         self.thread.start()
     
     def updatePalette(self, color):
@@ -52,12 +56,14 @@ class ThreadHandler(QtWidgets.QWidget):
     def updateCrash(self, sender):
         self.lbStatus.setText("Crash - See terminal")
         self.updatePalette("#FF0000")
+        self.running = False
         
     # Swap from Blinker signal to PyQt5 signal to preserve
     # plots after thread dies.
     def finishRun(self, sender):
         self.lbStatus.setText("Complete")
         self.updatePalette("#00FF00")
+        self.running = False
         self.pipelineComplete.emit(True)
     
 if __name__ == "__main__":
