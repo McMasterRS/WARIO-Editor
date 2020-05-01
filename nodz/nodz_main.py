@@ -128,42 +128,43 @@ class Nodz(QtWidgets.QGraphicsView):
 
             self.currentState = 'MENU'
             menu = QtWidgets.QMenu(self)
+            # Category menu - 2D dict that has all categories for all toolkits
             catMenu = dict()
-            tbMenu = dict()
+            # Toolkit menu
+            tkMenu = dict()
 
             nodeTypes = self.config['node_types']
-            nodeAttr = dict()
             nodeCat = dict()
-            nodeTb = dict()
+            nodeTk = dict()
             
             # Loop through nodes currently loaded
             for nt in nodeTypes:
-                nodeTb[nt] = self.config['node_types'][nt]['toolkit']
-                nodeAttr[nt] = self.config['node_types'][nt]
+                # Set the toolkit for that node
+                nodeTk[nt] = self.config['node_types'][nt]['toolkit']
                 
                 # Custom added at the end so can skip for now
                 if nt == "Custom":
                     continue
                     
                 # If toolkit doesnt exist in menu, add it
-                if nodeTb[nt] not in tbMenu:
-                    if nodeTb[nt] == "":
-                        nodeTb[nt] = "Other"
-                    tbMenu[nodeTb[nt]] = menu.addMenu(nodeTb[nt])
-                    catMenu[nodeTb[nt]] = dict()
+                if nodeTk[nt] not in tkMenu:
+                    if nodeTk[nt] == "":
+                        nodeTk[nt] = "Other"
+                    tkMenu[nodeTk[nt]] = menu.addMenu(nodeTk[nt])
+                    catMenu[nodeTk[nt]] = dict()
                     
                 # If category doesnt exist in toolkit, add it
                 nodeCat[nt] = self.config['node_types'][nt]['category']
-                if nodeCat[nt] not in catMenu[nodeTb[nt]]:
+                if nodeCat[nt] not in catMenu[nodeTk[nt]]:
                     if nodeCat[nt] == "":
                         nodeCat[nt] = "Other"
-                    catMenu[nodeTb[nt]][nodeCat[nt]] = tbMenu[nodeTb[nt]].addMenu(nodeCat[nt])
+                    catMenu[nodeTk[nt]][nodeCat[nt]] = tkMenu[nodeTk[nt]].addMenu(nodeCat[nt])
                     
                 # Trim the name from the key by removing the toolkit appended at the start
-                name = nt[len(nodeTb[nt]):]
+                name = nt[len(nodeTk[nt]):]
                 
                 # Add node to menu
-                action = catMenu[nodeTb[nt]][nodeCat[nt]].addAction(name, functools.partial(self.newNode,name=name,attrs=nodeAttr[nt],position=self.mapToScene(event.pos()),settings=self.config['node_types'][nt]["settings"], type=nt, toolkit=nodeTb[nt]))
+                action = catMenu[nodeTk[nt]][nodeCat[nt]].addAction(name, functools.partial(self.newNode,name=name,attrs=self.config['node_types'][nt],position=self.mapToScene(event.pos()),settings=self.config['node_types'][nt]["settings"], type=nt, toolkit=nodeTk[nt]))
                 
             # Add custom node
             menu.addAction('Custom', functools.partial(self.newNode,name='Custom',attrs=self.config['node_types']['Custom'],position=self.mapToScene(event.pos()),settings=self.config['node_types']['Custom']["settings"], type='Custom', toolkit='custom'))
@@ -383,6 +384,7 @@ class Nodz(QtWidgets.QGraphicsView):
         if event.key() in self.pressedKeys:
             self.pressedKeys.remove(event.key())
 
+    # Sets node colours to the "Unrun" state (default red)
     def initializeNodeEvent(self, sender):
         nodes = self.scene().nodes.keys()
         for n in nodes:
@@ -391,6 +393,7 @@ class Nodz(QtWidgets.QGraphicsView):
             node._createStyle(self.scene().views()[0].config)
             node.update()
 
+    # Sets the currently active node's colours (default blue)
     def activateNodeEvent(self, sender, **kw):
         nodeID = kw["name"]
         nodes = self.scene().nodes.keys()
@@ -402,6 +405,7 @@ class Nodz(QtWidgets.QGraphicsView):
                 node._createStyle(self.scene().views()[0].config)
                 node.update()
         
+    # Set a completed node's colours (default green)
     def completeNodeEvent(self, sender, **kw):
         nodeID = kw["name"]
         nodes = self.scene().nodes.keys()
@@ -543,6 +547,9 @@ class Nodz(QtWidgets.QGraphicsView):
             if newNode.type == "Custom":
                newNode.settings.initCustom()
     
+    # Event activated when you try and close the program. 
+    # If you have active nodes, it prompts you to save.
+    # TODO - add state check so it only prompts when edits are made
     def checkClose(self):
         if len(self.scene().nodes) > 0:
             msg = QtWidgets.QMessageBox()
@@ -551,14 +558,18 @@ class Nodz(QtWidgets.QGraphicsView):
             msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Close | QtWidgets.QMessageBox.Cancel)
             
             ret = msg.exec_()
-
+            
+            # save
             if ret == 2048:
                 self.saveGraphDialog()
+            # Cancel
             elif ret == 4194304:
                 return
-            
+    
         sys.exit()
-        
+     
+    # Checks all nodes to see if a toolkit is in use
+    # Makes it so that you cant disable a toolkit if nodes that use it exist
     def checkToolkitInUse(self, toolkit):
         nodes = self.scene().nodes.keys()
         for node in nodes:  
@@ -567,6 +578,7 @@ class Nodz(QtWidgets.QGraphicsView):
                 
         return False
         
+    # Open the settings UIs
     def openToolkit(self):
         self.toolkitUI.show()
         self.toolkitUI.activateWindow()
@@ -579,11 +591,15 @@ class Nodz(QtWidgets.QGraphicsView):
         self.globalUI.show()
         self.globalUI.activateWindow()
         
+    # Loop through all nodes and update their global variables
+    # TODO - replace this with a signal
     def updateGlobals(self, globals):
         self.globals = globals
         for node in self.scene().nodes:
             n = self.scene().nodes[node]
             n.settingsWindow.updateGlobals(globals)
+            
+            # Used to update the contents of the Set Global and Get Global nodes' settings windows
             if n.type == "Set Global" or n.type == "Get Global":
                 for i in range(0, n.settingsWindow.layout.rowCount()):
                     widget = n.settingsWindow.layout.itemAt(i, 1).widget()
@@ -619,6 +635,8 @@ class Nodz(QtWidgets.QGraphicsView):
             return
             
         nodes = self.scene().nodes.keys()
+        
+        # Checks if nodes are using the toolkit to be removed
         for node in nodes:  
             if self.scene().nodes[node].toolkit == name and state == False:
                 QtWidgets.QMessageBox.critical(self, "WARNING", "Cannot remove toolkit in use")
@@ -636,15 +654,16 @@ class Nodz(QtWidgets.QGraphicsView):
         # Globals from the config will be made uneditable as a part of addAutoRow
         self.globalUI.setRowsEditable()
       
+        # Load default config
         self.loadConfig(defaultConfigPath)
         
+        # Loop through toolkits and adds them to the node type list
         for tb in self.toolkits:
             path = os.path.normpath(os.path.join(self.toolkitUI.toolkitPaths[tb], "config.json"))
             cfg = utils._loadConfig(path)
             _types = cfg['node_types']
             types = {}
-            # Rename the types for all nodes to include toolkit
-            # This avoids duplication
+            # Rename the types for all nodes to include toolkit. This avoids duplication
             for key, type in _types.items():
                 type["toolkit"] = tb
                 # Load default preset if one not stated
@@ -1103,6 +1122,7 @@ class Nodz(QtWidgets.QGraphicsView):
             
         return node
 
+    # Shows prompt to load a flowchart
     def loadGraphDialog(self):
         dialog = QtWidgets.QFileDialog.getOpenFileName(directory='.', filter="JSON files (*.json)")
         if (dialog[0] != ''):
@@ -1110,6 +1130,7 @@ class Nodz(QtWidgets.QGraphicsView):
                 return
             self.loadGraph(filePath=dialog[0])
 
+    # Shows a prompt to save a flowchart
     def saveGraphDialog(self):
         dialog = QtWidgets.QFileDialog.getSaveFileName(directory='.', filter="JSON files (*.json)")
         if (dialog != ''):

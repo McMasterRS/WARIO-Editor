@@ -10,16 +10,22 @@ import subprocess
 
 version = "0.1.0"
 
+# Returns an icon from a given Qt icon code
 def getIcon(str):
     return QtWidgets.QWidget().style().standardIcon(getattr(QtWidgets.QStyle,str))
     
-class NodzWindow(QtWidgets.QMainWindow):
+# Primary WARIO window
+class WarioWindow(QtWidgets.QMainWindow):
     def __init__(self, nodz):
         QtWidgets.QMainWindow.__init__(self)
+        # Initialize the Nodz based UI
         self.nodz = nodz
         self.nodz.parent = self
 
+        # Runtime window to be used when running pipelines
         self.handler = None
+        
+        # WARIO specific settings window
         self.settings = WarioSettings()
         
         self.installEventFilter(self)
@@ -28,20 +34,27 @@ class NodzWindow(QtWidgets.QMainWindow):
         self.setupSignals()
         self.loadToolkitSettings()  
         
+    # Loads the existing toolkits into the interface
     def loadToolkitSettings(self):
-    
+        
+        # Config file path
         file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "toolkits", "toolkitConfig.json")
+        
+        # If it doesnt exist, create one with whatever toolkits are in the toolkit folder
         if os.path.exists(file):
             self.nodz.toolkitUI.loadToolkitSettings()
         else:
             self.nodz.toolkitUI.genSettings()
         
+    # Connects signals for highlighting nodes during runtime
     def setupSignals(self):
         signal('start').connect(self.nodz.initializeNodeEvent)
         signal('node start').connect(self.nodz.activateNodeEvent)
         signal('node complete').connect(self.nodz.completeNodeEvent)
         
+    # Set up the interface
     def setupWindow(self):
+        # Set the top bar/menu bar settings
         self.setWindowTitle("WARIO Editor")
         self.setCentralWidget(self.nodz)
         self.setWindowIcon(getIcon("SP_TitleBarMenuButton"))
@@ -70,33 +83,40 @@ class NodzWindow(QtWidgets.QMainWindow):
                 background-color: rgb(30,30,30);
             }""")
             
+        # Build the menu bar
         self.menu = self.menuBar()
         self.fileMenu = self.menu.addMenu('&File')
         self.editMenu = self.menu.addMenu('&Edit')
         self.toolkitMenu = self.menu.addMenu("&Toolkits")
         self.helpMenu = self.menu.addMenu('&Help')
         
+        # Populate the menu bar
         self.buildFileMenu()
         self.buildEditMenu()
         self.buildToolkitMenu()
         self.buildHelpMenu()
         
+    # Delete all existing nodes in the pipeline
     def clearGraph(self):
         self.nodz.clearGraph()
         self.nodz.currentFileName = ""
         self.setWindowTitle("WARIO Editor")
-        
+       
+   # Save the pipeline
     def saveFile(self):
+        # if a filename has already been set, dont show prompt
         if self.nodz.currentFileName != "":
             self.nodz.saveGraph(self.nodz.currentFileName)
         else:
             self.saveAsFile()
         
+    # Save As
     def saveAsFile(self):
         self.nodz.saveGraphDialog()
         if self.nodz.currentFileName != "":
             self.setWindowTitle("WARIO Editor - " + self.nodz.currentFileName)
             
+    # Load
     def loadFile(self):
         self.nodz.loadGraphDialog()
         if self.nodz.currentFileName != "":
@@ -110,12 +130,16 @@ class NodzWindow(QtWidgets.QMainWindow):
                     
                 self.setWindowTitle("WARIO Editor - " + self.nodz.currentFileName)
                 
+    # Save the file and run as a pipeline
     def saveRunFile(self):
         
+        # Check if the pipeline is already running
         if self.handler is not None:
             if self.handler.running == True:
                 return
     
+        # If the pipeline hasnt been saved, prompt the save window
+        # If there are no nodes, prompt the load window
         if self.nodz.currentFileName != "" and not self.settings.cbSavePrompt.isChecked():
             self.nodz.saveGraph(self.nodz.currentFileName)
         else:
@@ -124,11 +148,14 @@ class NodzWindow(QtWidgets.QMainWindow):
             else:
                 self.loadFile()
                 
+        # Double check that a file was selected/saved (stops run if cancel is hit)
         if self.nodz.currentFileName != "":
+            # Run the default thread handler
             if self.settings.rbDefault.isChecked():
                 self.handler = ThreadHandler()
                 self.handler.show()
                 self.handler.startPipeline(self.nodz.currentFileName)
+            # Import and run the custom thread handler defined in the settings window
             else:
                 spec = importlib.util.spec_from_file_location("handler", self.settings.tbDisplay.text())
                 mod = importlib.util.module_from_spec(spec)
@@ -136,11 +163,14 @@ class NodzWindow(QtWidgets.QMainWindow):
                 cls = getattr(mod, "getHandler")
                 self.handler = cls(self.nodz.currentFileName)
 
-            
+    # Plots a directed graph of the pipeline
     def plotGraph(self):
+        # If no file is loaded, prompt to load
+        # FIXME - check if nodes in the window and prompt to save if so
         if self.nodz.currentFileName == "":
             self.loadFile()
             
+        # If a file is selected, run code in extensions/genGraph to create plot
         if self.nodz.currentFileName != "":
             dialog = QtWidgets.QFileDialog.getSaveFileName(caption = "Graph Save Location",directory='.', filter="PDF files (*.pdf)")
             if (dialog[0] != ''):
@@ -198,11 +228,13 @@ class NodzWindow(QtWidgets.QMainWindow):
     
     def buildEditMenu(self):
     
+        # Show global variables window
         globalAct = QtWidgets.QAction(getIcon('SP_ComputerIcon'), "&Global Variables", self)
         globalAct.setShortcut("Ctrl+G")
         globalAct.setStatusTip("Open global variables window")   
         globalAct.triggered.connect(self.nodz.openGlobals)
         
+        # Show WARIO settings window
         settingsAct = QtWidgets.QAction(getIcon('SP_FileDialogDetailedView'), "WARIO &Preferences", self)
         settingsAct.setShortcut("Ctrl+P")
         settingsAct.setStatusTip("Open WARIO Preferences Window")
@@ -214,9 +246,10 @@ class NodzWindow(QtWidgets.QMainWindow):
     def openSettings(self):
         self.settings.show()
         
+        
+    # Function generator that creates individual function calls for each of the 
+    # toolboxes to handle them being enabled/disabled      
     def makeToolkitCall(self, name):
-        # Function generator that creates individual function calls for each of the 
-        # toolboxes to handle them being enabled/disabled
         nodz = self.nodz
         toolkitMenu = self.toolkitMenu
         
@@ -230,6 +263,7 @@ class NodzWindow(QtWidgets.QMainWindow):
                         
         return toolkitCall    
         
+    # Builds the toolkit actions and connects their generated functions
     def buildToolkitToggles(self):
         self.toolkitMenu.clear()
         
@@ -248,6 +282,7 @@ class NodzWindow(QtWidgets.QMainWindow):
                 
         self.toolkitMenu.addAction(self.toolkitAct)
 
+    # Calls the above function and adds the action for the toolkit manager
     def buildToolkitMenu(self):
     
         self.toolkitAct = QtWidgets.QAction(getIcon('SP_DirIcon'), "Manage", self)
@@ -267,11 +302,13 @@ class NodzWindow(QtWidgets.QMainWindow):
             Developed by Ron Harwood, Thomas Mudway and Oliver Cook at the McMaster University Research Software Engineering group 
             '''.format(version)))
     
+    # Opens a link to the WARIO editor repoAct
     def openRepo(self):
         url = QtCore.QUrl("https://github.com/McMasterRS/WARIO-Editor")
         if not QtGui.QDesktopServices.openUrl(url):
             QtGui.QMessageBox.warning(self, 'Open Url', 'Could not open url')
             
+    # Opens the help menu
     def openHelp(self):
         self.nodz.openHelp()
             
@@ -283,10 +320,11 @@ class NodzWindow(QtWidgets.QMainWindow):
         wikiAct = QtWidgets.QAction(getIcon('SP_MessageBoxQuestion'), "&Help", self)
         wikiAct.triggered.connect(self.openHelp)
         
-        #self.helpMenu.addAction(aboutAct)
+        self.helpMenu.addAction(aboutAct)
         self.helpMenu.addAction(repoAct)
         self.helpMenu.addAction(wikiAct)
         
+    # Custom event filter
     def eventFilter(self, object, event):
         # Show save prompt on close
         if event.type() == QtCore.QEvent.Close:
@@ -298,20 +336,18 @@ class NodzWindow(QtWidgets.QMainWindow):
             
         return False
         
-    def pipelineFinished(self):
-        self.runningPipeline = False
     
-def startNodz():
+def startWario():
 
     app = QtWidgets.QApplication([])
 
     nodz = nodz_main.Nodz(None)  
     nodz.initialize()   
 
-    window = NodzWindow(nodz)
+    window = WarioWindow(nodz)
     window.show()
     
     app.exec_()
     
 if __name__ == "__main__":
-    startNodz()
+    startWario()

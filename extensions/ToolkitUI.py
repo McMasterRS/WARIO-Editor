@@ -6,6 +6,7 @@ from wario.CustomWidgets import CentredCellCheckbox, UniqueNameTable
 
 import os
 
+# UI for modifying toolkits, as well as holding toolkit specific info
 class ToolkitUI(QtWidgets.QWidget):
     def __init__(self, parent):
         super(ToolkitUI, self).__init__()
@@ -14,7 +15,7 @@ class ToolkitUI(QtWidgets.QWidget):
         self.setWindowIcon(self.style().standardIcon(getattr(QtWidgets.QStyle,"SP_TitleBarMenuButton")))
         self.setWindowTitle("Toolkit Manager")
         
-        # Array of names and dict of paths
+        # Array of names and dict of paths/docs URL
         self.toolkitNames = []
         self.toolkitPaths = {}
         self.toolkitDocs = {}
@@ -22,6 +23,7 @@ class ToolkitUI(QtWidgets.QWidget):
         self.buildUI()
         self.setLayout(self.layout)
         
+    # Build the UI. Possibly replace with a .ui file to simplify modification
     def buildUI(self):
         self.layout = QtWidgets.QHBoxLayout()
         
@@ -46,13 +48,15 @@ class ToolkitUI(QtWidgets.QWidget):
         
         self.buttonLayout.addWidget(self.btAdd)
         self.buttonLayout.addWidget(self.btRemove)
-       # self.buttonLayout.addWidget(self.btOpen)
+        #self.buttonLayout.addWidget(self.btOpen)
         self.buttonLayout.addItem(vspace)
         
         self.layout.addItem(self.buttonLayout)
         
     # Show prompt to load toolkit and add to table
     def loadToolkit(self):
+    
+        # Need to get the folder that contains the toolkit config file
         path = os.path.abspath(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         if (path is not ''):
             if os.path.exists(os.path.join(path,"config.json")):
@@ -160,7 +164,7 @@ class ToolkitUI(QtWidgets.QWidget):
         QtWidgets.QMessageBox.warning(self, "Warning", "Unable to load file due to missing toolkit: {0}. Please add this toolkit via the toolkit manager to continue".format(toolkit))
         return False
         
-    # Updates the WARIO UI to make sure that the correct rows are showing and save the list
+    # Updates the WARIO UI to make sure that the correct toolkits are showing and save the list
     def reloadToolkits(self):
         self.toolkitNames = []
         data = {}

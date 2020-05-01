@@ -4,7 +4,11 @@ from wario.CustomSettings import *
 import collections
 from PyQt5 import QtWidgets
 
-# Window that displays node settings
+# Window that displays node settings based on JSON information
+# NOTE: THIS IS EFFECTIVELY UNUSED AND ONLY BEING LEFT TO ENSURE COMPATABILITY
+#       UNTIL ALL EXISTING NODES ARE MOVED TO THE NEW SYSTEM (CUSTOM UI WINDOWS)
+#       For this reason, I see little reason to do a second pass on commenting
+
 class SettingsItem(CustomSettings):
 
     def __init__(self, parent, widgets):

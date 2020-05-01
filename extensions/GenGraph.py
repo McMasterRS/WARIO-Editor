@@ -2,6 +2,7 @@ from graphviz import Digraph
 import os, json
 os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 
+# Generates dot graph using the digraph library
 def generateGraph(file_location, save_location):
 
     dot = Digraph()

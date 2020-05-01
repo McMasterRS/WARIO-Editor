@@ -7,14 +7,16 @@ class WarioSettings(QtWidgets.QWidget):
         
         self.installEventFilter(self)
 
+        # Loads UI file and defines file location for saved settings
         uic.loadUi(os.path.join(os.path.dirname(os.path.realpath(__file__)),"WarioSettings.ui"), self)
         self.file = os.path.join(os.path.dirname(os.path.realpath(__file__)),"..", "editorConfig.json")
         
+        # Connect function calls to UI elements
         self.rbCustom.toggled.connect(self.toggleActive)
         self.btLoadDisplay.clicked.connect(self.loadDisplay)
         self.toggleActive(False)
         
-        
+        # Load settings if file exists, otherwise generate new file
         if os.path.exists(self.file):
             self.loadSettings()
         else:
@@ -31,6 +33,8 @@ class WarioSettings(QtWidgets.QWidget):
             
         return False
         
+    # Toggles the custom runtime controls on and off depending on 
+    # the state of the custom radio button
     def toggleActive(self, enabled):
         if enabled:
             self.tbDisplay.setEnabled(True)
@@ -39,11 +43,13 @@ class WarioSettings(QtWidgets.QWidget):
             self.tbDisplay.setEnabled(False)
             self.btLoadDisplay.setEnabled(False)
             
+    # Loads a custom runtime window
     def loadDisplay(self):
         path = QtWidgets.QFileDialog.getOpenFileName(self, "Select Display File", filter = "Python Files (*.py)")[0]
         if path != "":
             self.tbDisplay.setText(path)
             
+    # Loads state of the settings window from file
     def loadSettings(self):
         
         with open(self.file) as file:
@@ -60,6 +66,7 @@ class WarioSettings(QtWidgets.QWidget):
             
         file.close()
         
+    # Collects the current state of the settings window and dumps to file
     def genSettings(self):
         
         data = {}

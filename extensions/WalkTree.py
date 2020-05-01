@@ -6,6 +6,9 @@ class TreeItem(QtWidgets.QTreeWidgetItem):
         super(TreeItem, self).__init__(parent, name)
         self.file = file
 
+# Walks through the nodes in a pipeline starting from the root and generates tree widgets based on these.
+# This allows for developers to create custom UIs that display information for each node post-run while
+# preserving the order that each node is run
 class WalkTree():
     def __init__(self, data):
     
@@ -38,27 +41,32 @@ class WalkTree():
             if root == True:
                 roots.append(node)
         
+        # Walk tree from each root
         for root in roots:
             self.walkTree(root, None, 0)
                     
+    # Walk the tree
     def walkTree(self, node, parent, depth):
+        # Assigns a parent and depth to each node, updating if a higher depth is found
         if node not in self.tree.keys() or self.tree[node]["depth"] < depth:
             self.tree[node] = {"parent" : parent, "depth" : depth}
             
+        # Loops through all connections for that node and walks them
         for con in self.connections:
             if con[0] == node:
                 if depth + 1 > self.maxDepth:
                     self.maxDepth = depth + 1
                 self.walkTree(con[1], node, depth + 1)
                 
-    def buildWidget(self, widget):
+    # builds the tree widget items based on the walked tree
+    def buildWidget(self, root = None):
         itemList = {}
         for i in range(0, self.maxDepth+1):
             for node in self.tree:
                 if self.tree[node]["depth"] == i:
                 
                     if i == 0:
-                        parent = widget
+                        parent = root
                     else:
                         parent = itemList[self.tree[node]["parent"]]
                         
