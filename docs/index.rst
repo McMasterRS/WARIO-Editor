@@ -18,15 +18,19 @@ Features
 Documentation Requirements
 --------------------------
 
+These are required to compile the documentation. All can be pip installed.
+
 * sphinx  
 * sphinx_rtd_theme  
 * sphinx-markdown-tables  
+* recommonmark
 
 .. toctree::
    :hidden: 
    :maxdepth: 2
-   :caption: User Guide
+   :caption: WARIO Editor
    
+   user/installation
    user/userGuide
    user/toolkits
    user/globals

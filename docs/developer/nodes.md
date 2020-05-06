@@ -6,10 +6,10 @@ Custom nodes require two core components to function, the Node class and the Set
 
 ## The Node Class
 
-All custom nodes must inheret from the Node class stored in the Pipeline folder. The name of the node class must match the name of the file it is contained within.
+All custom nodes must inheret from the Node class defined in the WARIO backend library. The name of the node class must match the name of the file containing it.
 
 ```python3
-from pipeline.Node import Node
+from wario.Node import Node
 ```
 
 Each node contains the following functions
@@ -24,15 +24,15 @@ Each node contains the following functions
 
 ### Node I/O
 
-Data passed from child nodes can be accessed in the ```self.args``` class variable in each node but is only accessible during the "process" function call. This data is stored in a dict where the keys match the name of the relevant attribute of the node. 
+Data passed from child nodes can be accessed in the ```self.args``` node class variable but is only accessible during the "process" function call. This data is stored in a dict where the keys match the name of the relevant attribute of the node. 
 
 ``` python3
     data = self.args["Input Data"]
 ```
 
-As there is no verification on the existance of attribute dat (nodes are ran once all *connected* child nodes are complete), you can make certain attributs optional by checking their existance in the list returned from ```self.args.keys()```, as seen in Example 1.
+As there is no validation testing on the existance of attribute data (nodes are ran once all *connected* child nodes are complete), you can make certain attributs optional by checking their existance in the list returned from ```self.args.keys()```, as seen in Example \1.
 
-The "process" function must return a dict of outputs, who's keys match the names of the output attributes. While the attributes are given fixed types for ease of use while building the flowchart, any type of data can be passed using them.
+The "process" function must return a dict of outputs, who's keys match the names of the output attributes. While the attributes are given fixed types to avoid errors when building a pipeline, there is no limitation on what data can be sent through them.
 
 ```python3
     return {"Output Data" : outputData}
@@ -61,7 +61,7 @@ Global variables can be modified as a part of any node's "process" function, but
 
 ## The Settings Class
 
-The settings class works in much the same way as described in the [Custom Settings]() page with one small addition. As the node's attributes arent being pulled from a config file, a dict describing them must be included in the settings class inside the "getAttribs" function. Attributes are defined in the same format as described in [Building Toolkits](). An example of the getAttribs function is shown below
+The settings class works in much the same way as described in the [Custom Settings](settings) page with one small addition. As the node's attributes arent being pulled from a config file, a dict describing them must be included in the settings class inside the "getAttribs" function. Attributes are defined in the same format as described in [Building Toolkits](toolkits). An example of the getAttribs function is shown below
 
 ```python3
 
@@ -86,7 +86,7 @@ The settings class works in much the same way as described in the [Custom Settin
 ### Example 1: List merger with settings
 
 ```python3
-from pipeline.Node import Node
+from wario.Node import Node
 from extensions.customSettings import CustomSettings
 
 from PyQt5 import QtWidgets
@@ -185,7 +185,7 @@ class mergeLists(Node):
 ### Example 2: Batch processing node class
 
 ```python3
-from pipeline.Node import Node
+from wario.Node import Node
 
 class batchAvSignal(Node):
     def __init__(self, name, params):

@@ -7,12 +7,12 @@ Global variables can be accessed by all nodes during pipeline execution. They ar
 
 ![](../Images/globalWindow.png)
 
-The buttons at the bottom can be used to add or remove global variables. Be aware that removing a global variable will remove any connections from nodes using that variable. Each variable has 4 components:
+The buttons at the bottom can be used to add or remove global variables. Be aware that removing a global variable will remove any connections from nodes using that variable. Each variable has \4 components:
 
 * A Unique name
 * The Data type 
 * An input method selector
-* The Data value
+* The value
 * A checkbox to make the variable a constant (un-editable during execution) 
 
 

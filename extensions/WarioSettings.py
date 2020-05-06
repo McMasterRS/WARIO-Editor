@@ -33,6 +33,15 @@ class WarioSettings(QtWidgets.QWidget):
             
         return False
         
+    #def colourSwap(self, colour):
+    #    lbDefault.
+    #    lbOptional.
+    #    lbRejected.
+        
+    #    lbUnfinished.
+    #    lbRunning.
+    #    lbFinished.
+        
     # Toggles the custom runtime controls on and off depending on 
     # the state of the custom radio button
     def toggleActive(self, enabled):

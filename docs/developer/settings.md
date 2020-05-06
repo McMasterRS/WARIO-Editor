@@ -50,11 +50,23 @@ Combined, this gives
         self.setLayout(self.layout)      
 ```
 
+Alternatively, it is possible to import .ui files created in software like QT-Designer. To import a .ui file use the following code
+
+```python3
+	uic.loadUi(os.path.join(os.path.dirname(os.path.realpath(__file__)),"uiFileRelativeToNodeFile.ui"), self)
+```
+
+The os.path commands generate a path to the ui file relative to the node's .py file, allowing you to create settings UIs for custom toolkits. This command assigns all widgets to be children of ```self``` and thus you can access them by referencing the names set in the designer, e.g.
+
+```python3
+self.labelWidget.setText("text to set")
+```
+
 ### 3 - Generating The Settings Output
 
-The final required function is ```genSettings```. This is called when the settings window is closed, loses focus, or the WARIO interface requests all node settings for saving. This function generates two dicts, one for the properties of the settings widgets and the other for the values of the variables used by the code.
+The final required function is ```genSettings```. This is called when the settings window is closed, loses focus, or the WARIO editor saves a file. This function generates two dicts, one for the properties of the settings widgets and the other for the values of the variables used by the code.
 
-The first thing that needs to be stored is the "settingsFile" and "settingsClass" values. These are used when loading a WARIO flowchart to locate the file and class that defines the settings window.
+First, we need to store the "settingsFile" and "settingsClass" values. These are used to locate the file and class that defines the node's settings UI when loading a WARIO pipeline.
 
 ```python3
     def genSettings(self):
@@ -103,7 +115,7 @@ This gives the full ```genSettings``` function as shown below
 
 ### 4 - Handling Loading
 
-Now that there is a system in place for saving the state of the settings window, code must be added to ```buildUI``` to make sure that the widgets are properly updated upon loading a flowchart file. As the function must be able to handle both new and loaded settings windows, each key must be checked before being applied if it is found to exist
+Now that there is a system in place for saving the state of the settings window, code must be added to ```buildUI``` to make sure that the widgets are properly updated upon loading a pipeline. As the function must be able to handle both new and loaded settings windows, we must check if to see if each key exists before applying
 
 ```python3
     def buildUI(self, settings):
@@ -158,7 +170,7 @@ There are several additional functions included in the CustomSettings class that
 
 ### updateGlobals
 
-The ```updateGlobals``` class is used for widgets that require access to the global variable values. This could be used for such things as global file naming or changing widget properties. The base version of this function is defined as follows, with "globals" containing the dict of global variables in the same manner as used in the code (see [Custom Nodes](nodes))
+The ```updateGlobals``` function is used for widgets that require access to the global variable values. This could be used for such things as global file naming or changing widget properties. The base version of this function is defined as follows, with "globals" containing the dict of global variables in the same manner as used in the code (see [Custom Nodes](nodes))
 
 ```python3
     def updateGlobals(self, globals):
@@ -167,13 +179,13 @@ The ```updateGlobals``` class is used for widgets that require access to the glo
 
 ### getAttribs
 
-The ```getAttribs``` function is used exclusively when defining the attributes for nodes to be used by the "Custom Node" flowchart node. See [Custom Nodes](nodes) for more information.
+The ```getAttribs``` function is used exclusively when defining the attributes for nodes to be used by the "Custom Node" pipeline node. See [Custom Nodes](nodes) for more information.
 
 ### eventFilter
 
-The ```eventFilter``` class is an overload of the built in PyQt5 version of the class that runs the ```genSettings``` function when the settings window is either closed or loses focus. This allows for the settings window to directly affect the node's properties such as its name or attributes.
+The ```eventFilter``` function is an overload of the built in PyQt5 version of the function that runs the ```genSettings``` function when the settings window is either closed or loses focus. This allows for the settings window to directly affect the node's properties such as its name or attributes.
 
-The default version of this class is as follows
+The default version of this functionis as follows
 
 ```python3
 

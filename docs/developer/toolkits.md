@@ -82,7 +82,7 @@ Attributes allow for connections to be made between nodes, so long as the attrib
 | :--- | :--- | 
 | connection | Sets the connection type of the attribute. Valid options are "input" or "output |
 | type | The attribute type. Only attributes with matching types can be connected | 
-| preset | OPTIONAL - Sets the visual style of the attribute. Options are given in ./nodz/config.json |
+| preset | OPTIONAL - Sets the attribute's visual style. Options are given in ./nodz/config.json |
 
 
 ### Node Settings
@@ -164,6 +164,6 @@ Combining these parameters gives us the combined config.json file shown here:
 
 ## Documenting Toolkits
 
-Toolkits should come with documentation in HTML format, stored within the toolkit's directory. This documentation is accessable as a tab in the WARIO help window when the toolkit is activated.
+Toolkits should come with documentation in HTML format, stored within the toolkit's directory. This documentation is accessable as a tab in the WARIO editor's help window when the toolkit is activated.
 
-It is recommended to use tools such as [Read The Docs](https://readthedocs.org/) that can host documentation created with libraries like [sphinx](https://www.sphinx-doc.org/en/master/index.html) or [mkdocs](https://www.mkdocs.org/) stored within a github repository. This allows for the creation of synchronized online and offline documentation.
+It is recommended to use tools such as [Read The Docs](https://readthedocs.org/) that can host documentation created with libraries like [sphinx](https://www.sphinx-doc.org/en/master/index.html) or [mkdocs](https://www.mkdocs.org/) stored within a github repository. This allows for the creation of synchronized online and offline documentation, as seen with the WARIO editor.

@@ -1,5 +1,5 @@
-# Using WARIO
-How to interact with the WARIO interface
+# Using The WARIO Editor
+How to interact with the WARIO Editor
 
 ---
 
@@ -21,13 +21,13 @@ How to interact with the WARIO interface
 * Alt+Left click - Drag flowchart
 * Scroll wheel - zoom in/out
 
-All commands marked with a * can also be found in the menu bar
+All commands marked with a \* can also be found in the menu bar
 
 ---
 
 ## Creating New Nodes
 
-To create a new node, right click on the WARIO interface, select a toolbox and category and click the node you wish to create. The node will appear under where the interface was clicked.
+To create a new node, right click on the editor, select a toolbox and category and click the node you wish to create. The node will appear where you right clicked.
 
 ![](../Images/createNewNode.gif)
 

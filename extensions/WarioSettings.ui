@@ -99,7 +99,24 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QComboBox" name="cbColourScheme"/>
+      <widget class="QComboBox" name="cbColourScheme">
+       <property name="currentText">
+        <string>Default</string>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>Default</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Colorblind</string>
+        </property>
+       </item>
+      </widget>
      </item>
     </layout>
    </item>
@@ -119,7 +136,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="lbDefault">
        <property name="text">
         <string>Default </string>
        </property>
@@ -139,35 +156,35 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="lbOptional">
        <property name="text">
         <string>Optional</string>
        </property>
       </widget>
      </item>
      <item row="1" column="2">
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="lbRejected">
        <property name="text">
         <string>Rejected</string>
        </property>
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="label_8">
+      <widget class="QLabel" name="lbUnfinished">
        <property name="text">
         <string>Unfinished</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLabel" name="label_9">
+      <widget class="QLabel" name="lbRunning">
        <property name="text">
         <string>Running</string>
        </property>
       </widget>
      </item>
      <item row="3" column="2">
-      <widget class="QLabel" name="label_10">
+      <widget class="QLabel" name="lbFinished">
        <property name="text">
         <string>Finished</string>
        </property>
