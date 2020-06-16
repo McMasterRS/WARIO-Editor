@@ -15,7 +15,7 @@ A flowchart based data pipeline development suit with an interface extended from
 
 ## Documentation
 
-Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/) and a local version is accessible from the help menu within WARIO
+Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/) and a local version is accessible from the help menu within the editor
 
 ## Prerequisites
 ```
@@ -23,10 +23,5 @@ Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/
 - PyQt5
 - PyQtWebEngine
 - Blinker
-- Graphviz
 - Wario
 ```
-
-REQUIRES THE USE OF THE TEST WARIO LIBRARY
-To install, use the command
-``` python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps wario

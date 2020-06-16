@@ -22,8 +22,7 @@ class HelpUI(QtWidgets.QWidget):
         self.setLayout(self.layout)
        
         # Build a tab for the default WARIO documentation held in the "docs" folder
-        self.buildTab(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "docs","_build", "html"), "WARIO")
-        
+        self.buildTab(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "docs","_build"), "WARIO")        
     
     # Build a tab based on a given toolkit URL and name
     def buildTab(self, path, name):

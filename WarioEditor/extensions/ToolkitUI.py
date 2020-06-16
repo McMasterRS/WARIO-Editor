@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
-import nodz.nodz_utils as utils
+import WarioEditor.nodz.nodz_utils as utils
 from wario.CustomWidgets import CentredCellCheckbox, UniqueNameTable
 
 import os

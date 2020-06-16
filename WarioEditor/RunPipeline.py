@@ -1,5 +1,5 @@
 from wario import PipelineThread
-from extensions.WalkTree import WalkTree
+from WarioEditor.extensions.WalkTree import WalkTree
 
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets

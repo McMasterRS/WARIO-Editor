@@ -1,8 +1,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-import nodz.nodz_main as nodz_main
-from RunPipeline import ThreadHandler
-from extensions.GenGraph import generateGraph
-from extensions.WarioSettings import WarioSettings
+import WarioEditor.nodz.nodz_main as nodz_main
+from WarioEditor.RunPipeline import ThreadHandler
+from WarioEditor.extensions.GenGraph import generateGraph
+from WarioEditor.extensions.WarioSettings import WarioSettings
 import sys, os, textwrap, importlib
 from blinker import signal
 

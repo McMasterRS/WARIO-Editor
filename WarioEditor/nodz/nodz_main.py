@@ -9,12 +9,12 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
-import nodz.nodz_utils as utils
+import WarioEditor.nodz.nodz_utils as utils
 
-from extensions.SettingsWindow import SettingsItem
-from extensions.GlobalUI import GlobalUI
-from extensions.HelpUI import HelpUI
-from extensions.ToolkitUI import ToolkitUI
+from WarioEditor.extensions.SettingsWindow import SettingsItem
+from WarioEditor.extensions.GlobalUI import GlobalUI
+from WarioEditor.extensions.HelpUI import HelpUI
+from WarioEditor.extensions.ToolkitUI import ToolkitUI
 
 defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
 
