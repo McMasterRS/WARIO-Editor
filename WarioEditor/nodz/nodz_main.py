@@ -15,6 +15,7 @@ from WarioEditor.extensions.SettingsWindow import SettingsItem
 from WarioEditor.extensions.GlobalUI import GlobalUI
 from WarioEditor.extensions.HelpUI import HelpUI
 from WarioEditor.extensions.ToolkitUI import ToolkitUI
+from WarioEditor.extensions.LoopBuilder import LoopBuilder
 
 defaultConfigPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
 
@@ -62,6 +63,9 @@ class Nodz(QtWidgets.QGraphicsView):
         # Global variables
         self.globalUI = GlobalUI(self)
         self.globals = []
+
+        # Loop Builder
+        self.loopUI = LoopBuilder(self)
         
         # Load nodz configuration.
         self.loadConfig(configPath)
