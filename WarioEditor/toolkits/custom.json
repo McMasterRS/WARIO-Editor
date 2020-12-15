@@ -1,0 +1,17 @@
+{
+    "node_types":{
+        "Custom": {
+            "preset": "node_default",
+            "file": "",
+            "alternate": true,
+            "position": "none",
+            "category": "Output",
+            "toolkit" : "custom",
+            "attributes": {},
+            "settings": {
+                "settingsFile" : "./toolkits/customNode.py",
+                "settingsClass" : "CustomNodeSettings"
+            }
+        }
+    }
+}

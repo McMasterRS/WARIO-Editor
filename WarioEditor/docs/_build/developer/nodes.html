@@ -1,0 +1,474 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Custom Nodes &mdash; WARIO 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Custom Settings" href="settings.html" />
+    <link rel="prev" title="Running The Pipeline" href="../user/pipeline.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> WARIO
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">WARIO Editor</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/userGuide.html">Using The WARIO Editor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/toolkits.html">Toolkits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/globals.html">Global Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Running The Pipeline</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Guide</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Custom Nodes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-node-class">The Node Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#node-i-o">Node I/O</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#settings-parameters">Settings parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-global-variables">Using Global Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-settings-class">The Settings Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-nodes">Example Nodes:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-1-list-merger-with-settings">Example 1: List merger with settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-2-batch-processing-node-class">Example 2: Batch processing node class</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Custom Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="globals.html">Custom Global Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolkits.html">Building Toolkits</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WARIO</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Custom Nodes</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/nodes.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="custom-nodes">
+<h1>Custom Nodes<a class="headerlink" href="#custom-nodes" title="Permalink to this headline">¶</a></h1>
+<p>Custom nodes require two core components to function, the Node class and the Settings class.</p>
+<hr class="docutils" />
+<div class="section" id="the-node-class">
+<h2>The Node Class<a class="headerlink" href="#the-node-class" title="Permalink to this headline">¶</a></h2>
+<p>All custom nodes must inheret from the Node class defined in the WARIO backend library. The name of the node class must match the name of the file containing it.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">wario.Node</span> <span class="kn">import</span> <span class="n">Node</span>
+</pre></div>
+</div>
+<p>Each node contains the following functions</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th align="center">Function</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">init</td>
+<td align="left">Initializes the node. Must have a call to the parent node class. Any global class variables <br>that are needed for the node's execution can be placed here. <br><br> This is also a good place to perform input validation on any parameters such as inputted <br>file strings.</td>
+</tr>
+<tr>
+<td align="center">start</td>
+<td align="left">Runs at beginning of pipeline after all nodes have been initialized</td>
+</tr>
+<tr>
+<td align="center">process</td>
+<td align="left">This is the primary function of the node and takes the inputs from connected nodes and <br>performs necessary operations on them before outputting the results.</td>
+</tr>
+<tr>
+<td align="center">end</td>
+<td align="left">This function runs on pipeline completion. It's particularly well suited to performing batch <br>processing where data is collected into a class variable during the "process" function.</td>
+</tr>
+<tr>
+<td align="center">reset</td>
+<td align="left">Reserved for later use</td>
+</tr>
+</tbody>
+</table><div class="section" id="node-i-o">
+<h3>Node I/O<a class="headerlink" href="#node-i-o" title="Permalink to this headline">¶</a></h3>
+<p>Data passed from child nodes can be accessed in the <code class="docutils literal notranslate"><span class="pre">self.args</span></code> node class variable but is only accessible during the “process” function call. This data is stored in a dict where the keys match the name of the relevant attribute of the node.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;Input Data&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>As there is no validation testing on the existance of attribute data (nodes are ran once all <em>connected</em> child nodes are complete), you can make certain attributs optional by checking their existance in the list returned from <code class="docutils literal notranslate"><span class="pre">self.args.keys()</span></code>, as seen in Example \1.</p>
+<p>The “process” function must return a dict of outputs, who’s keys match the names of the output attributes. While the attributes are given fixed types to avoid errors when building a pipeline, there is no limitation on what data can be sent through them.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Output Data&quot;</span> <span class="p">:</span> <span class="n">outputData</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="settings-parameters">
+<h3>Settings parameters<a class="headerlink" href="#settings-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Parameters calculated by the settings window are stored as a dict in the <code class="docutils literal notranslate"><span class="pre">self.parameters</span></code> variable. This is accessabile from initialization of the node onwards.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;showGraph&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-global-variables">
+<h3>Using Global Variables<a class="headerlink" href="#using-global-variables" title="Permalink to this headline">¶</a></h3>
+<p>Global variables are assigned to the node before the “process” function call and then any changes are extracted once the function is complete. these variables are stored as a dict in the <code class="docutils literal notranslate"><span class="pre">self.global_vars</span></code> class variable. The name if the global variable matches that shown in the global variables window in WARIO. While global variables used in toolkits are automatically inserted upon toolkit activation, any required for custom nodes must be added manually.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">globalFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_vars</span><span class="p">[</span><span class="s2">&quot;Global File&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Global variables can be modified as a part of any node’s “process” function, but attempting to modify a global variable marked as constant will cause an error, resulting in the pipeline execution aborting.</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="the-settings-class">
+<h2>The Settings Class<a class="headerlink" href="#the-settings-class" title="Permalink to this headline">¶</a></h2>
+<p>The settings class works in much the same way as described in the <a class="reference internal" href="settings.html"><span class="doc">Custom Settings</span></a> page with one small addition. As the node’s attributes arent being pulled from a config file, a dict describing them must be included in the settings class inside the “getAttribs” function. Attributes are defined in the same format as described in <a class="reference internal" href="toolkits.html"><span class="doc">Building Toolkits</span></a>. An example of the getAttribs function is shown below</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>
+    <span class="k">def</span> <span class="nf">getAttribs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">attribs</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;Data&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;preset&quot;</span><span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;plug&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;socket&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;csv&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                
+        <span class="k">return</span> <span class="n">attribs</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="example-nodes">
+<h2>Example Nodes:<a class="headerlink" href="#example-nodes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="example-1-list-merger-with-settings">
+<h3>Example 1: List merger with settings<a class="headerlink" href="#example-1-list-merger-with-settings" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">wario.Node</span> <span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span> <span class="nn">extensions.customSettings</span> <span class="kn">import</span> <span class="n">CustomSettings</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">QtWidgets</span>
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">QtCore</span>
+
+<span class="k">class</span> <span class="nc">MergeListsSettings</span><span class="p">(</span><span class="n">CustomSettings</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MergeListsSettings</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">buildUI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">delDuplicates</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s2">&quot;Delete Duplicates&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delDuplicates</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;deleteDuplicates&quot;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delDuplicates</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;deleteDuplicates&quot;</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">genSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="nb">vars</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">]</span>
+        <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;settingsClass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;settingsClass&quot;</span><span class="p">]</span>
+        
+        <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;deleteDuplicates&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delDuplicates</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>
+        <span class="nb">vars</span><span class="p">[</span><span class="s2">&quot;deleteDuplicates&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delDuplicates</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="nb">vars</span>
+        
+    <span class="k">def</span> <span class="nf">getAttribs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attribs</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;List 1&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;preset&quot;</span><span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;plug&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;socket&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;List2&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;preset&quot;</span><span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;plug&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;socket&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;List 3&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;preset&quot;</span><span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;plug&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;socket&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;List 4&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;preset&quot;</span><span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;plug&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;socket&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;Merged List&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;preset&quot;</span><span class="p">:</span> <span class="s2">&quot;attr_preset_1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;plug&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;socket&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                
+        <span class="k">return</span> <span class="n">attribs</span>
+
+<span class="k">class</span> <span class="nc">mergeLists</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">mergeLists</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="c1"># Check each input attribute for a list</span>
+        <span class="c1"># Allows for any number of the 4 nodes to be used</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;List </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;List </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+                
+        <span class="c1"># Delete duplicates if the setting is checked</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;deleteDuplicates&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="nb">list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">list</span><span class="p">))</span>
+                
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Merged List&quot;</span> <span class="p">:</span> <span class="nb">list</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-2-batch-processing-node-class">
+<h3>Example 2: Batch processing node class<a class="headerlink" href="#example-2-batch-processing-node-class" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">wario.Node</span> <span class="kn">import</span> <span class="n">Node</span>
+
+<span class="k">class</span> <span class="nc">batchAvSignal</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">batchAvSignal</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span> <span class="o">=</span> <span class="p">[]</span>
+        
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">evoked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;Evoked Data&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">evoked</span><span class="p">)</span>
+   
+        <span class="k">return</span>
+        
+    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="c1"># Get array sizes that I need</span>
+        <span class="n">numArrays</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="p">)</span>
+        <span class="n">numEvents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">numChannels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">numTimes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        
+        <span class="c1"># Important information for later</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span>
+        <span class="n">chNames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;ch_names&quot;</span><span class="p">]</span>
+        <span class="n">eventNames</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">comment</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        
+        <span class="c1"># Setup 4D numpy array to hold data</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">numEvents</span><span class="p">,</span> <span class="n">numChannels</span><span class="p">,</span> <span class="n">numTimes</span><span class="p">,</span> <span class="n">numArrays</span><span class="p">))</span>
+
+        <span class="c1"># Transform data into required format</span>
+        <span class="c1"># All subjects for all times for all channels for all events</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">evokedArray</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evokedArrays</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">evoked</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">evokedArray</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">evoked</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                    
+        <span class="c1"># data transformation makes getting statistics trivial</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">stdevs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+        
+        <span class="c1"># Save data as numpy data structure</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;toggleSaveData&quot;</span><span class="p">]:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;saveGraphData&quot;</span><span class="p">]</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">chNames</span> <span class="o">=</span> <span class="n">chNames</span><span class="p">,</span>
+                        <span class="n">eventNames</span> <span class="o">=</span> <span class="n">eventNames</span><span class="p">,</span>
+                        <span class="n">times</span> <span class="o">=</span> <span class="n">times</span><span class="p">,</span>
+                        <span class="n">mean</span> <span class="o">=</span> <span class="n">means</span><span class="p">,</span>
+                        <span class="n">std</span> <span class="o">=</span> <span class="n">stdevs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="settings.html" class="btn btn-neutral float-right" title="Custom Settings" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../user/pipeline.html" class="btn btn-neutral float-left" title="Running The Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, McMaster University
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

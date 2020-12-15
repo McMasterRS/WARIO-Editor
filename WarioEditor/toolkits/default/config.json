@@ -1,0 +1,431 @@
+{
+    "name" : "default",
+    "docs" : "",
+    "global_variables" : {
+    },
+
+    "node_types":{
+        "Get Global": {
+            "file": "getGlobal.py",
+            "category": "Input",
+            "attributes": {},
+            "settings": {
+                "global" : {
+                    "text" : "Global Variable",
+                    "type" : "globalbox",
+                    "params" : {
+                        "value" : "",
+                        "loaded" : false
+                    }
+                }
+            }
+        },
+        "Set Global": {
+            "preset": "node_default",
+            "file": "setGlobal.py",
+            "category": "Output",
+            "toolkit" : "default",
+            "attributes": {},
+            "settings": {
+                "global" : {
+                    "text" : "Global Variable",
+                    "type" : "globalbox",
+                    "params" : {
+                        "value" : "",
+                        "loaded" : false
+                    }
+                }
+            }
+        },
+        "Import CSV": {
+            "preset": "node_default",
+            "file": "importCSV.py",
+            "category": "Input",
+            "toolkit" : "default",
+            "attributes": {
+                "Data": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "csv"
+                }
+            },
+            "settings" : {
+                
+            }
+        },
+        "Random Integer In": {
+            "preset": "node_default",
+            "file": "randomInt.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Input",
+            "toolkit" : "default",
+            "attributes": {
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "settings" : {
+                "min" : {
+                    "text"   : "Minimum value",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : -2147483648,
+                        "maximum" : 2147483647,
+                        "value"   : 0
+                    }
+                },
+                "max" : {
+                    "text"   : "Maximum value",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : -2147483648,
+                        "maximum" : 2147483647,
+                        "value"   : 1
+                    }
+                }
+            }
+        },
+        "Random Float In": {
+            "preset": "node_default",
+            "file": "randomFloat.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Input",
+            "toolkit" : "default",
+            "attributes": {
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "float"
+                }
+            },
+            "settings" : {
+                "min" : {
+                    "text"   : "Minimum value",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : -2147483648,
+                        "maximum" : 2147483647,
+                        "value"   : 0
+                    }
+                },
+                "max" : {
+                    "text"   : "Maximum value",
+                    "type"   : "spinbox",
+                    "params" : {
+                        "minimum" : -2147483648,
+                        "maximum" : 2147483647,
+                        "value"   : 1
+                    }
+                }
+            }
+        },
+        "Integer Out": {
+            "preset": "node_default",
+            "file": "intOut.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Output",
+            "toolkit" : "default",
+            "attributes": {
+                "In": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                }
+            },
+            "settings" : {}
+        },
+        "Float Out": {
+            "preset": "node_default",
+            "file": "floatOut.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Output",
+            "toolkit" : "default",
+            "attributes": {
+                "In": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "float"
+                }
+            },
+            "settings": {}
+        },
+        "Integer Adder": {
+            "preset": "node_default",
+            "file": "intAdder.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Operator",
+            "toolkit" : "default",
+            "attributes": {
+                "In A": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "In B": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "settings" : {}
+        },
+        "Integer Multiplier": {
+            "preset": "node_default",
+            "file": "intMultiplier.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Operator",
+            "toolkit" : "default",
+            "attributes": {
+                "In A": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "In B": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "settings" : {}
+        },
+        "Integer Divider(R)": {
+            "preset": "node_default",
+            "file": "intDividerR.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Operator",
+            "toolkit" : "default",
+            "attributes": {
+                "Numerator": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Denominator": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                },
+                "Remainder": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "settings": {}
+        },
+        "Integer Divider(F)": {
+            "preset": "node_default",
+            "file": "intDividerF.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Operator",
+            "toolkit" : "default",
+            "attributes": {
+                "Numerator": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Denominator": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "float"
+                }
+            },
+            "settings": {}
+        },
+        "Integer Subtractor": {
+            "preset": "node_default",
+            "file": "intSubtractor.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Operator",
+            "toolkit" : "default",
+            "attributes": {
+                "In A": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "In B": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Out": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "settings": {}
+        },
+        "Float to Integer": {
+            "preset": "node_default",
+            "file": "floatToInt.py",
+            "alternate": true,
+            "position": "none",
+            "category": "Operator",
+            "toolkit" : "default",
+            "attributes": {
+                "Float": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "float"
+                },
+                "Integer": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "int"
+                }
+            },
+            "settings": {}
+        },
+        "Integer to Float": {
+            "preset": "node_default",
+            "file": "intToFloat",
+            "alternate": true,
+            "position": "none",
+            "category": "Operator",
+            "toolkit" : "default",
+            "attributes": {
+                "Integer": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": "int"
+                },
+                "Float": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "float"
+                }
+            },
+            "settings": {}
+        },
+        "Merge Lists": {
+            "file": "mergeLists",
+            "category": "Utility",
+            "attributes" : {
+                "List 1": {
+                    "connection" : "input",
+                    "type": ["list"]
+                },
+                "List 2": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"]
+                },
+                "List 3": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"]
+                },
+                "List 4": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": false,
+                    "socket": true,
+                    "type": ["list"]
+                },
+                "Merged List": {
+                    "index": -1,
+                    "preset": "attr_preset_1",
+                    "plug": true,
+                    "socket": false,
+                    "type": "list"
+                }
+            },
+            "settings" : {
+                "delduplicates" : {
+                    "text"   : "Delete Duplicates",
+                    "type"   : "checkbox",
+                    "params" : {}
+                }
+            }
+        }
+    }
+}

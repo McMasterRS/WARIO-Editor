@@ -1,4 +1,10 @@
 __pycache__
 *.pyc
+*.prof
 saves
-*toolkitConfig.json
+wariotmp
+toolkitConfig.json
+editorConfig.json
+build
+dist
+WARIO_Editor.egg-info
