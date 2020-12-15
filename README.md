@@ -2,7 +2,7 @@
 
 A flowchart based data pipeline development suit with an interface extended from the [Nodz](https://github.com/LeGoffLoic/Nodz) library.
 
-![Wario Example](https://github.com/McMasterRS/WARIO-Editor/tree/master/docs/Images/WARIO_example.png)
+![Wario Example](https://github.com/McMasterRS/WARIO-Editor/blob/master/WarioEditor/docs/Images/WARIO_example.png)
 
 ## Features
 * Easy to use flowchart system to create and connect nodes
