@@ -25,6 +25,15 @@ These are required to compile the documentation. All can be pip installed.
 * sphinx-markdown-tables  
 * recommonmark
 
+Updating Documentation
+----------------------
+
+The documentation can be re-compiled by running the following command inside the WarioEditor\docs folder::
+
+   sphinx-build . _build
+
+Any changes pushed to the master branch should be updated on the readthedocs wiki shortly after
+
 .. toctree::
    :hidden: 
    :maxdepth: 2

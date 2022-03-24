@@ -18,7 +18,7 @@ Only toolkits with the "Display" checkbox checked show under the toolkits menu.
 
 By default, only the custom node is activated 
 
-Clicking the toolkits listed under the Toolkits menu sets them either active (checked) or inactive (unchecked). Whena activated, the nodes included in the toolkit can be added to the flowchart. The user cannot set a toolkit inactive after using one of its nodes in the pipeline.
+Clicking the toolkits listed under the Toolkits menu sets them either active (checked) or inactive (unchecked). When activated, the nodes included in the toolkit can be added to the flowchart. The user cannot set a toolkit inactive after using one of its nodes in the pipeline.
 
 ![GIF showing how to activate toolkits](../Images/activatedToolkits.gif)
 

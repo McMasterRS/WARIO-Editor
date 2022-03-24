@@ -3,11 +3,11 @@
 Pipeline-wide custom variables
 
 ## Adding Global Variables
-Global variables can be accessed by all nodes during pipeline execution. They are defined in the global variables window, accessible in the Edit menu or by the shortcut given above.  
+Global variables can be accessed by all nodes during pipeline execution. They are defined in the global variables window and can be accessed in the Edit menu or by the shortcut given above.  
 
 ![](../Images/globalWindow.png)
 
-The buttons at the bottom can be used to add or remove global variables. Be aware that removing a global variable will remove any connections from nodes using that variable. Each variable has \4 components:
+The buttons at the bottom can be used to add or remove global variables. Be aware that removing a global variable will remove any connections from nodes using that variable. Each variable has 4 components:
 
 * A Unique name
 * The Data type 
