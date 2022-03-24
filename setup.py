@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="WARIO Editor",
-    version="0.1.2",
+    version="1.0.1",
     author="Thomas Mudway, Oliver Cook, Ron Harwood",
     description="Pipeline editor and front end for WARIO",
     long_description=long_description,
@@ -25,6 +25,7 @@ setuptools.setup(
         'PyQt5',
         'PyQtWebEngine',
         'blinker',
+        'graphviz',
         'wario'
     ],
     python_requires='>=3.6',
