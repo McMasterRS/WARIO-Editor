@@ -1,2 +1,3 @@
 sphinx_markdown_tables
 Sphinx~=4.4.0
+recommonmark
