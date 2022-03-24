@@ -28,8 +28,9 @@ These are required to compile the documentation. All can be pip installed.
 Updating Documentation
 ----------------------
 
-The documentation can be re-compiled by running `sphinx-build . _build` inside the WarioEditor\docs folder
+The documentation can be re-compiled by running the following command inside the WarioEditor\docs folder::
 
+   sphinx-build . _build
 
 Any changes pushed to the master branch should be updated on the readthedocs wiki shortly after
 
