@@ -17,11 +17,18 @@ A flowchart based data pipeline development suit with an interface extended from
 
 Documentation is hosted on [readthedocs](https://wario.readthedocs.io/en/latest/) and a local version is accessible from the help menu within the editor
 
-## Prerequisites
+## Installation
+
+1. download and unzip the WARIO Editor
+2. Install the editor and its requirements as a module by navigating to the WARIO Editor folder and running `pip install .`
+3. Run pip -m WarioEditor
+
+## Requirements
 ```
 - Python 3
 - PyQt5
 - PyQtWebEngine
 - Blinker
+- Graphviz
 - Wario
 ```
