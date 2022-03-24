@@ -1517,7 +1517,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
 
         """
         if self.attrCount > 0:
-            return (self.baseHeight +
+            return int(self.baseHeight +
                     self.attrHeight * self.attrCount +
                     self.border +
                     0.5 * self.radius)
@@ -1545,8 +1545,8 @@ class NodeItem(QtWidgets.QGraphicsItem):
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable)
 
         # Dimensions.
-        self.baseWidth  = config['node_width']
-        self.baseHeight = config['node_height']
+        self.baseWidth  = int(config['node_width'])
+        self.baseHeight = int(config['node_height'])
         self.attrHeight = config['node_attr_height']
         self.border = config['node_border']
         self.radius = config['node_radius']
@@ -1761,7 +1761,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
         metrics = QtGui.QFontMetrics(painter.font())
         text_width = metrics.boundingRect(self.name).width() + 14
         text_height = metrics.boundingRect(self.name).height() + 14
-        margin = (text_width - self.baseWidth) * 0.5
+        margin = int((text_width - self.baseWidth) * 0.5)
         textRect = QtCore.QRect(-margin,
                                 -text_height,
                                 text_width,
@@ -1780,7 +1780,7 @@ class NodeItem(QtWidgets.QGraphicsItem):
             config = nodzInst.config
 
             # Attribute rect.
-            rect = QtCore.QRect(self.border / 2,
+            rect = QtCore.QRect(int(self.border / 2),
                                 self.baseHeight - self.radius + offset,
                                 self.baseWidth - self.border,
                                 self.attrHeight)
@@ -2149,13 +2149,13 @@ class PlugItem(SlotItem):
         The bounding rect based on the width and height variables.
 
         """
-        width = height = self.parentItem().attrHeight / 2.0
+        width = height = int(self.parentItem().attrHeight / 2.0)
 
         nodzInst = self.scene().views()[0]
         config = nodzInst.config
 
-        x = self.parentItem().baseWidth - (width / 2.0)
-        y = (self.parentItem().baseHeight - config['node_radius'] +
+        x = self.parentItem().baseWidth - int(width / 2.0)
+        y = int(self.parentItem().baseHeight - config['node_radius'] +
              self.parentItem().attrHeight / 4 +
              self.parentItem().attrs.index(self.attribute) * self.parentItem().attrHeight)
 
@@ -2270,13 +2270,13 @@ class SocketItem(SlotItem):
         The bounding rect based on the width and height variables.
 
         """
-        width = height = self.parentItem().attrHeight / 2.0
+        width = height = int(self.parentItem().attrHeight / 2.0)
 
         nodzInst = self.scene().views()[0]
         config = nodzInst.config
 
-        x = - width / 2.0
-        y = (self.parentItem().baseHeight - config['node_radius'] +
+        x = - int(width / 2.0)
+        y = int(self.parentItem().baseHeight - config['node_radius'] +
             (self.parentItem().attrHeight/4) +
              self.parentItem().attrs.index(self.attribute) * self.parentItem().attrHeight )
 

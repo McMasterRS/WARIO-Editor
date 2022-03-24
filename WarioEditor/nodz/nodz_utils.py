@@ -38,7 +38,7 @@ def _convertDataToColor(data=None, alternate=False, av=20):
         color = QtGui.QColor(data[0], data[1], data[2], data[3])
         if alternate:
             mult = _generateAlternateColorMultiplier(color, av)
-            color = QtGui.QColor(data[0]-(av*mult), data[1]-(av*mult), data[2]-(av*mult), data[3])
+            color = QtGui.QColor(int(data[0]-(av*mult)), int(data[1]-(av*mult)), int(data[2]-(av*mult)), data[3])
         return color
 
     # wrong
@@ -83,8 +83,8 @@ def _createPointerBoundingBox(pointerPos, bbSize):
     point = pointerPos
 
     mbbPos = point
-    point.setX(point.x() - bbSize / 2)
-    point.setY(point.y() - bbSize / 2)
+    point.setX(int(point.x() - bbSize / 2))
+    point.setY(int(point.y() - bbSize / 2))
 
     size = QtCore.QSize(bbSize, bbSize)
     bb = QtCore.QRect(mbbPos, size)

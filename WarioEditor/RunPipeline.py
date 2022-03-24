@@ -74,7 +74,7 @@ class ThreadHandler(QtWidgets.QWidget):
         
     # Updates progress bar based on number of completed nodes
     def updateProgress(self):
-        self.progress.setValue(100 * (self.nodeCount) / self.numNodes)
+        self.progress.setValue(int(100 * (self.nodeCount) / self.numNodes))
     
     # Changes status text to the given colour
     def updatePalette(self, color):
